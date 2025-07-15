@@ -1,0 +1,1 @@
+import{m as s,o as t,w as e,d as a,N as r,bf as o,M as n}from"./index-BA4ml571.js";const d={__name:"ChangePassword.mdl",setup(c){return(l,u)=>(t(),s(n,null,{default:e(()=>[a(r,{class:"",size:"xs",title:"Change Your Password",subtitle:"Keep your account secure by setting a new password."},{default:e(()=>[a(o)]),_:1})]),_:1}))}};export{d as default};

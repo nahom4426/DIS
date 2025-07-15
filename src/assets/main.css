@@ -1,0 +1,53 @@
+@import './base.css';
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  }
+}
+:root {
+  /* Primary color */
+  --primary: 59, 130, 246; /* blue-500 equivalent */
+  
+  /* Secondary color */
+  --secondary: 99, 102, 241; /* indigo-500 equivalent */
+  
+  /* Other color variables from your config */
+  --toast: 255, 255, 255;
+  --text-clr: 31, 41, 55;
+  --accent: 139, 92, 246;
+  --base-clr: 249, 250, 251;
+  --base-clr2: 243, 244, 246;
+  --base-clr3: 229, 231, 235;
+  --base-clr-4: 209, 213, 219;
+  --dark: 17, 24, 39;
+  --error: 239, 68, 68;
+}
