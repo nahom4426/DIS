@@ -18,7 +18,7 @@ export default {
         "base-clr3": "rgba(var(--base-clr3) / <alpha-value>)",
         "base-clr-4": "rgba(var(--base-clr-4) / <alpha-value>)",
         dark: "rgba(var(--dark) / <alpha-value>)",
-        error: "rgba(var(--error) / <alpha-value>)",
+        error: "rgba(239, 68, 68, 0.8)",      /* Softer error color */
       },
       fontSize: {
         lg: ["1.25rem", "1.75rem"],

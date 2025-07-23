@@ -56,17 +56,21 @@ const toggleMenu = (name) => {
 
 <template>
   <div
-    class="h-full rounded-2xl w-drawer-width bg-white overflow-auto space-y-4 transition-all duration-300 flex flex-col"
+    class="h-full rounded-2xl w-drawer-width bg-white overflow-auto space-y-4 transition-all duration-300 flex flex-col relative"
   >
-    <div
-      @click="
-        isCollapsed ? props.toggleSidebar(true) : props.toggleSidebar(false)
-      "
-      :class="isCollapsed ? 'rotate-180' : ''"
-      class="size-6 cursor-pointer rounded-full border shadow-s flex items-center justify-center border-[#F6F7FA] top-left bg-white"
+    <!-- Standard Collapse Button -->
+    <button
+      @click="props.toggleSidebar(!isCollapsed)"
+      class="absolute -right-3 top-6 z-10 w-6 h-6 bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center hover:bg-gray-50"
+      :title="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
     >
-      <i v-html="icons.chevron_left"></i>
-    </div>
+      <i 
+        v-html="icons.chevron_left" 
+        :class="isCollapsed ? 'rotate-180' : ''"
+        class="text-gray-600 text-sm transition-transform duration-200"
+      ></i>
+    </button>
+
     <div class="space-y-4 flex-shrink-0">
       <div class="flex gap-2 py-4 w-1/3 items-center justify-center">
         <img

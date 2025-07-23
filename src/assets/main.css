@@ -37,8 +37,8 @@ a,
   /* Primary color */
   --primary: 148, 97, 253; /* #9461FD */
   
-  /* Secondary color */
-  --secondary: 99, 102, 241; /* indigo-500 equivalent */
+  /* Secondary color - Softer */
+  --secondary: #818cf8;  /* Softer indigo */
   
   /* Other color variables from your config */
   --toast: 255, 255, 255;

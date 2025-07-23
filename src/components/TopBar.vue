@@ -24,32 +24,32 @@ const props = defineProps({
 const router = useRouter();
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
-const showThemeSelector = ref(false);
-const showNotifications = ref(false);
+
+// Notifications
 const notifications = ref([
   {
     id: 1,
-    title: "Low Stock Alert",
-    message: "Amoxicillin 500mg is running low on stock",
-    time: "10 minutes ago",
-    read: false,
-    type: "warning"
+    title: "New Order",
+    message: "Order #1234 has been placed",
+    time: "2 min ago",
+    type: "info",
+    read: false
   },
   {
     id: 2,
-    title: "Expiry Alert",
-    message: "5 drugs will expire within 30 days",
-    time: "2 hours ago",
-    read: false,
-    type: "danger"
+    title: "Low Stock Alert",
+    message: "Paracetamol is running low",
+    time: "1 hour ago",
+    type: "warning",
+    read: false
   },
   {
     id: 3,
-    title: "New Order Received",
-    message: "New purchase order #12345 has been created",
-    time: "Yesterday",
-    read: true,
-    type: "info"
+    title: "System Update",
+    message: "System will be updated tonight",
+    time: "3 hours ago",
+    type: "info",
+    read: true
   }
 ]);
 
@@ -57,9 +57,10 @@ const unreadCount = computed(() => {
   return notifications.value.filter(n => !n.read).length;
 });
 
+// User profile computed properties
 const userInitials = computed(() => {
-  const user = authStore.user;
-  if (!user) return "U";
+  const user = authStore.auth?.user;
+  if (!user) return "";
   
   const firstName = user.firstName || "";
   const lastName = user.lastName || user.fatherName || "";
@@ -68,28 +69,37 @@ const userInitials = computed(() => {
 });
 
 const userFullName = computed(() => {
-  const user = authStore.user;
-  if (!user) return "User";
+  const user = authStore.auth?.user;
+  if (!user) return "";
   
-  return `${user.firstName || ""} ${user.lastName || user.fatherName || ""}`.trim();
+  const fullName = `${user.firstName || ""} ${user.lastName || user.fatherName || ""}`.trim();
+  return fullName;
 });
 
 const userRole = computed(() => {
-  return authStore.user?.roleName || "User";
+  return authStore.auth?.user?.roleName || "";
 });
 
 function markAllAsRead() {
   notifications.value = notifications.value.map(n => ({...n, read: true}));
 }
 
+function goToProfile() {
+  router.push("/profile");
+}
+
 function logout() {
+  // Clear user session/token
   localStorage.removeItem("userDetail");
+  localStorage.removeItem("authToken");
+  authStore.setAuth(null);
+  
+  // Redirect to login screen
   router.push("/login");
 }
 
 function changeTheme(themeId) {
   themeStore.setTheme(themeId);
-  showThemeSelector.value = false;
 }
 </script>
 

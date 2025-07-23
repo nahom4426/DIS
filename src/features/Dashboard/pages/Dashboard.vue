@@ -11,9 +11,6 @@ import LoopChart from "@/components/charts/LoopChart.vue";
 import LineChart from "@/components/charts/LineChart.vue";
 import DoughnutChart from "@/components/charts/DoughnutChart.vue";
 import Table from "@/components/Table.vue";
-import Progress_row from "../components/Progress_row.vue";
-import StackedBarChart from "@/components/charts/StackedBarChart.vue";
-import CardDashboard from "../components/CardDashboard.vue";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
@@ -60,6 +57,17 @@ const data = ref([
     percent: "15.3%",
     customClass: "bg-[#E6F7FF]",
   },
+  {
+    id: "DI004",
+    patientName: "Robert Wilson",
+    requestType: "Other",
+    question: "Contraindications for cardiac patients",
+    priority: "Normal",
+    status: "Pending Review",
+    submittedAt: "2024-01-14 14:20",
+    responseNeeded: "When time permits",
+    assignedTo: "Dr. Amanda Ross"
+  }
 ]);
 
 // Top performing providers
@@ -176,10 +184,35 @@ const quickStats = computed(() => ({
   todayRequests: data.value[3].amount,
 }));
 
-onMounted(() => {
-  fetchChartData();
-});
+function getPriorityColor(priority) {
+  switch(priority) {
+    case 'Urgent': return 'bg-red-100 text-red-800';
+    case 'High': return 'bg-orange-100 text-orange-800';
+    case 'Normal': return 'bg-blue-100 text-blue-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
+function getInquiryStatusColor(status) {
+  switch(status) {
+    case 'Completed': return 'bg-green-100 text-green-800';
+    case 'In Progress': return 'bg-blue-100 text-blue-800';
+    case 'Pending Review': return 'bg-yellow-100 text-yellow-800';
+    case 'Overdue': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
+function getRequestTypeColor(type) {
+  switch(type) {
+    case 'Patient Specific': return 'bg-purple-100 text-purple-800';
+    case 'Academic': return 'bg-indigo-100 text-indigo-800';
+    case 'Other': return 'bg-gray-100 text-gray-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
 </script>
+
 <template>
   <div class="flex flex-col gap-6 w-full overflow-x-hidden scrollbar-hide">
     <!-- Welcome Card -->

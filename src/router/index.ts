@@ -11,7 +11,7 @@ import adminRoutes from "./admin.routes";
 import providerRoutes from "./Provider.routes";
 
 
-import Profile from "@/features/profile/pages/profile.vue";
+import Profile from '@/views/Profile.vue'
 
 function addMetaToRoutes(routes) {
   return routes.map(route => {
