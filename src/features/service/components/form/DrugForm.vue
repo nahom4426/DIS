@@ -54,16 +54,6 @@ console.log(props.drugs);
     />
 
     <Input
-      name="price"
-      validation="required"
-      label="Price"
-      :value="props.drugs?.price || ''"
-      :attributes="{
-        placeholder: 'Price',
-      }"
-    />
-
-    <Input
       name="dosage"
       validation="required"
       label="Dosage"
@@ -73,13 +63,77 @@ console.log(props.drugs);
       }"
     />
     <Input
-      name="manufacturer"
+      name="storage"
       validation="required"
-      label="Manufacturer"
-      :value="props.drugs?.manufacturer || ''"
+      label="Storage"
+      :value="props.drugs?.storage || ''"
       :attributes="{
-        placeholder: 'Manufacturer',
+        placeholder: 'Storage Requirements',
       }"
     />
+    <Input
+      name="indication"
+      validation="required"
+      label="Indication"
+      :value="props.drugs?.indication || ''"
+      :attributes="{
+        placeholder: 'Drug Indication',
+      }"
+    />
+
+    <div class="col-span-3">
+      <Textarea
+        name="caution"
+        label="Caution"
+        :value="props.drugs?.caution || ''"
+        :attributes="{
+          placeholder: 'Enter Caution Information',
+        }"
+      />
+    </div>
+
+    <div class="col-span-3">
+      <Textarea
+        name="drugInteraction"
+        label="Drug Interaction"
+        :value="props.drugs?.drugInteraction || ''"
+        :attributes="{
+          placeholder: 'Enter Drug Interaction Details',
+        }"
+      />
+    </div>
+
+    <div class="col-span-3">
+      <Textarea
+        name="contraindication"
+        label="Contraindication"
+        :value="props.drugs?.contraindication || ''"
+        :attributes="{
+          placeholder: 'Enter Contraindication Information',
+        }"
+      />
+    </div>
+
+    <div class="col-span-3">
+      <Textarea
+        name="sideEffects"
+        label="Side Effects"
+        :value="props.drugs?.sideEffects || ''"
+        :attributes="{
+          placeholder: 'Enter Side Effects',
+        }"
+      />
+    </div>
+
+    <div class="col-span-3">
+      <Textarea
+        name="doseAdministration"
+        label="Dose & Administration"
+        :value="props.drugs?.doseAdministration || ''"
+        :attributes="{
+          placeholder: 'Enter Dose & Administration Guidelines',
+        }"
+      />
+    </div>
   </Form>
 </template>

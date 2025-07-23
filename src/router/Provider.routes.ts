@@ -9,12 +9,12 @@ export default [
 		component: createinstitution
 	},
 	{
-		path: '/payer_list',
-		name: 'Active Institution',
+		path: '/drug-management',
+		name: 'Drug Management',
 		component: ActiveInstitution,
 		meta: {
 		  requiresAuth: true,
-		  privilege: ['CREATE_USER'], // Changed from privileges to privilege to match what the router checks
+		  privilege: ['Create Employees'],
 		},
 	},
 	{

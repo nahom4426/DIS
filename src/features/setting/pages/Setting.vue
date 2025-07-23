@@ -13,6 +13,7 @@ function setTheme(color) {
 
 // Correctly define the colors array using ref
 const colors = ref([
+  { color: "purple" }, // Changed to purple for #9461FD
   { color: "orange" },
   { color: "brown" },
   { color: "violet" },

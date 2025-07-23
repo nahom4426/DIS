@@ -102,8 +102,8 @@ async function handleSubmit(formValues: any) {
     <NewFormParent 
       class="" 
       size="lg" 
-      title="New Payer" 
-      subtitle="To add a new payer, please fill out the information in the fields below."
+      title="New Provider" 
+      subtitle="To add a new provider, please fill out the information in the fields below."
     >
       <div class="bg-white rounded-lg">
         <InstitutionFormDataProvider ref="formDataProvider">

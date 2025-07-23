@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 :root {
-  --primary: 2 103 107;
+  --primary: 148 97 253;  /* #9461FD */
   --secondary: 223 241 241;
   --toast: 76 187 23;
   --dark: 51 51 51;
@@ -18,8 +18,8 @@
   --navbar-height: 5rem;
 }
 
-.orange {
-  --primary: 253 116 1;
+.purple {
+  --primary: 148 97 253;  /* #9461FD */
 }
 .brown {
   --primary: 187 93 39;
@@ -28,7 +28,7 @@
   --primary: 81 21 140;
 }
 .forestGreen {
-  --primary: 37 110 21;
+  --primary: 148 97 253;  /* #9461FD */
 }
 .deepskyblue {
   --primary: 0 191 255;

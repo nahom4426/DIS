@@ -7,7 +7,7 @@ export default {
         sans: ['"Inter Tight"', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
       colors: {
-   primary: "rgba(2, 138, 15, <alpha-value>)",          // Rich green
+        primary: "rgba(148, 97, 253, <alpha-value>)",          // #9461FD
         secondary: "rgba(32, 99, 169, <alpha-value>)",       // Cool blue
         toast: "rgba(255, 193, 7, <alpha-value>)",  
 

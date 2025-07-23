@@ -68,16 +68,16 @@ const toggleMenu = (name) => {
       <i v-html="icons.chevron_left"></i>
     </div>
     <div class="space-y-4 flex-shrink-0">
-      <div class="flex gap-2 py-4 w-full items-center justify-center">
+      <div class="flex gap-2 py-4 w-1/3 items-center justify-center">
         <img
-          class="size-8"
-          src="/src/assets/logo.svg"
+          class="size-15"
+          src="/src/assets/edislogo.png"
           alt="DIS Logo"
         />
         <span
           v-if="!props.isCollapsed"
           class="text-md font-bold days-one text-primary"
-          >DrugInformationSystem</span
+          >.</span
         >
       </div>
       <div class="border border-b border-[#F6F7FA]"></div>

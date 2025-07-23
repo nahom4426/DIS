@@ -78,11 +78,14 @@
 
 /* Theme Variants */
 .theme-medical {
-  --primary-500: 16 185 129;
-  --primary-600: 5 150 105;
-  --primary-700: 4 120 87;
-  --accent-500: 59 130 246;
+  --primary-500: 148 97 253;  /* #9461FD */
+  --primary-600: 126 34 206;  /* Darker purple */
+  --primary-700: 109 40 217;  /* Even darker purple */
 }
+
+/* Change accent colors */
+--accent-500: 148 97 253;     /* #9461FD */
+--success: 148 97 253;        /* #9461FD */
 
 .theme-pharmacy {
   --primary-500: 139 69 19;

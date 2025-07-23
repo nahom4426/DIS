@@ -46,8 +46,8 @@ function remove(id) {
         :pending="pending"
         :rows="drugs"
         :headers="{
-          head: ['Code', 'Drug Name', 'Price (ETB)', 'Status', 'actions'],
-          row: ['drugCode', 'drugName', 'price', 'status'],
+          head: ['Drug Name', 'Drug Code', 'Category', 'Dosage', 'Storage', 'Status', 'Actions'],
+          row: ['drugName', 'drugCode', 'category', 'dosage', 'storage', 'status'],
         }"
       >
         <template #actions="{ row }">
