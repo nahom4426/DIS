@@ -34,20 +34,20 @@ a,
   }
 }
 :root {
-  /* Primary color */
-  --primary: 59, 130, 246; /* blue-500 equivalent */
+  /* Primary color - Muted */
+  --primary: #a78bfa;  /* Lighter purple */
   
-  /* Secondary color */
-  --secondary: 99, 102, 241; /* indigo-500 equivalent */
+  /* Secondary color - Softer */
+  --secondary: #818cf8;  /* Softer indigo */
   
-  /* Other color variables from your config */
-  --toast: 255, 255, 255;
-  --text-clr: 31, 41, 55;
-  --accent: 139, 92, 246;
-  --base-clr: 249, 250, 251;
-  --base-clr2: 243, 244, 246;
-  --base-clr3: 229, 231, 235;
-  --base-clr-4: 209, 213, 219;
-  --dark: 17, 24, 39;
-  --error: 239, 68, 68;
+  /* Other color variables - Muted */
+  --toast: #fbbf24;      /* Softer amber */
+  --text-clr: #4b5563;   /* Lighter gray text */
+  --accent: #a78bfa;     /* Lighter purple */
+  --base-clr: #f9fafb;
+  --base-clr2: #f3f4f6;
+  --base-clr3: #e5e7eb;
+  --base-clr-4: #d1d5db;
+  --dark: #374151;       /* Lighter dark */
+  --error: #f87171;      /* Softer red */
 }

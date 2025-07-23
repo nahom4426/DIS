@@ -1,244 +1,178 @@
 <script setup>
 import icons from "@/utils/icons";
-import { ref } from "vue";
-import Cards from "../components/Cards.vue";
+import { ref, onMounted } from "vue";
 import Button from "@/components/Button.vue";
-import ChartCard from "@/components/charts/ChartCard.vue";
-import { onMounted } from "vue";
-import { useChartData } from "@/composables/useChartData";
-import BarChart from "@/components/charts/BarChart.vue";
-import LoopChart from "@/components/charts/LoopChart.vue";
 import Table from "@/components/Table.vue";
-import Progress_row from "../components/Progress_row.vue";
-import StackedBarChart from "@/components/charts/StackedBarChart.vue";
-import CardDashboard from "../components/CardDashboard.vue";
 import { useAuthStore } from "@/stores/auth";
 
+const authStore = useAuthStore();
 
-const claimStatuses = ref([
+// Doctor-specific data with query-based stats
+const doctorStats = ref([
   {
-    status: "Home Decor Range",
-    count: 45,
-    total: 7,
-    percentage: 85,
-    color: "#02676B",
+    title: "Active Patients",
+    value: "127",
+    change: "+12",
+    changeType: "increase",
+    icon: icons.users,
+    color: "bg-blue-50 text-blue-600"
   },
   {
-    status: "Disney Princess Pink Bag 18'",
-    count: 32,
-    total: 7,
-    percentage: 65,
-    color: "#02676B",
+    title: "Drug Inquiries",
+    value: "23",
+    change: "+5",
+    changeType: "increase", 
+    icon: icons.question_mark_circle,
+    color: "bg-purple-50 text-purple-600"
   },
   {
-    status: "Bathroom Essentials",
-    count: 28,
-    total: 7,
-    percentage: 45,
-    color: "#02676B",
+    title: "Pending Responses",
+    value: "8",
+    change: "-2",
+    changeType: "decrease",
+    icon: icons.clock,
+    color: "bg-yellow-50 text-yellow-600"
   },
   {
-    status: "Apple Smartwatches",
-    count: 25,
-    total: 7,
-    percentage: 35,
-    color: "#02676B",
-  },
+    title: "Resolved Today",
+    value: "15",
+    change: "+8",
+    changeType: "increase",
+    icon: icons.check_circle,
+    color: "bg-green-50 text-green-600"
+  }
 ]);
 
-const data = ref([
+// Drug inquiry status data
+const drugInquiries = ref([
   {
-    title: "Number of Employee",
-    Image: icons.no_emolpoyee,
-    amount: "450",
-    today: icons.no_emolpoyee,
-    percent: "8.5%",
-    customClass: "bg-[#FFE2E5]",
+    id: "DI001",
+    patientName: "Sarah Johnson",
+    requestType: "Patient Specific",
+    question: "Drug interaction between Lisinopril and Ibuprofen",
+    priority: "Urgent",
+    status: "Pending Review",
+    submittedAt: "2024-01-15 09:30",
+    responseNeeded: "30-60 min",
+    assignedTo: "Dr. Amanda Ross"
   },
   {
-    title: "Group of Employee",
-    Image: icons.product_sold,
-    amount: "3",
-    today: icons.product_sold,
-    percent: "8.5%",
-    customClass: "bg-[#D2FFDA]",
+    id: "DI002", 
+    patientName: "Michael Chen",
+    requestType: "Academic",
+    question: "Dosage adjustment for elderly patients with Metformin",
+    priority: "Normal",
+    status: "In Progress",
+    submittedAt: "2024-01-15 08:15",
+    responseNeeded: "End of day",
+    assignedTo: "Dr. Amanda Ross"
   },
   {
-    title: "Payers",
-    Image: icons.policy2,
-    amount: "12",
-    today: icons.new_customer,
-    percent: "8.5%",
-    customClass: "bg-[#F3E8FF]",
+    id: "DI003",
+    patientName: "Emily Davis",
+    requestType: "Patient Specific", 
+    question: "Alternative medications for Albuterol allergy",
+    priority: "High",
+    status: "Completed",
+    submittedAt: "2024-01-14 16:45",
+    responseNeeded: "Prompt",
+    assignedTo: "Dr. Amanda Ross"
   },
+  {
+    id: "DI004",
+    patientName: "Robert Wilson",
+    requestType: "Other",
+    question: "Contraindications for cardiac patients",
+    priority: "Normal",
+    status: "Pending Review",
+    submittedAt: "2024-01-14 14:20",
+    responseNeeded: "When time permits",
+    assignedTo: "Dr. Amanda Ross"
+  }
 ]);
-const barChartOptions = {
-  scales: {
-    y: {
-      beginAtZero: true,
-      title: {
-        display: true,
-        text: "Count",
-      },
-    },
-    x: {
-      grid: {
-        display: false,
-      },
-    },
-  },
-  plugins: {
-    legend: {
-      position: "top",
-    },
-  },
-};
 
-const { policyVsClaimData, revenueChartData, fetchChartData } = useChartData();
+const activeTab = ref('inquiries');
 
-onMounted(() => {
-  fetchChartData();
-});
+function getPriorityColor(priority) {
+  switch(priority) {
+    case 'Urgent': return 'bg-red-100 text-red-800';
+    case 'High': return 'bg-orange-100 text-orange-800';
+    case 'Normal': return 'bg-blue-100 text-blue-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
+function getInquiryStatusColor(status) {
+  switch(status) {
+    case 'Completed': return 'bg-green-100 text-green-800';
+    case 'In Progress': return 'bg-blue-100 text-blue-800';
+    case 'Pending Review': return 'bg-yellow-100 text-yellow-800';
+    case 'Overdue': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
+
+function getRequestTypeColor(type) {
+  switch(type) {
+    case 'Patient Specific': return 'bg-purple-100 text-purple-800';
+    case 'Academic': return 'bg-indigo-100 text-indigo-800';
+    case 'Other': return 'bg-gray-100 text-gray-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+}
 </script>
+
 <template>
-  <!-- <div class="flex flex-col gap-6 w-full  overflow-x-hidden scrollbar-hide">
-    <CardDashboard />
-    <div class="grid grid-cols-5 gap-5">
+  <div class="p-6 space-y-6">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <img src="/src/assets/mainlogo.png" alt="Logo" class="w-12 h-12" />
+          <div>
+            <h1 class="text-2xl font-bold">Welcome, Dr. {{ authStore.auth?.user?.firstName || 'User' }} {{ authStore.auth?.user?.lastName || authStore.auth?.user?.fatherName || 'Name' }}</h1>
+            <p class="text-blue-100 mt-1">Here's what's happening with your patients today</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-sm text-blue-100">{{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
+          <p class="text-lg font-semibold">{{ new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div
-        class="flex flex-col col-span-3 gap-6 bg-white px-5 py-4 rounded-2xl"
+        v-for="stat in doctorStats"
+        :key="stat.title"
+        class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
       >
         <div class="flex items-center justify-between">
-          <div class="flex flex-col gap-2">
-            <p class="font-semibold">Total Report</p>
-            <p class="text-xs">Sales Summary</p>
+          <div>
+            <p class="text-sm font-medium text-gray-600">{{ stat.title }}</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ stat.value }}</p>
+            <div class="flex items-center mt-2">
+              <span
+                :class="[
+                  'text-sm font-medium',
+                  stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
+                ]"
+              >
+                {{ stat.change }}
+              </span>
+              <span class="text-sm text-gray-500 ml-1">from yesterday</span>
+            </div>
           </div>
-          <Button class="border flex gap-2 font-medium items-center" type="">
-            <i v-html="icons.export"></i>
-            Export</Button
-          >
-        </div>
-        <div class="grid grid-cols-3 gap-6">
-          <Cards :data="data" />
+          <div :class="['p-3 rounded-lg', stat.color]">
+            <i v-html="stat.icon" class="text-xl"></i>
+          </div>
         </div>
       </div>
-      <div class="col-span-2">
-        <LoopChart
-          title="Claim Requests (ETB)"
-          :labels="['Jan', 'Feb', 'Mar', 'Apr']"
-          :datasets="[
-            {
-              label: 'Pharmacy Claim',
-              data: [2000, 6000, 500, 5000, 3000],
-              borderColor: '#EF4444',
-            },
-            {
-              label: 'Hospitals',
-              data: [3000, 5000, 1000, 6000, 4000],
-              borderColor: '#A700FF',
-            },
-            {
-              label: 'Clinics',
-              data: [1000, 3000, 2000, 1000],
-              borderColor: '#3CD856',
-            },
-          ]"
-          :tension="0.3"
-        />
-      </div>
     </div>
-    <div class="grid grid-cols-7 gap-6">
-      <div class="col-span-5">
-        <ChartCard title="Services vs Drugs (ETB)">
-          <BarChart
-            :chart-data="policyVsClaimData"
-            :options="barChartOptions"
-            :barThickness="20"
-            :maxBarThickness="30"
-            height="262px"
-          />
-        </ChartCard>
-      </div>
-      <div class="col-span-2">
-        <LoopChart
-          title="Volume vs Service Level"
-          :labels="['Jan', 'Feb', 'Mar']"
-          :datasets="[
-            {
-              label: 'Sales',
-              data: [100, 200, 150],
-              borderColor: '#FFD665',
-              backgroundColor: 'rgba(255, 214, 101, 0.3)',
-            },
-            {
-              label: 'Expenses',
-              data: [50, 100, 75],
-              borderColor: '#02676B',
-              backgroundColor: 'rgba(2, 103, 107, 0.3)',
-            },
-          ]"
-        />
-      </div>
-    </div>
-    <div class="grid grid-cols-7 gap-6">
-      <div
-        class="bg-white col-span-3 rounded-2xl px-5 py-4 border border-[#F8F9FA]"
-      >
-        <div class="space-y-2 flex flex-col gap-4">
-          <p class="font-semibold text-[#373946]">Top Providers</p>
-          <Table
-            :showPagination="false"
-            :headers="{
-              head: ['Name', 'TotalClaims', 'Sales'],
-              row: ['status', 'totalClaim', 'sales'],
-            }"
-            :row-com="Progress_row"
-            :rows="claimStatuses"
-          >
-          </Table>
-        </div>
-      </div>
-      <div class="col-span-2">
-        <LoopChart
-          title="Volume vs Service Level"
-          :labels="['Jan', 'Feb', 'Mar']"
-          :datasets="[
-            {
-              label: 'Sales',
-              data: [100, 200, 150],
-              borderColor: '#FFD665',
-              backgroundColor: 'rgba(255, 214, 101, 0.3)',
-            },
-            {
-              label: 'Expenses',
-              data: [50, 100, 75],
-              borderColor: '#02676B',
-              backgroundColor: 'rgba(2, 103, 107, 0.3)',
-            },
-          ]"
-        />
-      </div>
-      <div class="col-span-2">
-        <StackedBarChart
-          :labels="['Jan', 'Feb', 'Mar', 'Apr']"
-          :datasets="[
-            {
-              label: 'Volume',
-              data: [100, 600, 500, 800],
-              backgroundColor: '#FFD665',
-              borderRadius: 1,
-            },
-            {
-              label: 'Services',
-              data: [300, 350, 320, 380],
-              backgroundColor: '#02676B',
-              borderRadius: 1,
-            },
-          ]"
-          title="Quarterly Financials"
-          :show-values="true"
-          :border-radius="8"
-        />
-      </div>
-    </div>
-  </div> -->
+
+    <!-- Tab Navigation -->
+
+    
+  </div>
 </template>

@@ -63,13 +63,13 @@ function openEditModal(institution) {
 }
 
 function handleInstitutionUpdated(updatedInstitution) {
-  console.log("Institution updated:", updatedInstitution);
+  console.log("Provider updated:", updatedInstitution);
   store.update(updatedInstitution.institutionUuid, updatedInstitution);
   refreshData();
   addToast({
     type: "success",
-    title: "Institution Updated",
-    message: `Institution "${updatedInstitution.institutionName}" has been updated successfully`,
+    title: "Provider Updated",
+    message: `Provider "${updatedInstitution.institutionName}" has been updated successfully`,
   });
 }
 
@@ -82,14 +82,14 @@ function handleStatusChange(id, newStatus) {
         addToast({
           type: "success",
           title: "Status Updated",
-          message: `Institution status has been updated to ${newStatus}`,
+          message: `Provider status has been updated to ${newStatus}`,
         });
         refreshData();
       } else {
         addToast({
           type: "error",
           title: "Update Failed",
-          message: res.error || "Failed to update institution status",
+          message: res.error || "Failed to update provider status",
         });
       }
     }
@@ -140,8 +140,8 @@ function handleAddInstitution() {
       refreshData();
       addToast({
         type: "success",
-        title: "Institution Added",
-        message: `Institution "${newInstitution.institutionName}" has been added successfully`,
+        title: "Provider Added",
+        message: `Provider "${newInstitution.institutionName}" has been added successfully`,
       });
     },
   });
@@ -157,9 +157,9 @@ function handleImageError(event) {
 </script>
 
 <template>
-  <DefaultPage placeholder="Search Active Institutions">
+  <DefaultPage placeholder="Search Providers">
     
-    <!-- Filter Button -->
+    <!-- Filter Button 
      <template #filter>
       <button
         class="flex justify-center items-center gap-2 rounded-md px-6 py-4 text-primary bg-base-clr3"
@@ -167,7 +167,7 @@ function handleImageError(event) {
         <i v-html="icons.filter"></i>
         <p class="text-base">Filters</p>
       </button>
-    </template>
+    </template>-->
     <!-- Add Button -->
     <template #add-action>
        <button
@@ -175,28 +175,16 @@ function handleImageError(event) {
             @click="openModal('payerListImport')"
           >
             <i v-html="icons.add_circle" class=""></i>
-            Import Payers
+            Import Provider
           </button>
       <button
         @click.prevent="handleAddInstitution"
         class="btn flex justify-center items-center text-center gap-2 rounded-lg h-14 px-8 bg-primary text-white hover:bg-primary-dark"
       >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 18 18"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M9 5.8V12.2M12.2 9H5.8M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z"
-            stroke="white"
-            stroke-width="1.3"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 1V17M1 9H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        <p class="text-base">Add Payer</p>
+        Add Provider
       </button>
      
     </template>
@@ -218,17 +206,17 @@ function handleImageError(event) {
           :pending="pending"
           :headers="{
             head: [
-              'Payer Name',
-              'Contracts',
-              'Payer Admin User',
-              'Contact',
+              'Provider Name',
+              'Address', 
+              'Email',
+              'Phone Number',
               'Category',
               'Status',
               'Actions',
             ],
             row: [
-              'payerName',
-              'totalContracts',
+              'provider Name',
+              'Address',
               'email',
               'telephone',
               'category',

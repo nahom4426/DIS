@@ -43,7 +43,7 @@ const props = defineProps({
 
 // Form data
 const payerLogo = ref<File | null>(null);
-const payerName = ref('');
+const providerName = ref('');
 const dependantCoverage = ref(true);
 const category = ref('');
 const telephone = ref('');
@@ -232,11 +232,18 @@ function resetForm() {
 }
 
 const categoryOptions = [
-  'Insurance Company',
-  'Government Agency',
-  'Private company',
-  'Non-Profit Organization',
-  'Others'
+  'General Hospital',
+  'Specialized Hospital',
+  'Children’s Hospital',
+  'Maternity Hospital',
+  'Cardiology Hospital',
+  'Cancer Hospital (Oncology)',
+  'Dental Hospital',
+  'Psychiatric Hospital',
+  'Eye Hospital',
+  'Multi-Specialty Hospital',
+  'Other'
+
 ];
 </script>
 
@@ -253,7 +260,7 @@ const categoryOptions = [
       <!-- Payer Logo -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-[#75778B]">
-          Payer logo 
+          Provider logo 
         </label>
         <div 
           @dragover="handleDragOver"
@@ -305,20 +312,20 @@ const categoryOptions = [
         <!-- Payer Name -->
         <div class="w-full gap-3 space-y-2">
           <label class="block text-sm font-medium text-[#75778B]">
-            Payer Name <span class="text-red-500">*</span>
+            Provider Name <span class="text-red-500">*</span>
           </label>
           <Input
             v-model="payerName"
             name="payerName"
             validation="required"
             :attributes="{
-              placeholder: 'Enter Payer\'s legal name',
+              placeholder: 'Enter Provider\'s legal name',
               required: true
             }"
           />
         </div>
 
-        <!-- Dependent Coverage -->
+        <!-- Dependent Coverage 
         <div class="px-2 space-y-2">
           <label class="block text-sm font-medium text-[#75778B]">
             Dependent Coverage <span class="text-red-500">*</span>
@@ -366,7 +373,7 @@ const categoryOptions = [
               <span class="text-sm font-medium">No</span>
             </label>
           </div>
-        </div>
+        </div>-->
       </div>
       
       <!-- Two column layout -->
@@ -570,7 +577,7 @@ const categoryOptions = [
       </Button>
       <ModalFormSubmitButton
         :pending="pending"
-        :btn-text="isEdit ? 'Update Payer' : 'Add Payer'"
+        :btn-text="isEdit ? 'Update Provider' : 'Add Provider'"
         class="bg-[#02676B] hover:bg-[#014F4F] text-white px-6 py-3 border-[#02676B] hover:border-[#014F4F]"
       />
     </div>

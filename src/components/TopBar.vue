@@ -24,32 +24,32 @@ const props = defineProps({
 const router = useRouter();
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
-const showThemeSelector = ref(false);
-const showNotifications = ref(false);
+
+// Notifications
 const notifications = ref([
   {
     id: 1,
-    title: "Low Stock Alert",
-    message: "Amoxicillin 500mg is running low on stock",
-    time: "10 minutes ago",
-    read: false,
-    type: "warning"
+    title: "New Order",
+    message: "Order #1234 has been placed",
+    time: "2 min ago",
+    type: "info",
+    read: false
   },
   {
     id: 2,
-    title: "Expiry Alert",
-    message: "5 drugs will expire within 30 days",
-    time: "2 hours ago",
-    read: false,
-    type: "danger"
+    title: "Low Stock Alert",
+    message: "Paracetamol is running low",
+    time: "1 hour ago",
+    type: "warning",
+    read: false
   },
   {
     id: 3,
-    title: "New Order Received",
-    message: "New purchase order #12345 has been created",
-    time: "Yesterday",
-    read: true,
-    type: "info"
+    title: "System Update",
+    message: "System will be updated tonight",
+    time: "3 hours ago",
+    type: "info",
+    read: true
   }
 ]);
 
@@ -57,9 +57,10 @@ const unreadCount = computed(() => {
   return notifications.value.filter(n => !n.read).length;
 });
 
+// User profile computed properties
 const userInitials = computed(() => {
-  const user = authStore.user;
-  if (!user) return "U";
+  const user = authStore.auth?.user;
+  if (!user) return "";
   
   const firstName = user.firstName || "";
   const lastName = user.lastName || user.fatherName || "";
@@ -68,28 +69,37 @@ const userInitials = computed(() => {
 });
 
 const userFullName = computed(() => {
-  const user = authStore.user;
-  if (!user) return "User";
+  const user = authStore.auth?.user;
+  if (!user) return "";
   
-  return `${user.firstName || ""} ${user.lastName || user.fatherName || ""}`.trim();
+  const fullName = `${user.firstName || ""} ${user.lastName || user.fatherName || ""}`.trim();
+  return fullName;
 });
 
 const userRole = computed(() => {
-  return authStore.user?.roleName || "User";
+  return authStore.auth?.user?.roleName || "";
 });
 
 function markAllAsRead() {
   notifications.value = notifications.value.map(n => ({...n, read: true}));
 }
 
+function goToProfile() {
+  router.push("/profile");
+}
+
 function logout() {
+  // Clear user session/token
   localStorage.removeItem("userDetail");
+  localStorage.removeItem("authToken");
+  authStore.setAuth(null);
+  
+  // Redirect to login screen
   router.push("/login");
 }
 
 function changeTheme(themeId) {
   themeStore.setTheme(themeId);
-  showThemeSelector.value = false;
 }
 </script>
 
@@ -207,78 +217,57 @@ function changeTheme(themeId) {
               >
                 No notifications
               </div>
-              <div 
-                v-for="notification in notifications" 
-                :key="notification.id"
-                class="px-4 py-3 hover:bg-neutral-50 transition-colors border-l-2"
-                :class="{
-                  'border-error': notification.type === 'danger' && !notification.read,
-                  'border-warning': notification.type === 'warning' && !notification.read,
-                  'border-info': notification.type === 'info' && !notification.read,
-                  'border-transparent': notification.read,
-                  'bg-neutral-50': !notification.read
-                }"
-              >
-                <div class="flex justify-between items-start">
-                  <span class="font-medium text-sm">{{ notification.title }}</span>
-                  <span class="text-xs text-neutral-500">{{ notification.time }}</span>
-                </div>
-                <p class="text-xs text-neutral-600 mt-1">{{ notification.message }}</p>
-              </div>
-            </div>
-            <div class="px-4 py-2 border-t border-neutral-200">
-              <button class="text-xs text-primary-600 hover:text-primary-700 w-full text-center">
-                View all notifications
-              </button>
             </div>
           </div>
         </template>
       </Dropdown>
-      
-      <!-- User Profile -->
+
+      <!-- User Profile Dropdown -->
       <Dropdown v-slot="{ setRef, toggleDropdown }">
         <button 
-          ref="setRef"
           @click="toggleDropdown"
-          class="flex items-center gap-2 ml-2"
+          class="flex items-center gap-3 ml-2 p-2 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
+          aria-label="User profile menu"
         >
-          <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-medium text-sm">
-            {{ userInitials }}
+          <!-- Profile Avatar -->
+          <div class="w-9 h-9 rounded-full bg-primary-500 text-white flex items-center justify-center font-semibold text-sm shadow-sm">
+            DR
           </div>
+          
+          <!-- User Info -->
           <div class="hidden md:block text-left">
-            <div class="text-sm font-medium">{{ userFullName }}</div>
-            <div class="text-xs text-neutral-500">{{ userRole }}</div>
+            <div class="text-sm font-semibold text-gray-800">Dr. {{ userFullName }}</div>
+            <div class="text-xs text-gray-500">{{ userRole }}</div>
           </div>
-          <span class="hidden md:block text-neutral-400" v-html="icons.chevron_down"></span>
+          
+          <!-- Dropdown Arrow -->
+          <span class="hidden md:block text-gray-400 transition-transform duration-200" v-html="icons.chevron_down"></span>
         </button>
         
         <template #dropdown>
           <div class="py-2 w-56">
+            <!-- User Info Header -->
             <div class="px-4 py-3 border-b border-neutral-200">
-              <div class="font-medium">{{ userFullName }}</div>
-              <div class="text-sm text-neutral-500">{{ userRole }}</div>
+              <div class="font-semibold text-gray-800">Dr. {{ userFullName }}</div>
+              <div class="text-sm text-gray-500">{{ userRole }}</div>
             </div>
-            <div class="mt-2">
-              <router-link 
-                to="/profile" 
-                class="flex items-center px-4 py-2 text-sm hover:bg-neutral-100 transition-colors"
+            
+            <!-- Menu Items -->
+            <div class="mt-2 space-y-1">
+              <button 
+                @click="goToProfile" 
+                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-neutral-100 transition-colors"
               >
-                <span class="mr-3" v-html="icons.user"></span>
-                My Profile
-              </router-link>
-              <router-link 
-                to="/settings" 
-                class="flex items-center px-4 py-2 text-sm hover:bg-neutral-100 transition-colors"
-              >
-                <span class="mr-3" v-html="icons.settings"></span>
-                Settings
-              </router-link>
+                <span class="mr-3 text-gray-500" v-html="icons.user"></span>
+                Profile
+              </button>
+              
               <button 
                 @click="logout" 
-                class="flex items-center w-full px-4 py-2 text-sm text-left hover:bg-neutral-100 transition-colors text-error"
+                class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
               >
-                <span class="mr-3" v-html="icons.logout"></span>
-                Sign Out
+                <span class="mr-3 text-red-500" v-html="icons.logout"></span>
+                Log Out
               </button>
             </div>
           </div>

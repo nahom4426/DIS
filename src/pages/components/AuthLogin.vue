@@ -17,23 +17,25 @@ const route = useRoute();
 const redirecting = ref(true);
 const auth = useAuthStore();
 let detiail = localStorage.getItem("userDetail");
-function reRoute() {
-  if (route.query.redirect && route.query?.from == "other")
-    location.href = route.query.redirect;
-  else if (route.query.redirect) router.replace(route.query.redirect);
-  else router.replace("/");
-}
+// function reRoute() {
+//   if (route.query.redirect && route.query?.from == "other")
+//     location.href = route.query.redirect;
+//   else if (route.query.redirect) router.replace(route.query.redirect);
+//   else router.replace("/");
+// }
 
-if (detiail) {
-  detiail = JSON.parse(detiail);
-  auth.setAuth({
-    user: detiail,
-    accessToken: detiail.token,
-  });
-  reRoute();
-} else {
-  redirecting.value = false;
-}
+// if (detiail) {
+//   detiail = JSON.parse(detiail);
+//   auth.setAuth({
+//     user: detiail,
+//     accessToken: detiail.token,
+//   });
+//   reRoute();
+// } else {
+//   redirecting.value = false;
+// }
+
+redirecting.value = false;
 
 const loginReq = useApiRequest();
 function handleLogin({ values }) {
@@ -51,7 +53,7 @@ function handleLogin({ values }) {
           openModal('ChangePassword')
         }
         localStorage.setItem("userDetail", JSON.stringify(res.data));
-        reRoute();
+        // reRoute(); // Comment this out
       }
       toasted(res.success, "Successfully Logged In", res.error);
     }
@@ -63,7 +65,6 @@ const emit = defineEmits(["user"]);
   <NewFormLayout v-slot="{ submit }" id="login-form">
     <div class="space-y-6">
       <div class="flex flex-col items-center justify-center gap-4">
-        <h1 class="font-semibold text-xl">Nice to see you again 👋</h1>
         <h2 class="w-[332px] text-center">
           Upon successful authentication, access your role-specific dashboard
           within the platform.

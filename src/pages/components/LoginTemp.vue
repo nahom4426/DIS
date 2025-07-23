@@ -52,11 +52,11 @@ function prevous() {
   <div
     class="flex flex-col rounded-2xl max-h-[32rem] scrollbar-hide bg-white p-9"
   >
-    <div
-      class="flex gap-2 items-center justify-center mb-6 border-b border-base-clr3 pb-6"
-    >
-      <img src="../../assets/logo.svg" alt="DIS Logo" />
-      <h1 class="text-xl font-semibold text-primary">DIS</h1>
+    <div class="flex flex-col items-center justify-center mb-6 border-b border-base-clr3 pb-6">
+      <img style="width: 100px; height: 80px;" src="../../assets/mainlogo.png" alt="DIS Logo" />
+      <div class="text-center mt-2">
+        <h1 class="text-lg font-bold text-purple-500">Ethiopian Drug Information System</h1>
+      </div>
     </div>
 
     <component

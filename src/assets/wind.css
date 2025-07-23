@@ -4,40 +4,40 @@
 @tailwind utilities;
 
 :root {
-  --primary: 2 103 107;
+  --primary: 167 139 250;  /* Lighter purple RGB */
   --secondary: 223 241 241;
-  --toast: 76 187 23;
-  --dark: 51 51 51;
+  --toast: 251 191 36;     /* Softer amber */
+  --dark: 75 85 99;        /* Lighter dark */
   --text-clr: var(--dark);
-  --base-clr: 117 119 139;
-  --base-clr2: 245 245 255;
-  --base-clr3: 246 247 250;
-  --error: 219 46 72;
+  --base-clr: 156 163 175; /* Softer base */
+  --base-clr2: 249 250 251;
+  --base-clr3: 248 250 252;
+  --error: 248 113 113;    /* Softer red */
 
   --drawer-width: 16rem;
   --navbar-height: 5rem;
 }
 
 .orange {
-  --primary: 253 116 1;
+  --primary: 251 146 60;   /* Softer orange */
 }
 .brown {
-  --primary: 187 93 39;
+  --primary: 180 83 9;     /* Softer brown */
 }
 .violet {
-  --primary: 81 21 140;
+  --primary: 139 92 246;   /* Softer violet */
 }
 .forestGreen {
-  --primary: 37 110 21;
+  --primary: 52 211 153;   /* Softer green */
 }
 .deepskyblue {
-  --primary: 0 191 255;
+  --primary: 56 189 248;   /* Softer sky blue */
 }
 .mediumblue {
-  --primary: 0 0 255;
+  --primary: 59 130 246;   /* Softer blue */
 }
 .indigo {
-  --primary: 75 0 130;
+  --primary: 129 140 248;  /* Softer indigo */
 }
 .crimson {
   --primary: 220 20 60;

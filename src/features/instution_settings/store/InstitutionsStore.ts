@@ -198,6 +198,13 @@ export const institutions = defineStore("institutionsStore", () => {
     itemsPerPage.value = limit;
   }
 
+  function refreshData() {
+    console.log("Refreshing provider data");
+    if (dataProvider.value) {
+      dataProvider.value.refresh();
+    }
+  }
+
   return {
     institutions,
     totalPages,
@@ -213,6 +220,7 @@ export const institutions = defineStore("institutionsStore", () => {
     remove,
     setPage,
     setLimit,
+    refreshData,
   };
 });
 

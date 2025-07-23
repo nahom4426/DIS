@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue';
 import { defineProps, onMounted, onUnmounted } from 'vue';
 import Button from "@/components/Button.vue";
 import { openModal } from '@customizer/modal-x';
@@ -40,6 +41,10 @@ const props = defineProps({
     type: Function,
     default: () => {}
   }
+});
+
+const filteredRowData = computed(() => {
+  return Array.isArray(props.rowData) ? props.rowData.filter(r => r !== null) : [];
 });
 
 const { addToast } = useToast();
@@ -198,7 +203,7 @@ function getTypeStyle(statusOrType) {
 
 <template>
 <tr 
-  v-for="(row, idx) in rowData.filter(r => r !== null)" 
+  v-for="(row, idx) in filteredRowData" 
   :key="idx"
   @click.self="onRowClick(row)" 
   class="bg-white border-b hover:bg-gray-50 transition-colors duration-150 ease-in-out" 
