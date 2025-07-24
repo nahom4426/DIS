@@ -1,4 +1,4 @@
-<script setup>
+<!---<script setup>
 import icons from "@/utils/icons";
 import { ref, shallowRef } from "vue";
 import ServiceSearchResults from "../components/ServiceSearchResults.vue";
@@ -62,7 +62,7 @@ function showMedicationResults() {
       />
     </svg>
     
-    <!-- Tooltip -->
+    <!-- Tooltip --
     <span class="tooltip">Back</span>
   </button>
           </h2>

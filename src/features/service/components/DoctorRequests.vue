@@ -135,7 +135,7 @@ const filteredRequests = computed(() => {
 
 <template>
   <div class="p-6">
-    <div v-if="filteredRequests.length === 0" class="text-center py-12">
+    <div v-if="filteredRequests.length === 1" class="text-center py-12">
       <div class="text-gray-400 mb-4">
         <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

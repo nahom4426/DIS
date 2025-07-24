@@ -53,14 +53,25 @@ export const useThemeStore = defineStore("themeStore", () => {
 // Drug Information System Navigation
 export default [
   {
-    path: "/",
+    path: "/dashboard",
     name: "Dashboard",
-    icon: icons.dashboards,
+    icon: icons.dashboard,
+  },
+  {
+    path: "/home",
+    name: "Home",
+    icon: icons.request
   },
   {
     path: "/doctor-requests",
+    name: "Requests",
+    icon: icons.request,
+  },
+  {
+    path: "drug-management",
     name: "Drug Management",
     icon: icons.drug,
+
   },
   {
     path: "/users",

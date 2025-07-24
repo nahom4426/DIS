@@ -56,7 +56,7 @@ const toggleMenu = (name) => {
 
 <template>
   <div
-    class="h-full rounded-2xl w-drawer-width bg-white overflow-auto space-y-4 transition-all duration-300 flex flex-col relative"
+    class="h-full rounded-2xl w-drawer-width bg-white  transition-all duration-300 flex flex-col relative"
   >
     <!-- Standard Collapse Button -->
     <button
