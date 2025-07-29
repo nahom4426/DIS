@@ -11,7 +11,7 @@ const authStore = useAuthStore();
 const submitReq = useApiRequest();
 
 const formData = reactive({
-  requestType: '', // Change from object to string
+  requestType: '',
   patientInfo: {
     age: '',
     sex: '',
@@ -83,38 +83,37 @@ function confirmSubmission() {
     requestQuestion: formData.requestQuestion,
     preferredResponse: formData.preferredResponse,
     responseNeeded: formData.responseNeeded,
-    submittedBy: authStore.auth?.user?.userUuid || 'Current User',
+    submittedAt: new Date().toISOString(),
+    submittedBy: authStore.auth?.user?.userUuid || authStore.auth?.user?.id || 'Current User',
+    submitterName: authStore.auth?.user?.firstName + ' ' + (authStore.auth?.user?.lastName || authStore.auth?.user?.fatherName || ''),
+    submitterEmail: authStore.auth?.user?.email,
+    status: 'Pending Review'
   };
 
   console.log('Submitting form data to API:', submissionData);
   
+  // Submit to API
   submitReq.send(
     () => submitDrugInformationRequest(submissionData),
     (response) => {
       if (response.success) {
-        toasted(true, "Drug information request submitted successfully");
+        console.log('Request submitted successfully:', response.data);
         
         // Also save to localStorage as backup
         const existingRequests = JSON.parse(localStorage.getItem('drugInformationRequests') || '[]');
-        existingRequests.push({...submissionData, ...response.data});
+        existingRequests.push({
+          ...submissionData,
+          requestId: response.data.requestId || Date.now().toString()
+        });
         localStorage.setItem('drugInformationRequests', JSON.stringify(existingRequests));
         
+        toasted(true, 'Drug information request submitted successfully!');
         emit('submit', response.data);
-        showConfirmation.value = false;
-        
-        // Reset form
-        Object.keys(formData).forEach(key => {
-          if (typeof formData[key] === 'object') {
-            Object.keys(formData[key]).forEach(subKey => {
-              formData[key][subKey] = '';
-            });
-          } else {
-            formData[key] = '';
-          }
-        });
       } else {
-        toasted(false, "Failed to submit request", response.error);
+        console.error('Failed to submit request:', response.error);
+        toasted(false, response.error || 'Failed to submit request');
       }
+      showConfirmation.value = false;
     }
   );
 }
@@ -545,6 +544,8 @@ input, select, textarea {
   }
 }
 </style>
+
+
 
 
 

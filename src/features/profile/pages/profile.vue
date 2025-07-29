@@ -57,10 +57,24 @@ const handleFileChange = (event) => {
           profilePicture.value = base64Image;
           authStore.setProfile(base64Image);
 
-          localStorage.setItem(
-            "userDetail",
-            JSON.stringify({...(authStore.auth?.user || {})})
-          );
+          // Update the user object with new image data
+          const updatedUser = {
+            ...(authStore.auth?.user || {}),
+            imageData: base64Image,
+            profilePicture: base64Image
+          };
+          
+          authStore.setAuth({
+            ...authStore.auth,
+            user: updatedUser
+          });
+
+          // Update both localStorage keys for compatibility
+          localStorage.setItem("userDetail", JSON.stringify(updatedUser));
+          localStorage.setItem("doctorCommUser", JSON.stringify(updatedUser));
+
+          // Dispatch custom event to notify DoctorCommLayout
+          window.dispatchEvent(new CustomEvent('profileUpdated'));
 
           toasted(true, "Profile picture updated successfully!");
         } else {
@@ -171,3 +185,4 @@ function handleUpdateProfile({values}){
     </div>
   </div>
 </template>
+

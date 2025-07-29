@@ -6,21 +6,27 @@ import { useAuthStore } from "@/stores/auth";
 
 import Dashboard from "@/features/Dashboard/pages/Dashboard.vue";
 
+import doctorCommunicationRoutes from '@/features/doctor-communication/routes'
+
 // import institutionRoutes from "./institution.routes";
 import adminRoutes from "./admin.routes";
 import providerRoutes from "./Provider.routes";
+import registrationRequestRoutes from "./registrationRequest.routes"
 
 
-import Profile from '@/views/Profile.vue'
 
-function addMetaToRoutes(routes) {
+import Profile from "@/features/profile/pages/profile.vue";
+
+// Debug and create safe routes
+console.log('doctorCommunicationRoutes:', doctorCommunicationRoutes)
+const safeRoutes = Array.isArray(doctorCommunicationRoutes) ? doctorCommunicationRoutes : []
+
+function addMetaToRoutes(routes: any[]) {
   return routes.map(route => {
-    // If the route has a privilege property in its meta, make sure it's also marked as requiresAuth
     if (route.meta?.privilege && !route.meta.requiresAuth) {
       route.meta.requiresAuth = true;
     }
     
-    // If the route has children, process them recursively
     if (route.children) {
       route.children = addMetaToRoutes(route.children);
     }
@@ -37,6 +43,9 @@ const router = createRouter({
       name: 'login',
       component: Login
     },
+    
+    // Independent Doctor Communication System - using safe routes
+    ...safeRoutes,
     
     {
       path: "/main",
@@ -55,11 +64,15 @@ const router = createRouter({
         },
         
         ...adminRoutes,
-        ...providerRoutes,
-     
-       
+        // ...instutionSetingRoutes, // Fix typo if this exists
+        ...registrationRequestRoutes,
       ],
     },
+    
+    {
+      path: '/',
+      redirect: '/doctor-comm/dashboard'
+    }
   ]),
 });
 
@@ -91,17 +104,91 @@ router.beforeEach((to, from, next) => {
   next()
 })
 router.beforeEach(async (to, from) => {
+  const auth = useAuthStore()
+  
   // Temporarily bypass login - go directly to dashboard
   if (to.path === '/login') {
-    return { path: '/dashboard' };
+    return { path: '/doctor-comm/dashboard' };
   }
   
   if (to.path === '/') {
-    return { path: '/dashboard' };
+    console.log("Root path, redirecting to dashboard");
+    return { path: '/doctor-comm/dashboard' };
   }
+
+  // Updated protection check to include doctor communication routes
+  const isProtectedRoute = to.path !== '/login' && 
+                          !to.path.startsWith('/public/') && 
+                          (to.matched.some(record => record.name === 'home') || 
+                           to.path.startsWith('/doctor-comm/'));
   
-  // Allow all other routes without authentication
+  console.log("Route protection check:", { 
+    isProtectedRoute,
+    path: to.path,
+    meta: to.meta,
+    matched: to.matched.map(r => r.name)
+  });
+
+  if (isProtectedRoute) {
+    if (!auth.auth?.accessToken) {
+      console.log("No access token, redirecting to login");
+      return {
+        path: '/login',
+        query: { redirect: to.fullPath }
+      };
+    }
+
+    console.log("User info:", {
+      roleName: auth.auth?.user?.roleName,
+      authorities: auth.auth?.user?.authorities
+    });
+
+    // Super Admin or user with All Privileges can access everything
+    if (
+      auth.auth?.user?.authorities?.includes("All Privileges") ||
+      auth.auth?.user?.roleName === "Super Admin"
+    ) {
+      console.log("User is Super Admin or has All Privileges, access granted");
+      return true;
+    }
+
+    // Check if the route requires specific privileges
+    if (to.meta?.privilege && to.meta.privilege.length > 0) {
+      console.log("Route requires specific privileges:", to.meta.privilege);
+      
+      // User has no authorities, deny access
+      if (!auth.auth?.user?.authorities || auth.auth.user.authorities.length === 0) {
+        console.log("User has no authorities, access denied");
+        return { path: '/doctor-comm/dashboard' };
+      }
+      
+      // Check if user has any of the required privileges
+      const hasRequiredPrivilege = to.meta.privilege.some((privilege: string) => 
+        auth.auth.user.authorities.includes(`ROLE_${privilege}`)
+      );
+      
+      if (!hasRequiredPrivilege) {
+        console.log("User lacks required privileges, access denied");
+        return { path: '/doctor-comm/dashboard' };
+      }
+      
+      console.log("User has required privileges, access granted");
+    }
+  }
+
   return true;
 });
 
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+

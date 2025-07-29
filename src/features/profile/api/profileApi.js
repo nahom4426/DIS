@@ -9,13 +9,10 @@ export function getPersonalDetails(userId) {
     .get(`${basePath}/${userId}/details`);
 }
 
-export function uploadProfilePicture( file) {
-  // const formData = new FormData();
-  // formData.append("file", file);
-
+export function uploadProfilePicture(formData) {
   return api
     .addAuthenticationHeader()
-    .put(`${basePath}/changeProfile/`, file, {
+    .put(`${basePath}/changeProfile/`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -27,8 +24,9 @@ export function changePassword(id,data) {
     .addAuthenticationHeader()
     .put(`${basePath}/changepassword/${id}`, data);
 }
-export function updateProfileData(id,data) {
+export function updateProfileData(id, data) {
   return api
     .addAuthenticationHeader()
-    .post(`${basePath}/${id}`, data);
+    .put(`${basePath}/${id}`, data);
 }
+

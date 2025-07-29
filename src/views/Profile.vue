@@ -14,6 +14,24 @@
           <div class="space-y-4">
             <h3 class="text-lg font-medium text-gray-900">Personal Information</h3>
             
+            <!-- Profile Image Upload -->
+            <div class="flex items-center gap-4">
+              <img
+                :src="profileImagePreview || defaultProfileImage"
+                alt="Profile"
+                class="w-20 h-20 rounded-full object-cover border"
+              />
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  @change="onProfileImageChange"
+                  class="block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                />
+                <p class="text-xs text-gray-400 mt-1">JPG, PNG, or GIF. Max 2MB.</p>
+              </div>
+            </div>
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
               <input 
@@ -109,6 +127,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import defaultProfileImage from '@/assets/img/profile.png'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -126,6 +145,9 @@ const passwordData = ref({
   confirmPassword: ''
 })
 
+const profileImagePreview = ref(null)
+const profileImageFile = ref(null)
+
 onMounted(() => {
   // Load user data from auth store
   const user = authStore.auth?.user
@@ -136,8 +158,35 @@ onMounted(() => {
       email: user.email || '',
       roleName: user.roleName || ''
     }
+    // If user has imageData, show it
+    if (user.imageData) {
+      profileImagePreview.value = user.imageData.startsWith('data:image/')
+        ? user.imageData
+        : `data:image/png;base64,${user.imageData}`
+    }
   }
 })
+
+function onProfileImageChange(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    alert('Please select a valid image file.')
+    return
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Image size should be less than 2MB.')
+    return
+  }
+
+  profileImageFile.value = file
+  const reader = new FileReader()
+  reader.onload = e => {
+    profileImagePreview.value = e.target.result
+  }
+  reader.readAsDataURL(file)
+}
 
 function saveProfile() {
   // Validate password if changing
@@ -147,18 +196,19 @@ function saveProfile() {
       return
     }
   }
-  
-  // Update auth store with new profile data
+
+  // Prepare updated user data
   const updatedUser = {
     ...authStore.auth.user,
-    ...userProfile.value
+    ...userProfile.value,
+    imageData: profileImagePreview.value // Save as data URL or base64
   }
-  
+
   authStore.setAuth({
     ...authStore.auth,
     user: updatedUser
   })
-  
+
   alert('Profile updated successfully!')
 }
 

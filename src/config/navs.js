@@ -57,6 +57,50 @@ export default [
     name: "Dashboard",
     icon: icons.dashboard,
   },
+    {
+    path: "/users",
+    name: "User Management",
+    icon: icons.user,
+    privilege: ["Create Employees"],
+  },
+   
+       {
+    path: 'registration',
+    name: "Registration",
+    icon: icons.user_plus || icons.user,
+    // privilege: ["MANAGE_REGISTRATION_REQUESTS"],
+  },
+   {
+    name: "Pharmacist Communication",
+    icon: icons.chat,
+    privilege: [""],
+    navs: [
+       {
+    path: "/doctor-comm/dashboard",
+    name: "Doctor Communication",
+    icon: icons.communication, // Add appropriate icon
+  },
+      {
+        path: "/doctor-comm/inquiries",
+        name: "Recent Inquiries",
+        icon: icons.inbox,
+        privilege: [""],
+      },
+      {
+        path: "/doctor-comm/history",
+        name: "Full History",
+        icon: icons.history,
+        privilege: [""],
+      },
+      {
+        path: "/doctor-comm/drug-lookup",
+        name: "Drug Lookup Tool",
+        icon: icons.search,
+        privilege: [""],
+      },
+ 
+    ],
+  },
   {
     path: "/home",
     name: "Home",
@@ -73,12 +117,7 @@ export default [
     icon: icons.drug,
 
   },
-  {
-    path: "/users",
-    name: "User Management",
-    icon: icons.user,
-    privilege: ["Create Employees"],
-  },
+
   {
     path: "/roles",
     name: "Roles & Permissions",
@@ -91,6 +130,7 @@ export default [
     icon: icons.privilege,
     // privilege: ["CREATE_USER"],
   },
+ 
   // {
   //   path: "/system_settings",
   //   name: "System Settings",
@@ -103,3 +143,8 @@ export default [
   //   icon: icons.palette,
   // },
 ];
+
+
+
+
+
