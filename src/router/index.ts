@@ -6,6 +6,8 @@ import { useAuthStore } from "@/stores/auth";
 
 import Dashboard from "@/features/Dashboard/pages/Dashboard.vue";
 
+import doctorCommunicationRoutes from '@/features/doctor-communication/routes'
+
 // import institutionRoutes from "./institution.routes";
 import adminRoutes from "./admin.routes";
 import instutionSetingRoutes from "./institution_settings.routes";
@@ -13,14 +15,16 @@ import instutionSetingRoutes from "./institution_settings.routes";
 
 import Profile from "@/features/profile/pages/profile.vue";
 
+// Debug and create safe routes
+console.log('doctorCommunicationRoutes:', doctorCommunicationRoutes)
+const safeRoutes = Array.isArray(doctorCommunicationRoutes) ? doctorCommunicationRoutes : []
+
 function addMetaToRoutes(routes) {
   return routes.map(route => {
-    // If the route has a privilege property in its meta, make sure it's also marked as requiresAuth
     if (route.meta?.privilege && !route.meta.requiresAuth) {
       route.meta.requiresAuth = true;
     }
     
-    // If the route has children, process them recursively
     if (route.children) {
       route.children = addMetaToRoutes(route.children);
     }
@@ -37,6 +41,9 @@ const router = createRouter({
       name: 'login',
       component: Login
     },
+    
+    // Independent Doctor Communication System - using safe routes
+    ...safeRoutes,
     
     {
       path: "/main",
@@ -56,10 +63,13 @@ const router = createRouter({
         
         ...adminRoutes,
         ...instutionSetingRoutes,
-     
-       
       ],
     },
+    
+    {
+      path: '/',
+      redirect: '/doctor-comm/dashboard'
+    }
   ]),
 });
 
@@ -118,12 +128,14 @@ router.beforeEach(async (to, from) => {
 
   if (to.path === '/') {
     console.log("Root path, redirecting to dashboard");
-    return { path: '/dashboard' };
+    return { path: '/doctor-comm/dashboard' };
   }
 
+  // Updated protection check to include doctor communication routes
   const isProtectedRoute = to.path !== '/login' && 
                           !to.path.startsWith('/public/') && 
-                          to.matched.some(record => record.name === 'home');
+                          (to.matched.some(record => record.name === 'home') || 
+                           to.path.startsWith('/doctor-comm/'));
   
   console.log("Route protection check:", { 
     isProtectedRoute,
@@ -162,7 +174,7 @@ router.beforeEach(async (to, from) => {
       // User has no authorities, deny access
       if (!auth.auth?.user?.authorities || auth.auth.user.authorities.length === 0) {
         console.log("User has no authorities, access denied");
-        return { path: '/dashboard' };
+        return { path: '/doctor-comm/dashboard' };
       }
       
       // Check if user has any of the required privileges
@@ -172,17 +184,24 @@ router.beforeEach(async (to, from) => {
       
       if (!hasRequiredPrivilege) {
         console.log("User lacks required privileges, access denied");
-        return { path: '/dashboard' };
+        return { path: '/doctor-comm/dashboard' };
       }
       
       console.log("User has required privileges, access granted");
     }
-    
-    // If no specific privileges are required, allow access
-    return true;
   }
 
   return true;
 });
 
 export default router;
+
+
+
+
+
+
+
+
+
+

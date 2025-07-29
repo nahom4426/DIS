@@ -58,6 +58,11 @@ export default [
     icon: icons.dashboard,
   },
   {
+    path: "/doctor-comm/dashboard",
+    name: "Doctor Communication",
+    icon: icons.communication, // Add appropriate icon
+  },
+  {
     name: "Drug Management",
     icon: icons.drugs,
     privilege: [""],
@@ -230,6 +235,31 @@ export default [
     icon: icons.privilege,
     // privilege: ["CREATE_USER"],
   },
+  {
+    name: "Doctor Communication",
+    icon: icons.chat,
+    privilege: [""],
+    navs: [
+      {
+        path: "/doctor-comm/inquiries",
+        name: "Recent Inquiries",
+        icon: icons.inbox,
+        privilege: [""],
+      },
+      {
+        path: "/doctor-comm/history",
+        name: "Full History",
+        icon: icons.history,
+        privilege: [""],
+      },
+      {
+        path: "/doctor-comm/drug-lookup",
+        name: "Drug Lookup Tool",
+        icon: icons.search,
+        privilege: [""],
+      },
+    ],
+  },
   // {
   //   path: "/system_settings",
   //   name: "System Settings",
@@ -242,3 +272,8 @@ export default [
   //   icon: icons.palette,
   // },
 ];
+
+
+
+
+

@@ -34,47 +34,49 @@ function toggleSidebar(status) {
   isCollapsed.value = !isCollapsed.value;
 }
 
+const doctorCommNavs = [
+  {
+    name: 'Dashboard',
+    path: '/doctor-comm/dashboard',
+    icon: icons.dashboard,
+    privilege: ['Doctor Communication']
+  },
+  {
+    name: 'Recent Inquiries',
+    path: '/doctor-comm/inquiries',
+    icon: icons.inbox,
+    privilege: ['Doctor Communication']
+  },
+  {
+    name: 'Full History',
+    path: '/doctor-comm/history',
+    icon: icons.history,
+    privilege: ['Doctor Communication']
+  },
+  {
+    name: 'Drug Lookup',
+    path: '/doctor-comm/drug-lookup',
+    icon: icons.search,
+    privilege: ['Doctor Communication']
+  }
+]
+
+// Add doctor comm navs to your existing navigation
+const allNavs = [
+  ...navs,
+  ...doctorCommNavs
+]
+
 const filteredNavs = computed(() => {
-  const privileges = authStore.user?.authorities || [];
-  const userRole = authStore.user?.roleName;
-
-  const hasAccess = (path, requiredPrivileges) => {
-    if (!requiredPrivileges || requiredPrivileges.length === 0) return true;
-    
-    // Super Admin or user with All Privileges can access everything
-    if (userRole === "Super Admin" || privileges.includes("All Privileges")) {
-      return true;
+  return allNavs.filter((nav) => {
+    if (nav.privilege && nav.privilege.length > 0) {
+      return nav.privilege.some((privilege) =>
+        authStore.auth?.user?.authorities?.includes(privilege) ||
+        authStore.auth?.user?.authorities?.includes("All Privileges")
+      );
     }
-    
-    // If user has no authorities and privileges are required, deny access
-    if (privileges.length === 0) {
-      return false;
-    }
-    
-    // Check if user has any of the required privileges
-    return requiredPrivileges.some((priv) => 
-      privileges.includes(`ROLE_${priv}`)
-    );
-  };
-
-  return navs
-    .map((item) => {
-      if (item.navs) {
-        const filteredChildren = item.navs.filter((child) =>
-          hasAccess(child.path, child.privilege)
-        );
-        if (filteredChildren.length) {
-          return {
-            ...item,
-            navs: filteredChildren,
-          };
-        }
-        return null;
-      } else {
-        return hasAccess(item.path, item.privilege) ? item : null;
-      }
-    })
-    .filter(Boolean);
+    return true;
+  });
 });
 
 onMounted(() => {
@@ -89,9 +91,9 @@ onMounted(() => {
 <template>
   <div
     :class="colorStore.color"
-    class="flex h-full py-3 pl-3 gap-6 w-full bg-[#F6F7FA]"
+    class="flex h-screen py-3 pl-3 gap-6 w-full bg-[#F6F7FA] overflow-hidden"
   >
-    <div class="h-screen w-navbar-width rounded-lg transition-all duration-300">
+    <div class="h-full w-navbar-width rounded-lg transition-all duration-300 flex-shrink-0">
       <Drawer
         :is-collapsed="isCollapsed"
         :toggle-sidebar="toggleSidebar"
@@ -101,16 +103,23 @@ onMounted(() => {
       />
     </div>
 
-    <div class="flex flex-col gap-6 flex-1 pr-6 overflow-hidden">
-      <NavBar :breadcrumbs="breadcrumbs" />
+    <div class="flex flex-col gap-6 flex-1 pr-6 min-h-0">
+      <NavBar :breadcrumbs="breadcrumbs" class="flex-shrink-0" />
 
-      <div
-        class="show-scrollbar w-full h-[calc(100%-var(--navbar-height))] overflow-auto"
-      >
-        <RouterView />
+      <div class="flex-1 overflow-y-auto min-h-0">
+        <div class="pb-6">
+          <RouterView />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped></style>
+
+
+
+
+
+
+

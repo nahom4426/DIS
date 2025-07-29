@@ -1,4 +1,5 @@
 <script setup>
+//import NewFormLayout from "@/components/NewFormLayout.vue";
 import NewFormLayout from "@/components/NewFormLayout.vue";
 import InputEmail from "@/components/new_form_elements/InputEmail.vue";
 import InputPassword from "@/components/new_form_elements/InputPassword.vue";
@@ -38,6 +39,35 @@ if (detiail) {
 const loginReq = useApiRequest();
 function handleLogin({ values }) {
   if (loginReq.pending.value) return;
+  
+  // Temporary bypass - skip actual API call
+  // const mockResponse = {
+  //   success: true,
+  //   data: {
+  //     userUuid: 'temp-user-123',
+  //     email: values.email,
+  //     firstName: 'Test',
+  //     lastName: 'User',
+  //     roleName: 'Pharmacist',
+  //     authorities: ['All Privileges'],
+  //     token: 'temp-token-123',
+  //     firstTimeLogin: false
+  //   }
+  // };
+
+  // // Simulate the successful login flow
+  // auth.setAuth({
+  //   user: mockResponse.data,
+  //   imageData: mockResponse.data?.imageData,
+  //   accessToken: mockResponse.data?.token,
+  // });
+
+  // localStorage.setItem("userDetail", JSON.stringify(mockResponse.data));
+  // reRoute();
+  // toasted(true, "Successfully Logged In (Temporary Mode)", null);
+  
+  // Original code (commented out for temporary bypass)
+  
   loginReq.send(
     () => login(values),
     (res) => {
@@ -56,6 +86,7 @@ function handleLogin({ values }) {
       toasted(res.success, "Successfully Logged In", res.error);
     }
   );
+  
 }
 const emit = defineEmits(["user"]);
 </script>
@@ -98,3 +129,5 @@ const emit = defineEmits(["user"]);
     </div>
   </NewFormLayout>
 </template>
+
+

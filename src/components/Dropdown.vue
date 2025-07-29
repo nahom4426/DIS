@@ -27,12 +27,10 @@ const props = defineProps({
   },
 });
 
-onUpdated(() => {
-  setStyle();
-});
+const emit = defineEmits(['update:open']);
 
 const openDropdown = ref(props.open);
-const dropdown = ref("");
+const dropdown = ref(null);
 
 function setRef(el) {
   dropdown.value = el;
@@ -40,21 +38,35 @@ function setRef(el) {
 
 function toggleDropdown() {
   openDropdown.value = !openDropdown.value;
+  emit('update:open', openDropdown.value);
 }
 
 function setValue() {
-  if (!openDropdown.value) dropdown.value.style.display = "none";
-  else dropdown.value.style.removeProperty("display");
+  if (!dropdown.value) return;
+  
+  if (!openDropdown.value) {
+    dropdown.value.style.display = "none";
+  } else {
+    dropdown.value.style.removeProperty("display");
+  }
 }
 
 function setStyle() {
+  if (!dropdown.value) return;
+  
   dropdown.value.style.position = "absolute";
   dropdown.value.style.zIndex = 20;
 
   dropdown.value.style.setProperty("--top", props.top);
   dropdown.value.style.setProperty("--right", props.right);
-  dropdown.value.style.setProperty("--left", props.left);
-  dropdown.value.style.setProperty("--bottom", props.bottom);
+  
+  if (props.left) {
+    dropdown.value.style.setProperty("--left", props.left);
+  }
+  
+  if (props.bottom) {
+    dropdown.value.style.setProperty("--bottom", props.bottom);
+  }
 
   setValue();
 
@@ -66,7 +78,22 @@ function setStyle() {
 watch(openDropdown, setValue);
 watch(props, setStyle);
 
-onMounted(setStyle);
+onMounted(() => {
+  // Delay the style setting to ensure the ref is available
+  setTimeout(setStyle, 0);
+});
+
+onUpdated(() => {
+  if (dropdown.value) {
+    setStyle();
+  }
+});
+
+// Expose methods and state to parent component
+defineExpose({
+  toggleDropdown,
+  openDropdown,
+});
 </script>
 
 <template>
@@ -75,11 +102,10 @@ onMounted(setStyle);
     class="inline-flex relative"
     @trigger="openDropdown = false"
   >
-    <slot
-      :setRef="setRef"
-      :toggleDropdown="toggleDropdown"
-      :open="openDropdown"
-    ></slot>
+    <slot name="trigger" :toggleDropdown="toggleDropdown" :open="openDropdown"></slot>
+    <div ref="dropdown" v-show="openDropdown">
+      <slot name="dropdown"></slot>
+    </div>
   </OnClickOutside>
 </template>
 
@@ -93,3 +119,4 @@ onMounted(setStyle);
   right: var(--right);
 }
 </style>
+
