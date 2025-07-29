@@ -11,6 +11,8 @@ import doctorCommunicationRoutes from '@/features/doctor-communication/routes'
 // import institutionRoutes from "./institution.routes";
 import adminRoutes from "./admin.routes";
 import providerRoutes from "./Provider.routes";
+import registrationRequestRoutes from "./registrationRequest.routes"
+
 
 
 import Profile from "@/features/profile/pages/profile.vue";
@@ -19,7 +21,7 @@ import Profile from "@/features/profile/pages/profile.vue";
 console.log('doctorCommunicationRoutes:', doctorCommunicationRoutes)
 const safeRoutes = Array.isArray(doctorCommunicationRoutes) ? doctorCommunicationRoutes : []
 
-function addMetaToRoutes(routes) {
+function addMetaToRoutes(routes: any[]) {
   return routes.map(route => {
     if (route.meta?.privilege && !route.meta.requiresAuth) {
       route.meta.requiresAuth = true;
@@ -62,7 +64,8 @@ const router = createRouter({
         },
         
         ...adminRoutes,
-        ...instutionSetingRoutes,
+        // ...instutionSetingRoutes, // Fix typo if this exists
+        ...registrationRequestRoutes,
       ],
     },
     
@@ -101,9 +104,11 @@ router.beforeEach((to, from, next) => {
   next()
 })
 router.beforeEach(async (to, from) => {
+  const auth = useAuthStore()
+  
   // Temporarily bypass login - go directly to dashboard
   if (to.path === '/login') {
-    return { path: '/dashboard' };
+    return { path: '/doctor-comm/dashboard' };
   }
   
   if (to.path === '/') {
@@ -158,7 +163,7 @@ router.beforeEach(async (to, from) => {
       }
       
       // Check if user has any of the required privileges
-      const hasRequiredPrivilege = to.meta.privilege.some(privilege => 
+      const hasRequiredPrivilege = to.meta.privilege.some((privilege: string) => 
         auth.auth.user.authorities.includes(`ROLE_${privilege}`)
       );
       
@@ -175,6 +180,8 @@ router.beforeEach(async (to, from) => {
 });
 
 export default router;
+
+
 
 
 

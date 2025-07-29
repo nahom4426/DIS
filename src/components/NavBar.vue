@@ -1,12 +1,20 @@
 <script setup>
 import icons from "@/utils/icons";
 import { useAuthStore } from "@/stores/auth";
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { useRouter } from "vue-router";
 import imageSrc from '@/assets/img/profile.png'
 
+const router = useRouter();
 const authStore = useAuthStore();
 const isScrolled = ref(false);
-const profilePicture = ref(authStore.auth?.user?.imageData || null);
+
+// Use a computed property for the profile picture so it updates reactively
+const profilePicture = computed(() => {
+  const img = authStore.auth?.user?.imageData;
+  if (!img) return imageSrc;
+  return img.startsWith("data:image/") ? img : `data:image/png;base64,${img}`;
+});
 
 // Dropdown states
 const languageDropdownOpen = ref(false);
@@ -38,16 +46,8 @@ function handleClickOutside(event) {
   }
 }
 
-// Process profile picture
-async function processProfilePicture() {
-  if (profilePicture.value != null && !profilePicture.value.startsWith("data:image/")) {
-    profilePicture.value = `data:image/png;base64,${authStore.auth?.user?.imageData}`;
-  }
-}
-
 // Handle scroll effect
 onMounted(() => {
-  processProfilePicture();
   window.addEventListener('scroll', () => {
     isScrolled.value = window.scrollY > 10;
   });
@@ -58,10 +58,6 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
 });
 
-function handleImageError() {
-  profilePicture.value = imageSrc;
-}
-
 function logout() {
   closeAllDropdowns();
   localStorage.removeItem("userDetail");
@@ -70,12 +66,12 @@ function logout() {
 
 function goToProfile() {
   closeAllDropdowns();
-  this.$router.push('/profile');
+  router.push('/profile'); // <-- Use router instead of this.$router
 }
 
 function goToSettings() {
   closeAllDropdowns();
-  this.$router.push('/settings');
+  router.push('/settings'); // <-- Use router instead of this.$router
 }
 
 const props = defineProps({

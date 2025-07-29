@@ -8,6 +8,7 @@ import CompletedRequests from "../components/CompletedRequests.vue";
 import Button from "@/components/Button.vue";
 import { openModal } from "@customizer/modal-x";
 import DrugInformationRequestForm from "@/components/DrugInformationRequestForm.vue";
+import { useDrugInformationStore } from '@/features/doctor-communication/store/drugInformationStore';
 
 const items = ["Pending Requests", "In Progress", "Completed"];
 const active = ref(0);
@@ -16,6 +17,8 @@ const setActive = (item) => {
   active.value = item;
 };
 const showInquiryForm = ref(false);
+const drugInfoStore = useDrugInformationStore();
+
 function handleNewInquiry() {
   showInquiryForm.value = true;
 }
@@ -36,8 +39,16 @@ const components = [
 
 const search = ref("");
 
-function handleFormSubmit(formData) {
-  console.log("Form submitted:", formData);
+function handleFormSubmit(submittedData) {
+  console.log("Form submitted:", submittedData);
+  
+  // Add to store
+  drugInfoStore.addRequest(submittedData);
+  
+  // Show success message
+  toasted(true, 'Your drug information request has been submitted successfully!');
+  
+  // Close form
   showInquiryForm.value = false;
 }
 
@@ -100,3 +111,4 @@ function closeForm() {
     </div>
   </div>
 </template>
+

@@ -2,9 +2,13 @@
 import { ref, reactive } from 'vue';
 import Button from '@/components/Button.vue';
 import { openModal } from '@customizer/modal-x';
+import { useApiRequest } from '@/composables/useApiRequest';
+import { submitDrugInformationRequest } from '@/features/doctor-communication/api/drugInformationApi';
+import { useAuthStore } from '@/stores/auth';
+import { toasted } from '@/utils/utils';
 
 const formData = reactive({
-  requestType: '', // Change from object to string
+  requestType: '',
   patientInfo: {
     age: '',
     sex: '',
@@ -22,6 +26,8 @@ const formData = reactive({
 
 const showConfirmation = ref(false);
 const emit = defineEmits(['submit', 'back', 'showConfirmation']);
+const submitReq = useApiRequest();
+const authStore = useAuthStore();
 
 function validateForm() {
   const errors = [];
@@ -77,19 +83,38 @@ function confirmSubmission() {
     preferredResponse: formData.preferredResponse,
     responseNeeded: formData.responseNeeded,
     submittedAt: new Date().toISOString(),
-    submittedBy: 'Current User', // You can get this from auth store
+    submittedBy: authStore.auth?.user?.userUuid || authStore.auth?.user?.id || 'Current User',
+    submitterName: authStore.auth?.user?.firstName + ' ' + (authStore.auth?.user?.lastName || authStore.auth?.user?.fatherName || ''),
+    submitterEmail: authStore.auth?.user?.email,
     status: 'Pending Review'
   };
 
   console.log('Submitting form data:', submissionData);
   
-  // Save to localStorage immediately
-  const existingRequests = JSON.parse(localStorage.getItem('drugInformationRequests') || '[]');
-  existingRequests.push(submissionData);
-  localStorage.setItem('drugInformationRequests', JSON.stringify(existingRequests));
-  
-  emit('submit', submissionData);
-  showConfirmation.value = false;
+  // Submit to API
+  submitReq.send(
+    () => submitDrugInformationRequest(submissionData),
+    (response) => {
+      if (response.success) {
+        console.log('Request submitted successfully:', response.data);
+        
+        // Also save to localStorage as backup
+        const existingRequests = JSON.parse(localStorage.getItem('drugInformationRequests') || '[]');
+        existingRequests.push({
+          ...submissionData,
+          requestId: response.data.requestId || Date.now().toString()
+        });
+        localStorage.setItem('drugInformationRequests', JSON.stringify(existingRequests));
+        
+        toasted(true, 'Drug information request submitted successfully!');
+        emit('submit', response.data);
+      } else {
+        console.error('Failed to submit request:', response.error);
+        toasted(false, response.error || 'Failed to submit request');
+      }
+      showConfirmation.value = false;
+    }
+  );
 }
 
 function cancelSubmission() {
@@ -518,6 +543,8 @@ input, select, textarea {
   }
 }
 </style>
+
+
 
 
 

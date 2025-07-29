@@ -57,50 +57,29 @@ export default [
     name: "Dashboard",
     icon: icons.dashboard,
   },
-  {
-    path: "/doctor-comm/dashboard",
-    name: "Doctor Communication",
-    icon: icons.communication, // Add appropriate icon
-  },
-  {
-    path: "/home",
-    name: "Home",
-    icon: icons.request
-  },
-  {
-    path: "/doctor-requests",
-    name: "Requests",
-    icon: icons.request,
-  },
-  {
-    path: "drug-management",
-    name: "Drug Management",
-    icon: icons.drug,
-
-  },
-  {
+    {
     path: "/users",
     name: "User Management",
     icon: icons.user,
     privilege: ["Create Employees"],
   },
-  {
-    path: "/roles",
-    name: "Roles & Permissions",
-    icon: icons.role,
-    // privilege: ["MANAGE_ROLES"],
+   
+       {
+    path: 'registration',
+    name: "Registration",
+    icon: icons.user_plus || icons.user,
+    // privilege: ["MANAGE_REGISTRATION_REQUESTS"],
   },
-    {
-    path: "/privileges",
-    name: "Privilege",
-    icon: icons.privilege,
-    // privilege: ["CREATE_USER"],
-  },
-  {
-    name: "Doctor Communication",
+   {
+    name: "Pharmacist Communication",
     icon: icons.chat,
     privilege: [""],
     navs: [
+       {
+    path: "/doctor-comm/dashboard",
+    name: "Doctor Communication",
+    icon: icons.communication, // Add appropriate icon
+  },
       {
         path: "/doctor-comm/inquiries",
         name: "Recent Inquiries",
@@ -119,8 +98,39 @@ export default [
         icon: icons.search,
         privilege: [""],
       },
+ 
     ],
   },
+  {
+    path: "/home",
+    name: "Home",
+    icon: icons.request
+  },
+  {
+    path: "/doctor-requests",
+    name: "Requests",
+    icon: icons.request,
+  },
+  {
+    path: "drug-management",
+    name: "Drug Management",
+    icon: icons.drug,
+
+  },
+
+  {
+    path: "/roles",
+    name: "Roles & Permissions",
+    icon: icons.role,
+    // privilege: ["MANAGE_ROLES"],
+  },
+    {
+    path: "/privileges",
+    name: "Privilege",
+    icon: icons.privilege,
+    // privilege: ["CREATE_USER"],
+  },
+ 
   // {
   //   path: "/system_settings",
   //   name: "System Settings",
