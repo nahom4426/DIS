@@ -49,13 +49,55 @@ const rolesError = ref('');
 const roles = ref([]);
 const fetchRolesPending = ref(false);
 
+// Add new refs for provider and role
+const providerUuid = ref('');
+const providersError = ref('');
+const providers = ref([]);
+const fetchProvidersPending = ref(false);
 
-// Role options computation
+// Ethiopian Hospital List
+const ethiopianHospitalList = [
+  { label: 'Tikur Anbessa Specialized Hospital', value: 'tikur-anbessa' },
+  { label: 'St. Paul\'s Hospital Millennium Medical College', value: 'st-pauls' },
+  { label: 'Zewditu Memorial Hospital', value: 'zewditu' },
+  { label: 'Alert Hospital', value: 'alert' },
+  { label: 'Yekatit 12 Hospital Medical College', value: 'yekatit-12' },
+  { label: 'Ras Desta Damtew Memorial Hospital', value: 'ras-desta' },
+  { label: 'Gandhi Memorial Hospital', value: 'gandhi' },
+  { label: 'Tirunesh Beijing Hospital', value: 'tirunesh-beijing' },
+  { label: 'Bethzatha General Hospital', value: 'bethzatha' },
+  { label: 'Hayat Medical College Hospital', value: 'hayat' },
+  { label: 'Myungsung Christian Medical Center', value: 'myungsung' },
+  { label: 'Korean Hospital', value: 'korean' },
+  { label: 'Cure Ethiopia Children\'s Hospital', value: 'cure-ethiopia' },
+  { label: 'International Clinical Laboratories', value: 'icl' },
+  { label: 'Hallelujah General Hospital', value: 'hallelujah' },
+  { label: 'St. Peter Specialized Hospital', value: 'st-peter' },
+  { label: 'Armed Forces Comprehensive Specialized Hospital', value: 'armed-forces' },
+  { label: 'Police Hospital', value: 'police' },
+  { label: 'Minilik II Hospital', value: 'minilik-ii' },
+  { label: 'Adera Medical Center', value: 'adera' }
+];
+
+// Provider options computation
+const providerOptions = computed(() => {
+  return ethiopianHospitalList;
+});
+
+// Role options with predefined roles including superadmin
+const predefinedRoles = [
+  { label: 'Super Admin', value: 'superadmin' },
+  
+];
+
+// Role options computation - combine API roles with predefined roles
 const roleOptions = computed(() => {
-  return roles.value.map(role => ({
+  const apiRoles = roles.value.map(role => ({
     label: role.roleName,
     value: role.roleUuid
   }));
+  
+  return [...predefinedRoles, ...apiRoles];
 });
 
 
@@ -94,7 +136,6 @@ const genderOptions = ['Female', 'Male'];
 
 // Initialize form data from props
 onMounted(async () => {
-  // Fetch roles when component mounts
   await fetchRoles();
 
   if (props.initialData && Object.keys(props.initialData).length > 0) {
@@ -107,20 +148,21 @@ onMounted(async () => {
     gender.value = props.initialData.gender || '';
     mobilePhone.value = props.initialData.mobilePhone || '';
     roleUuid.value = props.initialData.roleUuid || '';
+    providerUuid.value = props.initialData.providerUuid || '';
   }
 });
 
 function handleSubmit() {
   const formData = {
     email: email.value,
-  
     title: title.value,
     firstName: firstName.value,
     fatherName: fatherName.value,
     grandFatherName: grandFatherName.value,
     gender: gender.value,
     mobilePhone: mobilePhone.value,
-    roleUuid: roleUuid.value
+    roleUuid: roleUuid.value,
+    providerUuid: providerUuid.value
   };
 
   props.onSubmit(formData);
@@ -267,37 +309,59 @@ function handleSubmit() {
         />
       </div>
 
+      <!-- Provider -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-[#75778B]">
+          Provider <span class="text-red-500">*</span>
+        </label>
+        <InputLayout>
+          <select
+            v-model="providerUuid"
+            name="providerUuid"
+            required
+            :disabled="!providerOptions.length"
+            class="custom-input"
+          >
+            <option value="" disabled>
+              {{ providerOptions.length ? 'Select provider' : 'No providers available' }}
+            </option>
+            <option
+              v-for="option in providerOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+        </InputLayout>
+        <p v-if="providersError" class="mt-2 text-sm text-red-600">{{ providersError }}</p>
+      </div>
+
       <!-- Role -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-[#75778B]">
           Role <span class="text-red-500">*</span>
         </label>
-    <InputLayout
- 
- 
->
-  <select
-    v-model="roleUuid"
-    name="roleUuid"
-    required
-    :disabled="!roleOptions.length"
-    class="custom-input"
-  >
-    <option value="" disabled>
-      {{ roleOptions.length ? 'Select role' : 'No roles available' }}
-    </option>
-    <option
-      v-for="option in roleOptions"
-      :key="option.value"
-      :value="option.value"
-    >
-      {{ option.label }}
-    </option>
-  </select>
-</InputLayout>
-
-
-
+        <InputLayout>
+          <select
+            v-model="roleUuid"
+            name="roleUuid"
+            required
+            :disabled="!roleOptions.length"
+            class="custom-input"
+          >
+            <option value="" disabled>
+              {{ roleOptions.length ? 'Select role' : 'No roles available' }}
+            </option>
+            <option
+              v-for="option in roleOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+        </InputLayout>
         <p v-if="rolesError" class="mt-2 text-sm text-red-600">{{ rolesError }}</p>
       </div>
     </div>

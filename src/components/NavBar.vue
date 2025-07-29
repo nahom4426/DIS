@@ -1,13 +1,42 @@
 <script setup>
 import icons from "@/utils/icons";
-import Dropdown from "./Dropdown.vue";
 import { useAuthStore } from "@/stores/auth";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import imageSrc from '@/assets/img/profile.png'
 
 const authStore = useAuthStore();
 const isScrolled = ref(false);
 const profilePicture = ref(authStore.auth?.user?.imageData || null);
+
+// Dropdown states
+const languageDropdownOpen = ref(false);
+const profileDropdownOpen = ref(false);
+
+// Close all dropdowns
+function closeAllDropdowns() {
+  languageDropdownOpen.value = false;
+  profileDropdownOpen.value = false;
+}
+
+// Toggle specific dropdown and close others
+function toggleLanguageDropdown() {
+  const wasOpen = languageDropdownOpen.value;
+  closeAllDropdowns();
+  languageDropdownOpen.value = !wasOpen;
+}
+
+function toggleProfileDropdown() {
+  const wasOpen = profileDropdownOpen.value;
+  closeAllDropdowns();
+  profileDropdownOpen.value = !wasOpen;
+}
+
+// Close dropdowns when clicking outside
+function handleClickOutside(event) {
+  if (!event.target.closest('.dropdown-container')) {
+    closeAllDropdowns();
+  }
+}
 
 // Process profile picture
 async function processProfilePicture() {
@@ -22,6 +51,11 @@ onMounted(() => {
   window.addEventListener('scroll', () => {
     isScrolled.value = window.scrollY > 10;
   });
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 
 function handleImageError() {
@@ -29,8 +63,19 @@ function handleImageError() {
 }
 
 function logout() {
+  closeAllDropdowns();
   localStorage.removeItem("userDetail");
   window.location.href = "/login";
+}
+
+function goToProfile() {
+  closeAllDropdowns();
+  this.$router.push('/profile');
+}
+
+function goToSettings() {
+  closeAllDropdowns();
+  this.$router.push('/settings');
 }
 
 const props = defineProps({
@@ -87,31 +132,42 @@ const props = defineProps({
     <!-- Right Section -->
     <div class="flex items-center gap-4">
       <!-- Language Selector -->
-      <Dropdown v-slot="{ setRef, toggleDropdown }">
+      <div class="dropdown-container relative">
         <button
-          @click.prevent="toggleDropdown"
+          @click.stop="toggleLanguageDropdown"
           class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 group"
         >
           <span class="text-sm font-medium text-gray-700 group-hover:text-primary">ENG</span>
           <i 
             v-html="icons.chevron_down" 
-            class="text-xs text-gray-500 group-hover:text-primary transition-transform duration-200 group-hover:rotate-180"
+            class="text-xs text-gray-500 group-hover:text-primary transition-transform duration-200"
+            :class="{ 'rotate-180': languageDropdownOpen }"
           />
         </button>
         
         <div
-          class="absolute shadow-lg border p-2 mt-2 rounded-lg flex flex-col gap-1 w-40 bg-white/95 backdrop-blur-sm"
-          :ref="setRef"
+          v-if="languageDropdownOpen"
+          class="absolute shadow-lg border p-2 mt-2 rounded-lg flex flex-col gap-1 w-40 bg-white/95 backdrop-blur-sm z-50"
         >
-          <button class="p-2 text-left hover:bg-gray-50 rounded-md transition-colors">English</button>
-          <button class="p-2 text-left hover:bg-gray-50 rounded-md transition-colors">Amharic</button>
+          <button 
+            @click="closeAllDropdowns"
+            class="p-2 text-left hover:bg-gray-50 rounded-md transition-colors"
+          >
+            English
+          </button>
+          <button 
+            @click="closeAllDropdowns"
+            class="p-2 text-left hover:bg-gray-50 rounded-md transition-colors"
+          >
+            Amharic
+          </button>
         </div>
-      </Dropdown>
+      </div>
 
       <!-- User Profile -->
-      <Dropdown v-slot="{ setRef, toggleDropdown }">
+      <div class="dropdown-container relative">
         <div
-          @click.prevent="toggleDropdown"
+          @click.stop="toggleProfileDropdown"
           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 cursor-pointer group"
         >
           <div class="relative">
@@ -137,14 +193,15 @@ const props = defineProps({
           
           <i 
             v-html="icons.chevron_down" 
-            class="text-xs text-gray-500 transition-transform duration-200 group-hover:rotate-180"
+            class="text-xs text-gray-500 transition-transform duration-200"
+            :class="{ 'rotate-180': profileDropdownOpen }"
           />
         </div>
 
         <!-- Dropdown Menu -->
         <div
+          v-if="profileDropdownOpen"
           class="absolute right-0 shadow-xl border border-gray-100 p-2 mt-2 rounded-xl flex flex-col gap-1 w-56 bg-white/95 backdrop-blur-sm z-50"
-          :ref="setRef"
         >
           <div class="px-3 py-2 border-b border-gray-100">
             <p class="text-sm font-medium text-gray-800">{{ authStore.auth.user?.firstName }} {{ authStore.auth.user?.fatherName }}</p>
@@ -152,7 +209,7 @@ const props = defineProps({
           </div>
           
           <button
-            @click="$router.push('/profile')"
+            @click="goToProfile"
             class="p-2 flex items-center gap-3 rounded-lg hover:bg-gray-50 transition-all duration-200 group"
           >
             <i v-html="icons.profile" class="text-gray-500 group-hover:text-primary" />
@@ -160,7 +217,7 @@ const props = defineProps({
           </button>
           
           <button
-            @click="$router.push('/settings')"
+            @click="goToSettings"
             class="p-2 flex items-center gap-3 rounded-lg hover:bg-gray-50 transition-all duration-200 group"
           >
             <i v-html="icons.settings" class="text-gray-500 group-hover:text-primary" />
@@ -170,14 +227,14 @@ const props = defineProps({
           <div class="border-t border-gray-100 my-1"></div>
           
           <button
-            @click="logout()"
+            @click="logout"
             class="p-2 flex items-center gap-3 rounded-lg hover:bg-red-50 text-red-500 transition-all duration-200 group"
           >
             <i v-html="icons.logout" class="group-hover:text-red-600" />
             <span class="text-sm">Logout</span>
           </button>
         </div>
-      </Dropdown>
+      </div>
     </div>
   </div>
 </template>

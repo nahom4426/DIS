@@ -52,15 +52,15 @@ a,
 }
 :root {
   /* Primary color */
-  --primary: 59, 130, 246; /* blue-500 equivalent */
+  --primary: 148, 97, 253; /* #9461FD */
   
-  /* Secondary color */
-  --secondary: 99, 102, 241; /* indigo-500 equivalent */
+  /* Secondary color - Softer */
+  --secondary: #818cf8;  /* Softer indigo */
   
   /* Other color variables from your config */
   --toast: 255, 255, 255;
   --text-clr: 31, 41, 55;
-  --accent: 139, 92, 246;
+  --accent: 148, 97, 253; /* #9461FD */
   --base-clr: 249, 250, 251;
   --base-clr2: 243, 244, 246;
   --base-clr3: 229, 231, 235;

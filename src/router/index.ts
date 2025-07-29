@@ -10,7 +10,7 @@ import doctorCommunicationRoutes from '@/features/doctor-communication/routes'
 
 // import institutionRoutes from "./institution.routes";
 import adminRoutes from "./admin.routes";
-import instutionSetingRoutes from "./institution_settings.routes";
+import providerRoutes from "./Provider.routes";
 
 
 import Profile from "@/features/profile/pages/profile.vue";
@@ -101,31 +101,11 @@ router.beforeEach((to, from, next) => {
   next()
 })
 router.beforeEach(async (to, from) => {
-  const auth = useAuthStore();
-  console.log("Navigation guard triggered:", { to: to.path, from: from.path });
+  // Temporarily bypass login - go directly to dashboard
+  if (to.path === '/login') {
+    return { path: '/dashboard' };
+  }
   
-  if (!auth.auth?.accessToken) {
-    const userDetail = localStorage.getItem("userDetail");
-    if (userDetail) {
-      try {
-        const parsedDetail = JSON.parse(userDetail);
-        auth.setAuth({
-          user: parsedDetail,
-          accessToken: parsedDetail?.token,
-        });
-        console.log("Restored auth from localStorage");
-      } catch (e) {
-        localStorage.removeItem("userDetail");
-        console.error("Failed to parse userDetail from localStorage", e);
-      }
-    }
-  }
-
-  if (to.path === "/login" && auth.auth?.accessToken) {
-    console.log("Already logged in, redirecting from login page");
-    return { path: from.path || '/dashboard' };
-  }
-
   if (to.path === '/') {
     console.log("Root path, redirecting to dashboard");
     return { path: '/doctor-comm/dashboard' };

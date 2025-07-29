@@ -1,112 +1,21 @@
 <script setup>
-import { ref, watch, onMounted, onUpdated } from "vue";
-import { vOnClickOutside, OnClickOutside } from "@vueuse/components";
+import { ref } from 'vue'
 
-const props = defineProps({
-  open: {
-    type: Boolean,
-    default: false,
-  },
-  position: {
-    type: String,
-    default: "bottom-right",
-  },
-  top: {
-    type: String,
-    default: "100%",
-  },
-  right: {
-    type: String,
-    default: "0",
-  },
-  left: {
-    type: String,
-  },
-  bottom: {
-    type: String,
-  },
-});
-
-const emit = defineEmits(['update:open']);
-
-const openDropdown = ref(props.open);
-const dropdown = ref(null);
-
-function setRef(el) {
-  dropdown.value = el;
-}
+const isOpen = ref(false)
+const setRef = ref(null)
 
 function toggleDropdown() {
-  openDropdown.value = !openDropdown.value;
-  emit('update:open', openDropdown.value);
+  isOpen.value = !isOpen.value
 }
-
-function setValue() {
-  if (!dropdown.value) return;
-  
-  if (!openDropdown.value) {
-    dropdown.value.style.display = "none";
-  } else {
-    dropdown.value.style.removeProperty("display");
-  }
-}
-
-function setStyle() {
-  if (!dropdown.value) return;
-  
-  dropdown.value.style.position = "absolute";
-  dropdown.value.style.zIndex = 20;
-
-  dropdown.value.style.setProperty("--top", props.top);
-  dropdown.value.style.setProperty("--right", props.right);
-  
-  if (props.left) {
-    dropdown.value.style.setProperty("--left", props.left);
-  }
-  
-  if (props.bottom) {
-    dropdown.value.style.setProperty("--bottom", props.bottom);
-  }
-
-  setValue();
-
-  if (props.position == "bottom-right") {
-    dropdown.value.classList.add("bottom-right");
-  }
-}
-
-watch(openDropdown, setValue);
-watch(props, setStyle);
-
-onMounted(() => {
-  // Delay the style setting to ensure the ref is available
-  setTimeout(setStyle, 0);
-});
-
-onUpdated(() => {
-  if (dropdown.value) {
-    setStyle();
-  }
-});
-
-// Expose methods and state to parent component
-defineExpose({
-  toggleDropdown,
-  openDropdown,
-});
 </script>
 
 <template>
-  <OnClickOutside
-    :class="[!dropdown ? 'loading-dropdown' : 'dropdown']"
-    class="inline-flex relative"
-    @trigger="openDropdown = false"
-  >
-    <slot name="trigger" :toggleDropdown="toggleDropdown" :open="openDropdown"></slot>
-    <div ref="dropdown" v-show="openDropdown">
+  <div class="relative">
+    <slot :setRef="setRef" :toggleDropdown="toggleDropdown"></slot>
+    <div v-if="isOpen" class="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
       <slot name="dropdown"></slot>
     </div>
-  </OnClickOutside>
+  </div>
 </template>
 
 <style>

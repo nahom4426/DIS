@@ -1,3 +1,4 @@
+<!-- Consider renaming this file to ActiveProvidersDataProvider.vue -->
 <script setup lang="ts">
 import { usePagination } from "@/composables/usePagination";
 import { getActiveInstitutions } from "../api/institutionsApi";

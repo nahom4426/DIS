@@ -37,13 +37,8 @@ const filteredData = computed(() => {
         :show-pagination="false"
         :rows="filteredData"
         :headers="{
-          head: ['Code', 'Drug Name', 'Price (ETB)', 'Status', 'actions'],
-          row: ['drugCode', 'drugName', 'price', 'status'],
-        }"
-        :cells="{
-          price: (price) => {
-            return formatCurrency(price);
-          },
+          head: ['Drug Code', 'Drug Name', 'Category', 'Dosage', 'Manufacturer', 'Status'],
+          row: ['drugCode', 'drugName', 'category', 'dosage', 'manufacturer', 'status'],
         }"
       >
       </Table>
