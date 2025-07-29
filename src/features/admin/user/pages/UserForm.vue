@@ -1,10 +1,10 @@
 <script setup>
-import {ref, computed, onMounted } from 'vue';
+import {ref, computed, onMounted, watch } from 'vue';
 import Input from '@/components/new_form_elements/Input.vue';
 import InputPassword from '@/components/new_form_elements/InputPassword.vue';
 import Select from '@/components/new_form_elements/Select.vue';
 import Form from '@/components/new_form_builder/Form.vue';
-import { getAllRole } from '../../role/Api/RoleApi';
+import { getAllHospitals, getAllRole } from '../../role/Api/RoleApi';
 import Spinner from '@/components/Spinner.vue';
 import InputLayout from '@/components/new_form_elements/NewInputLayout.vue';
 const props = defineProps({
@@ -45,12 +45,15 @@ const gender = ref('');
 const mobilePhone = ref('');
 const roleUuid = ref('');
 const rolesError = ref('');
+const hospitalError = ref('');
 // Role fetching state
 const roles = ref([]);
+const hospitals = ref([]); 
 const fetchRolesPending = ref(false);
+const fetchHospitalPending = ref(false);
 
 // Add new refs for provider and role
-const providerUuid = ref('');
+const hospitalUuid = ref('');
 const providersError = ref('');
 const providers = ref([]);
 const fetchProvidersPending = ref(false);
@@ -97,9 +100,14 @@ const roleOptions = computed(() => {
     value: role.roleUuid
   }));
   
-  return [...predefinedRoles, ...apiRoles];
+  return [ ...apiRoles];
 });
-
+const hospitalOptions = computed(() => {
+  return hospitals.value.map(hospital => ({
+    label: hospital.name,
+    value: hospital.hospitalUuid
+  }));
+});
 
 // Fetch roles function
 async function fetchRoles() {
@@ -109,11 +117,11 @@ async function fetchRoles() {
     
     const response = await getAllRole({ page: 1, limit: 500 });
     
-    if (!response?.data?.content || !Array.isArray(response.data.content)) {
+    if (!response?.data || !Array.isArray(response.data)) {
       throw new Error('Invalid data format: missing content array');
     }
 
-    roles.value = response.data.content.map(item => ({
+    roles.value = response.data.map(item => ({
       roleUuid: item.roleUuid,
       roleName: item.roleName,
       roleDescription: item.roleDescription || '',
@@ -129,6 +137,31 @@ async function fetchRoles() {
     fetchRolesPending.value = false;
   }
 }
+async function fetchHospitals() {
+  try {
+    fetchHospitalPending.value = true;
+    hospitalError.value = null;
+    
+    const response = await getAllHospitals({ page: 1, limit: 500 });
+    
+    if (!response?.data || !Array.isArray(response.data)) {
+      throw new Error('Invalid data format: missing content array');
+    }
+
+    hospitals.value = response.data.map(item => ({
+      hospitalUuid: item.hospitalUuid,
+      name: item.name,
+    }));
+
+    if (hospitals.value.length === 0) {
+      hospitalError.value = 'No Hospital available';
+    }
+  } catch (err) {
+    hospitalError.value = 'Failed to load Hospital. Please try again.';
+  } finally {
+    fetchHospitalPending.value = false;
+  }
+}
 
 // Title options
 const titleOptions = ['Mr', 'Ms.', 'Dr.', 'Prof'];
@@ -137,7 +170,8 @@ const genderOptions = ['Female', 'Male'];
 // Initialize form data from props
 onMounted(async () => {
   await fetchRoles();
-
+ 
+  await fetchHospitals(); 
   if (props.initialData && Object.keys(props.initialData).length > 0) {
     email.value = props.initialData.email || '';
     password.value = props.initialData.password || '';
@@ -148,7 +182,7 @@ onMounted(async () => {
     gender.value = props.initialData.gender || '';
     mobilePhone.value = props.initialData.mobilePhone || '';
     roleUuid.value = props.initialData.roleUuid || '';
-    providerUuid.value = props.initialData.providerUuid || '';
+    hospitalUuid.value = props.initialData.hospitalUuid || '';
   }
 });
 
@@ -162,7 +196,7 @@ function handleSubmit() {
     gender: gender.value,
     mobilePhone: mobilePhone.value,
     roleUuid: roleUuid.value,
-    providerUuid: providerUuid.value
+    hospitalUuid: hospitalUuid.value
   };
 
   props.onSubmit(formData);
@@ -296,37 +330,38 @@ function handleSubmit() {
       <!-- Mobile Phone -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-[#75778B]">
-          Mobile Phone <span class="text-red-500">*</span>
+          phoneNumber <span class="text-red-500">*</span>
         </label>
         <Input
           v-model="mobilePhone"
-          name="mobilePhone"
+          name="phoneNumber"
           validation="required|phone"
           :attributes="{
-            placeholder: 'Enter mobile phone',
+            placeholder: 'Enter phoneNumber',
             required: true
           }"
         />
       </div>
 
       <!-- Provider -->
-      <div class="space-y-2">
+    
+  <div class="space-y-2">
         <label class="block text-sm font-medium text-[#75778B]">
-          Provider <span class="text-red-500">*</span>
+          Hospital <span class="text-red-500">*</span>
         </label>
         <InputLayout>
           <select
-            v-model="providerUuid"
-            name="providerUuid"
+            v-model="hospitalUuid"
+            name="hospitalUuid"
             required
-            :disabled="!providerOptions.length"
             class="custom-input"
+            :disabled="!roleOptions.length"
           >
             <option value="" disabled>
-              {{ providerOptions.length ? 'Select provider' : 'No providers available' }}
+              {{ hospitalOptions.length ? 'Select Hospital' : 'No Hospital available' }}
             </option>
             <option
-              v-for="option in providerOptions"
+              v-for="option in hospitalOptions"
               :key="option.value"
               :value="option.value"
             >
@@ -334,9 +369,8 @@ function handleSubmit() {
             </option>
           </select>
         </InputLayout>
-        <p v-if="providersError" class="mt-2 text-sm text-red-600">{{ providersError }}</p>
+        <p v-if="hospitalError" class="mt-2 text-sm text-red-600">{{ hospitalError }}</p>
       </div>
-
       <!-- Role -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-[#75778B]">

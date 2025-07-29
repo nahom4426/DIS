@@ -11,7 +11,7 @@ import Dashboard from "@/features/Dashboard/pages/Dashboard.vue";
 import adminRoutes from "./admin.routes";
 import providerRoutes from "./Provider.routes";
 
-import Profile from '@/views/Profile.vue'
+import Profile from '@/components/ProfilePage.vue'
 
 function addMetaToRoutes(routes) {
   return routes.map(route => {
@@ -39,7 +39,7 @@ const router = createRouter({
     },
     
     {
-      path: "/main",
+      path: "",
       name: "home",
       component: MainLayout,
       children: [

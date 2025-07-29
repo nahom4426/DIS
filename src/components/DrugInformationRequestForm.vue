@@ -2,6 +2,13 @@
 import { ref, reactive } from 'vue';
 import Button from '@/components/Button.vue';
 import { openModal } from '@customizer/modal-x';
+import { submitDrugInformationRequest } from '@/features/service/api/drugInformationApi';
+import { useApiRequest } from '@/composables/useApiRequest';
+import { useAuthStore } from '@/stores/auth';
+import { toasted } from '@/utils/utils';
+
+const authStore = useAuthStore();
+const submitReq = useApiRequest();
 
 const formData = reactive({
   requestType: '', // Change from object to string
@@ -76,20 +83,40 @@ function confirmSubmission() {
     requestQuestion: formData.requestQuestion,
     preferredResponse: formData.preferredResponse,
     responseNeeded: formData.responseNeeded,
-    submittedAt: new Date().toISOString(),
-    submittedBy: 'Current User', // You can get this from auth store
-    status: 'Pending Review'
+    submittedBy: authStore.auth?.user?.userUuid || 'Current User',
   };
 
-  console.log('Submitting form data:', submissionData);
+  console.log('Submitting form data to API:', submissionData);
   
-  // Save to localStorage immediately
-  const existingRequests = JSON.parse(localStorage.getItem('drugInformationRequests') || '[]');
-  existingRequests.push(submissionData);
-  localStorage.setItem('drugInformationRequests', JSON.stringify(existingRequests));
-  
-  emit('submit', submissionData);
-  showConfirmation.value = false;
+  submitReq.send(
+    () => submitDrugInformationRequest(submissionData),
+    (response) => {
+      if (response.success) {
+        toasted(true, "Drug information request submitted successfully");
+        
+        // Also save to localStorage as backup
+        const existingRequests = JSON.parse(localStorage.getItem('drugInformationRequests') || '[]');
+        existingRequests.push({...submissionData, ...response.data});
+        localStorage.setItem('drugInformationRequests', JSON.stringify(existingRequests));
+        
+        emit('submit', response.data);
+        showConfirmation.value = false;
+        
+        // Reset form
+        Object.keys(formData).forEach(key => {
+          if (typeof formData[key] === 'object') {
+            Object.keys(formData[key]).forEach(subKey => {
+              formData[key][subKey] = '';
+            });
+          } else {
+            formData[key] = '';
+          }
+        });
+      } else {
+        toasted(false, "Failed to submit request", response.error);
+      }
+    }
+  );
 }
 
 function cancelSubmission() {

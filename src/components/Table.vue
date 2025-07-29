@@ -172,12 +172,10 @@ const showEmptyState = computed(() => {
     
     <!-- Empty state - show when no data and not loading -->
     <tr v-if="showEmptyState">
-      <td :colspan="spec.head.length + 1">
+      <td :colspan="spec.head.length + 8">
         <slot name="placeholder">
           <div class="flex flex-col gap-2 items-center py-8">
-            <div class="flex-1 w-full flex justify-center py-5 h-full">
-              <img src="../assets/img/noData.gif" alt="No Data" class="h-56" />
-            </div>
+        
             <p class="text-xl text-gray-600">
               {{ placeholder ? placeholder : "No Data Found" }}
             </p>

@@ -33,7 +33,7 @@ watch(() => props.selectPrivilege, (newVal) => {
 
 <template>
     <Form class="grid grid-cols-3 gap-4 p-6" :inner="false" id="roleForm">
-        <Input name="roleName" validation="required" label="Role Name" :value="roles?.roleName || ''" :attributes="{
+        <Input name="roleName" validation="required" label="roleName" :value="roles?.roleName || ''" :attributes="{
             placeholder: 'Enter Role Name',
         }" />
         <Textarea validation="required" name="roleDescription" :value="roles?.roleDescription || ''"
@@ -44,7 +44,7 @@ watch(() => props.selectPrivilege, (newVal) => {
             <SelectPrivilegeInput 
                 label="Select Privileges" 
                 validation="required" 
-                name="privilegeUuid"
+                name="privilegeUuids"
                 :options="privileges" 
                 :selectedPrivilege="selectPrivilege || []" 
             />

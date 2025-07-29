@@ -46,7 +46,7 @@ const pagination = usePagination({
           head: [
             'Fullname',
             'Email',
-            'Mobile Phone',
+            'phoneNumber',
             'User Type',
             'Role Name',
             'Gender',
@@ -56,7 +56,7 @@ const pagination = usePagination({
           row: [
             'fullname',
             'email',
-            'mobilePhone',
+            'phoneNumber',
             'userType',
             'roleName',
             

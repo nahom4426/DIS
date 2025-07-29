@@ -25,9 +25,9 @@ function create({ values, reset }) {
     },
     (res) => {
       if (res.success) {
-        console.log(res.data?.content);
+        console.log(res.data);
         
-        privilegeStore.add(res.data?.content);
+        privilegeStore.add(res.data);
         if (reset) reset();
         
         toasted(res.success, "Privilege Created Successfully", res.error);

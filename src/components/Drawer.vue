@@ -56,7 +56,10 @@ const toggleMenu = (name) => {
 
 <template>
   <div
-    class="h-full rounded-2xl w-drawer-width bg-white  transition-all duration-300 flex flex-col relative"
+    :class="[
+      'h-full rounded-2xl bg-white transition-all duration-300 flex flex-col relative',
+      props.isCollapsed ? 'w-16' : 'w-64'
+    ]"
   >
     <!-- Standard Collapse Button -->
     <button
@@ -71,88 +74,108 @@ const toggleMenu = (name) => {
       ></i>
     </button>
 
+    <!-- Logo Section -->
     <div class="space-y-4 flex-shrink-0">
-      <div class="flex gap-2 py-4 w-1/3 items-center justify-center">
+      <div :class="[
+        'flex gap-2 py-4 items-center',
+        props.isCollapsed ? 'justify-center px-2' : 'justify-start px-4'
+      ]">
         <img
-          class="size-15"
+          class="w-8 h-8 flex-shrink-0"
           src="/src/assets/edislogo.png"
           alt="DIS Logo"
         />
         <span
           v-if="!props.isCollapsed"
-          class="text-md font-bold days-one text-primary"
-          >.</span
-        >
+          class="text-md font-bold days-one text-primary whitespace-nowrap"
+        >EDIS</span>
       </div>
-      <div class="border border-b border-[#F6F7FA]"></div>
+      <div class="border-b border-[#F6F7FA]"></div>
     </div>
+
+    <!-- Navigation Menu -->
     <div
-      :class="[props.isCollapsed ? 'items-center' : 'px-4']"
-      class="overflow-scroll scrollbar-hide h-full text-base-clr"
+      :class="[
+        'flex-1 text-base-clr overflow-y-auto',
+        props.isCollapsed ? 'px-2' : 'px-4'
+      ]"
+      style="scrollbar-width: none; -ms-overflow-style: none;"
     >
-      <div class="flex flex-col justify-center overflow-x-hidden gap-2">
+      <div class="flex flex-col gap-2">
         <template v-for="item in filteredNavs" :key="item.name || item.path">
+          <!-- Menu items with children -->
           <template v-if="item.navs && item.navs.length">
             <button
               @click="toggleMenu(item.name)"
-              class="flex justify-between w-full items-center h-12 rounded-lg transition-all duration-200"
-              :class="{
-                'bg-[#DFF1F1]':
-                  expandedMenus.includes(item.name) && !isCollapsed,
-                '': !expandedMenus.includes(item.name) || isCollapsed,
-              }"
+              :class="[
+                'flex items-center h-12 rounded-lg transition-all duration-200 group',
+                props.isCollapsed ? 'justify-center px-2' : 'justify-between px-3',
+                expandedMenus.includes(item.name) && !props.isCollapsed ? 'bg-[#DFF1F1]' : 'hover:bg-gray-100'
+              ]"
+              :title="props.isCollapsed ? item.name : ''"
             >
-              <span class="flex items-center gap-4 ml-3">
-                <i v-html="item.icon"></i>
+              <span :class="[
+                'flex items-center',
+                props.isCollapsed ? 'justify-center' : 'gap-3'
+              ]">
+                <i v-html="item.icon" class="text-lg flex-shrink-0"></i>
                 <span
                   v-if="!props.isCollapsed"
-                  class="text-sm md:whitespace-nowrap font-medium"
-                  >{{ item.name }}</span
-                >
+                  class="text-sm font-medium whitespace-nowrap"
+                >{{ item.name }}</span>
               </span>
               <i
-                v-if="!isCollapsed"
-                class="mr-3"
+                v-if="!props.isCollapsed"
                 v-html="icons.chevron_down"
                 :class="{ 'rotate-180': expandedMenus.includes(item.name) }"
+                class="transition-transform duration-200 flex-shrink-0"
               />
             </button>
 
+            <!-- Submenu items -->
             <div
-              name="child-items"
-              tag="div"
-              class="pl-1 mt- space-y-2 border-l"
-              :class="[isCollapsed ? '' : 'ml-6']"
+              v-if="!props.isCollapsed"
+              v-show="expandedMenus.includes(item.name)"
+              class="ml-6 space-y-1 border-l border-gray-200 pl-3"
             >
-               <RouterLink
-    v-show="expandedMenus.includes(item.name)"
-    v-for="child in item.navs"
-    :key="child.path"
-    :to="child.path"
-    class="flex h-12 pl-3 rounded-lg hover:bg-secondary/20 transition-colors"
-    active-class="bg-primary text-white"
-  >
-    <span class="flex items-center gap-3">
-      <i v-html="child.icon" />
-      <span v-if="!isCollapsed">{{ child.name }}</span>
-    </span>
-  </RouterLink>
+              <RouterLink
+                v-for="child in item.navs"
+                :key="child.path"
+                :to="child.path"
+                :class="[
+                  'flex items-center h-10 px-3 rounded-lg hover:bg-secondary/20 transition-colors group',
+                  'router-link-active:bg-primary router-link-active:text-white'
+                ]"
+              >
+                <span class="flex items-center gap-3">
+                  <i v-html="child.icon" class="text-base flex-shrink-0"></i>
+                  <span class="text-sm font-medium whitespace-nowrap">{{ child.name }}</span>
+                </span>
+              </RouterLink>
             </div>
           </template>
+
+          <!-- Single menu items -->
           <template v-else>
             <RouterLink
               :to="item.path"
               @click="handleSingleItemClick"
-              class="flex h-12 rounded-lg hover:bg-secondary transition-all duration-200"
-              :class="[isCollapsed ? 'justify-center' : ' pl-3']"
+              :class="[
+                'flex items-center h-12 rounded-lg hover:bg-secondary transition-all duration-200 group',
+                props.isCollapsed ? 'justify-center px-2' : 'px-3',
+                'router-link-active:bg-primary router-link-active:text-white'
+              ]"
+              :title="props.isCollapsed ? item.name : ''"
             >
-              <span class="flex items-center gap-3">
-                <i v-html="item.icon"></i>
+              <span :class="[
+                'flex items-center',
+                props.isCollapsed ? 'justify-center' : 'gap-3'
+              ]">
+                <i v-html="item.icon" class="text-lg flex-shrink-0"></i>
                 <span
                   v-if="!props.isCollapsed"
-                  class="text-sm font-medium transition-all duration-200"
-                  >{{ item.name }}</span
-                >
+                  class="text-sm font-medium whitespace-nowrap"
+                >{{ item.name }}</span>
               </span>
             </RouterLink>
           </template>
@@ -163,29 +186,21 @@ const toggleMenu = (name) => {
 </template>
 
 <style scoped>
-.__drawer {
-  overflow-y: scroll;
-  /* --drawer-width: 260px; */
-}
 .router-link-active {
   @apply bg-primary text-white;
 }
 
-
-.top-left {
-  position: absolute;
-  top: 45px;
-  left: calc(var(--drawer-width));
+/* Hide scrollbar */
+div::-webkit-scrollbar {
+  display: none;
 }
+
 i {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-html {
-  transition: background-color 0.3s ease;
-}
 @media (max-width: 767px) {
   .__drawer {
     transform: translateX(-100%);
@@ -193,6 +208,7 @@ html {
   }
   .__drawer:not(.is-collapsed) {
     transform: translateX(0);
+    width: 280px;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   }
 }

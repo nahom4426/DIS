@@ -3,7 +3,7 @@ import { getQueryFormObject } from "@/utils/utils.js";
 
 // Create a new API service instance with the specific base URL
 const api = new ApiService(import.meta.env.v_API_URI);
-const path = "/users";
+const path = "/user";
 
 export function CreateUser(data) {
   const formattedData = {
@@ -13,7 +13,7 @@ export function CreateUser(data) {
 
   return api
     .addAuthenticationHeader()
-    .post(`${path}/signup`, formattedData)
+    .post(`${path}`, formattedData)
     .catch((error) => {
       return {
         success: false,
@@ -24,7 +24,7 @@ export function CreateUser(data) {
 }
 export function getAllUser(query = {}) {
   const qr = getQueryFormObject(query);
-  return api.addAuthenticationHeader().get(`${path}/all${qr}`);
+  return api.addAuthenticationHeader().get(`${path}/users${qr}`);
 }
 export function getUserById(id) {
   return api.addAuthenticationHeader().get(`${path}/${id}`);

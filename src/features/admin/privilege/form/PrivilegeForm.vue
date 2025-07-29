@@ -12,24 +12,7 @@ const props = defineProps({
   },
 });
 
-const privilegeType = ref([
-  {
-    label: "For All",
-    value: "FOR_ALL",
-  },
-  {
-    label: "Admin",
-    value: "FOR_SYSTEM_ADMIN",
-  },
-  {
-    label: "Provider",
-    value: "FOR_PROVIDER",
-  },
-  {
-    label: "Payer",
-    value: "FOR_PAYER",
-  },
-]);
+
 </script>
 <template>
   <Form
@@ -38,53 +21,33 @@ const privilegeType = ref([
     id="privilegeForm"
   >
     <Input
-      name="privilegeName"
+      name="name"
       validation="required|minmax-3,50 (Minimum length is 3 characters.)"
       label="Privilege Name"
       :value="props.privilege?.privilegeName || ''"
       :attributes="{
         placeholder: 'Enter Privilege',
       }"
-    />
+    />  
     <Input
       validation="required|minmax-3,50 (Minimum length is 3 characters.)"
-      name="privilegeDescription"
-      :value="props.privilege?.privilegeDescription || ''"
+      name="description"
+      :value="props.privilege?.description || ''"
       label="Privilege Description"
       :attributes="{
         placeholder: 'Enter Privilege description',
       }"
     />
     <Input
-      :value="props.privilege?.privilegeCategory || ''"
-      name="privilegeCategory"
+      :value="props.privilege?.category || ''"
+      name="category"
       label="Privilege Category"
       validation="required|minmax-3,50 (Minimum length is 3 characters.)"
       :attributes="{
         placeholder: 'Enter Privilege Category',
       }"
     />
-     <Input
-      :value="props.privilege?.privilegeType || ''"
-      name="privilegeType"
-      label="Privilege Type"
-      validation="required|minmax-3,50 (Minimum length is 3 characters.)"
-      :attributes="{
-        placeholder: 'Enter Privilege Type',
-      }"
-    />
-    <div v-privilege.role="'ADMIN'">
-      <Select
-        :obj="true"
-        :value="props.privilege?.privilegeType"
-        name="privilegeType"
-        validation="required"
-        label="Privilege Type"
-        :options="privilegeType"
-        :attributes="{
-          placeholder: 'Enter Privilege Type',
-        }"
-      />
-    </div>
+     
+   
   </Form>
 </template>

@@ -6,9 +6,13 @@ const path = "/role";
 
 export function getAllRole(query = {}) {
   const qr = getQueryFormObject(query);
-  return api.addAuthenticationHeader().get(`${path}`);
+  return api.addAuthenticationHeader().get(`${path}/roles${qr}`);
 }
-export function craeteRole(data) {
+export function getAllHospitals(query = {}) {
+  const qr = getQueryFormObject(query);
+  return api.addAuthenticationHeader().get(`/hospital/hospitals${qr}`);
+}
+export function createRole(data) {
   return api.addAuthenticationHeader().post(`${path}`, data);
 }
 export function getRoleById(id) {

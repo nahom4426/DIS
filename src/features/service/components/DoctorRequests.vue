@@ -147,7 +147,7 @@ const filteredRequests = computed(() => {
 
     <div v-else>
       <div class="mb-4">
-        <h3 class="text-lg font-semibold text-gray-900">In Progress Drug Information Requests ({{ filteredRequests.length }})</h3>
+        <!-- <h3 class="text-lg font-semibold text-gray-900">In Progress Drug Information Requests ({{ filteredRequests.length }})</h3> -->
         <p class="text-sm text-gray-600">Currently being worked on by pharmacists</p>
       </div>
 

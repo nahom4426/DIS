@@ -1,9 +1,11 @@
 <script setup>
-import icons from "@/utils/icons";
-import { useAuthStore } from "@/stores/auth";
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import imageSrc from '@/assets/img/profile.png'
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+import icons from '@/utils/icons';
+import imageSrc from '@/assets/img/profile.png';
 
+const router = useRouter();
 const authStore = useAuthStore();
 const isScrolled = ref(false);
 const profilePicture = ref(authStore.auth?.user?.imageData || null);
@@ -70,12 +72,12 @@ function logout() {
 
 function goToProfile() {
   closeAllDropdowns();
-  this.$router.push('/profile');
+  router.push('/profile');
 }
 
 function goToSettings() {
   closeAllDropdowns();
-  this.$router.push('/settings');
+  router.push('/settings');
 }
 
 const props = defineProps({

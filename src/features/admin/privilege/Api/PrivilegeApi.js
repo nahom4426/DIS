@@ -2,11 +2,11 @@ import ApiService from "@/service/ApiService";
 import { getQueryFormObject } from "@/utils/utils.js";
 
 const api = new ApiService();
-const path = "/users";
+const path = "";
 
 export function getAllPrivilege(query = {}) {
   const qr = getQueryFormObject(query);
-  return api.addAuthenticationHeader().get(`${path}/privilege/all${qr}`);
+  return api.addAuthenticationHeader().get(`${path}/privilege/privileges${qr}`);
 }
 export function createPrivilege(data) {
   return api.addAuthenticationHeader().post(`${path}/privilege`, data);

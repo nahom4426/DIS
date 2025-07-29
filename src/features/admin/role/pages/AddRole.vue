@@ -1,7 +1,7 @@
 <script setup>
 import PrivilegesDataProvider from "../../privilege/components/PrivilegesDataProvider.vue";
 import { useApiRequest } from "@/composables/useApiRequest";
-import { craeteRole } from "../Api/RoleApi";
+import { createRole } from "../Api/RoleApi";
 import { toasted } from "@/utils/utils";
 import { useRoles } from "../store/roleStore";
 import RoleForm from "../form/RoleForm.vue";
@@ -16,7 +16,7 @@ const router = useRouter();
 
 function create({ values }) {
   req.send(
-    () => craeteRole(values),
+    () => createRole(values),
     (res) => {
       if (res.success) {
         roleStore.add(res.data);

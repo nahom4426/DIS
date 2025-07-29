@@ -128,7 +128,7 @@ function getRequestTypeColor(type) {
     <div class="bg-gradient-to-r from-blue-400 to-blue-500 rounded-lg p-6 text-white">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <img src="/src/assets/mainlogo.png" alt="Logo" class="w-12 h-12" />
+          <img src="/src/assets/Adobe Express - file (2).png" alt="Logo" class="w-12 h-12" />
           <div>
             <h1 class="text-2xl font-bold">Welcome, Dr. {{ authStore.auth?.user?.firstName || 'User' }} {{ authStore.auth?.user?.lastName || authStore.auth?.user?.fatherName || 'Name' }}</h1>
             <p class="text-blue-100 mt-1">Here's what's happening with your patients today</p>
