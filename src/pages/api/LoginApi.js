@@ -1,14 +1,14 @@
 import ApiService from "@/service/ApiService";
 
 const api = new ApiService(import.meta.env?.vv_API_URI);
-const path = "auth/users";
+const path = "api/auth";
 
 export function signup(data, config = {}) {
   return api.post(`${path}/signUp`, data, config);
 }
 
 export function login(data, config = {}) {
-  return api.post(`${path}/signin`, data, config);
+  return api.post(`${path}/login`, data, config);
 }
 
 // Send password reset code to email

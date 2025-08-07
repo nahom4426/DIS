@@ -2,7 +2,7 @@ import ApiService from "@/service/ApiService";
 import { getQueryFormObject } from "@/utils/utils.js";
 
 const api = new ApiService();
-const basePath = "/drug-information-requests";
+const Path = "/api/physician/questions";
 
 // Submit drug information request
 export function submitDrugInformationRequest(data) {
@@ -15,7 +15,7 @@ export function submitDrugInformationRequest(data) {
 
   return api
     .addAuthenticationHeader()
-    .post(`${basePath}`, formattedData)
+    .post(`${Path}`, formattedData)
     .catch((error) => {
       return {
         success: false,
@@ -28,19 +28,19 @@ export function submitDrugInformationRequest(data) {
 // Get all drug information requests with pagination
 export function getAllDrugInformationRequests(query = {}) {
   const qr = getQueryFormObject(query);
-  return api.addAuthenticationHeader().get(`${basePath}${qr}`);
+  return api.addAuthenticationHeader().get(`${Path}/questions${qr}`);
 }
 
 // Get drug information request by ID
 export function getDrugInformationRequestById(id) {
-  return api.addAuthenticationHeader().get(`${basePath}/${id}`);
+  return api.addAuthenticationHeader().get(`${Path}/${id}`);
 }
 
 // Update drug information request status
 export function updateDrugInformationRequestStatus(id, status) {
   return api
     .addAuthenticationHeader()
-    .put(`${basePath}/${id}/status`, { status })
+    .put(`${Path}/${id}/status`, { status })
     .catch((error) => {
       return {
         success: false,
@@ -50,13 +50,14 @@ export function updateDrugInformationRequestStatus(id, status) {
     });
 }
 
+
 // Delete drug information request
 export function deleteDrugInformationRequest(id) {
-  return api.addAuthenticationHeader().delete(`${basePath}/${id}`);
+  return api.addAuthenticationHeader().delete(`${Path}/${id}`);
 }
 
 // Get requests by user
 export function getUserDrugInformationRequests(userId, query = {}) {
   const qr = getQueryFormObject(query);
-  return api.addAuthenticationHeader().get(`${basePath}/user/${userId}${qr}`);
+  return api.addAuthenticationHeader().get(`${Path}/user/${userId}${qr}`);
 }

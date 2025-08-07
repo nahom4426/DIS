@@ -103,7 +103,7 @@ const emit = defineEmits(["user"]);
       </div>
       <Input
         label="Email"
-        name="email"
+        name="username"
         validation="required|email"
         :attributes="{ placeholder: 'Enter your email' }"
       />

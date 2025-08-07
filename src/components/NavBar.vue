@@ -1,17 +1,9 @@
 <script setup>
-<<<<<<< HEAD
-import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useRouter } from 'vue-router';
-import icons from '@/utils/icons';
-import imageSrc from '@/assets/img/profile.png';
-=======
 import icons from "@/utils/icons";
 import { useAuthStore } from "@/stores/auth";
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import imageSrc from '@/assets/img/profile.png'
->>>>>>> 768174987201b4037df05a855d37a2dcc595fb5e
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -167,6 +159,47 @@ const props = defineProps({
           </button>
         </div>
       </div>
+<!-- Notification Bell -->
+<div class="dropdown-container relative">
+  <button
+    @click.stop="toggleNotificationDropdown"
+    class="relative p-2 rounded-full hover:bg-gray-100 transition-colors group"
+    aria-label="Notifications"
+  >
+    <i
+      v-html="icons.bell"
+      class="w-5 h-5 text-gray-600 group-hover:text-primary"
+    />
+    <!-- Badge -->
+    <span
+      v-if="notificationCount > 0"
+      class="absolute top-0 right-0 inline-flex items-center justify-center px-1 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full"
+    >
+      {{ notificationCount }}
+    </span>
+  </button>
+
+  <!-- Dropdown panel -->
+  <div
+    v-if="notificationDropdownOpen"
+    class="absolute right-0 mt-2 w-72 bg-white/95 border shadow-xl rounded-lg z-50 backdrop-blur-sm"
+  >
+    <div class="p-3 border-b text-sm font-semibold text-gray-700">
+      Notifications
+    </div>
+    <ul class="max-h-60 overflow-y-auto">
+      <li v-for="(notif, i) in notifications" :key="i" class="px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">
+        {{ notif }}
+      </li>
+      <li v-if="notifications.length === 0" class="px-4 py-4 text-sm text-gray-500 text-center">
+        No new notifications.
+      </li>
+    </ul>
+    <div class="p-2 text-center border-t">
+      <button class="text-xs text-primary hover:underline">View All</button>
+    </div>
+  </div>
+</div>
 
       <!-- User Profile -->
       <div class="dropdown-container relative">

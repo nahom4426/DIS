@@ -67,12 +67,12 @@ export default [
        {
     path: 'registration',
     name: "Registration",
-    icon: icons.user_plus || icons.user,
+    icon: icons.register,
     // privilege: ["MANAGE_REGISTRATION_REQUESTS"],
   },
    {
     name: "Pharmacist Communication",
-    icon: icons.chat,
+    icon: icons.pharmacist,
     privilege: [""],
     navs: [
        {

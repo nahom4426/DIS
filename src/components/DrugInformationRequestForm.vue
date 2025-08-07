@@ -9,6 +9,8 @@ import { toasted } from '@/utils/utils';
 
 const authStore = useAuthStore();
 const submitReq = useApiRequest();
+const id =authStore.auth.userUuid;
+console.log(authStore.auth.userUuid);
 
 const formData = reactive({
   requestType: '',
@@ -72,23 +74,28 @@ function handleSubmit() {
   }
 
   console.log('Form is valid, navigating to confirmation page');
+  showConfirmation.value= true;
+
   // Emit event to parent to show confirmation page
   emit('showConfirmation', formData);
 }
 
 function confirmSubmission() {
-  const submissionData = {
-    requestType: formData.requestType,
-    patientInfo: formData.patientInfo,
-    requestQuestion: formData.requestQuestion,
-    preferredResponse: formData.preferredResponse,
-    responseNeeded: formData.responseNeeded,
-    submittedAt: new Date().toISOString(),
-    submittedBy: authStore.auth?.user?.userUuid || authStore.auth?.user?.id || 'Current User',
-    submitterName: authStore.auth?.user?.firstName + ' ' + (authStore.auth?.user?.lastName || authStore.auth?.user?.fatherName || ''),
-    submitterEmail: authStore.auth?.user?.email,
-    status: 'Pending Review'
-  };
+ const submissionData = {
+  requestType: formData.requestType,
+  userUuid : authStore.auth.userUuid,
+  patientInfo: formData.patientInfo,
+  requestQuestion: formData.requestQuestion,
+  preferredResponse: formData.preferredResponse,
+  responseNeeded: formData.responseNeeded,
+  submittedAt: new Date().toISOString(),
+  submittedBy: authStore.auth?.user?.userUuid || authStore.auth?.user?.id || 'Current User',
+  submitterName: authStore.auth?.user?.firstName + ' ' + (authStore.auth?.user?.lastName || authStore.auth?.user?.fatherName || ''),
+  submitterEmail: authStore.auth?.user?.email,
+  status: 'Pending Review'
+};
+
+  
 
   console.log('Submitting form data to API:', submissionData);
   
@@ -463,7 +470,7 @@ function goBack() {
             <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
               <h3 class="text-lg font-semibold text-gray-900 mb-3">Request/Question</h3>
               <div class="bg-white p-4 rounded border">
-                <p class="text-gray-900 whitespace-pre-wrap">{{ formData.requestQuestion }}</p>
+                <p class="text-gray-900 whitespace-pre-wrap">{{ question }}</p>
               </div>
             </div>
 

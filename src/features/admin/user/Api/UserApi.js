@@ -3,7 +3,7 @@ import { getQueryFormObject } from "@/utils/utils.js";
 
 // Create a new API service instance with the specific base URL
 const api = new ApiService(import.meta.env.v_API_URI);
-const path = "/user";
+const path = "/api/admin/user";
 
 export function CreateUser(data) {
   const formattedData = {

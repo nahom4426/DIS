@@ -1,25 +1,32 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia'
+import type { LoginResponse } from '@/features/auth/authApi'
+import { ref } from 'vue'
 
-export const useAuthStore = defineStore("authStore", () => {
-  const auth = ref({
-    user: {
-      firstName: "Test",
-      lastName: "User", 
-      email: "test@example.com",
-      roleName: "Admin",
-      authorities: ["All Privileges"]
-    },
-    accessToken: "mock-token"
-  });
-  const imageData = ref('')
+export const useAuthStore = defineStore('myAuthStore', () => {
+  const auth = ref<LoginResponse>({
+    token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXllckBnbWFpbC5jb20iLCJpYXQiOjE3MjY3MzE5MDIsImV4cCI6ODY0MDAxNzI2NzMxOTAyfQ.d9lI2EUE3oDicgDquqI3EYV0jEB5QD8UEfvN429GoIQ",
+    userUuid: '',
+    email: '',
+    roleName: '',
+    title: '',
+    firstName: '',
+    fatherName: '',
+    grandFatherName: '',
+    gender: 'Male ',
+    mobilePhone: '',
+    userStatus: 'ACTIVE',
+    roles: [],
+    userType: 'Payer',
+    payerUuid: '',
+    privileges: []
+  })
 
-  function setAuth(val: any) {
-    auth.value = val;
+  function setAuth(data: LoginResponse) {
+    auth.value = data
   }
-  function setProfile(val: any) {
-    imageData.value = val;
-  }
 
-  return { auth, setAuth, setProfile, imageData };
-});
+  return {
+    auth,
+    setAuth
+  }
+})

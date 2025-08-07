@@ -21,7 +21,7 @@ function getRequestTypes() {
   const types = [];
   if (props.data?.formData?.requestType?.patientSpecific) types.push('Patient Specific');
   if (props.data?.formData?.requestType?.academic) types.push('Academic');
-  if (props.data?.formData?.requestType?.other) types.push('Other');
+ 
   return types.join(', ');
 }
 </script>
