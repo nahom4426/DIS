@@ -20,9 +20,13 @@ function create({ values }) {
     (res) => {
       if (res.success) {
         roleStore.add(res.data);
+        // Force refresh of roles data
+        roleStore.set([...roleStore.roles, res.data]);
+        toasted(res.success, "Role Created", res.error);
         router.push("/roles");
+      } else {
+        toasted(false, "Failed to create role", res.error);
       }
-      toasted(res.success, "Role Created", res.error);
     }
   );
 }
@@ -39,7 +43,12 @@ const goBack = () => {
     title="Add Role"
   >
     <PrivilegesDataProvider :pre-page="500" v-slot="{ privileges, pending }">
-      <RoleForm v-if="!pending" :privileges="privileges" :roles="roleStore" />
+      <RoleForm 
+        v-if="!pending" 
+        :privileges="privileges" 
+        :roles="{}" 
+        :selectPrivilege="[]"
+      />
       <p v-else>Loading...</p>
     </PrivilegesDataProvider>
 

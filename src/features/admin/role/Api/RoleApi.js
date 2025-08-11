@@ -13,7 +13,7 @@ export function getAllHospitals(query = {}) {
   return api.addAuthenticationHeader().get(`/hospital/hospitals${qr}`);
 }
 export function createRole(data) {
-  return api.addAuthenticationHeader().post(`${path}`, data);
+  return api.addAuthenticationHeader().post(`${path}/create`, data);
 }
 export function getRoleById(id) {
   return api.addAuthenticationHeader().get(`${path}/${id}`);

@@ -2,7 +2,7 @@ import ApiService from "@/service/ApiService";
 import { getQueryFormObject } from "@/utils/utils.js";
 
 const api = new ApiService();
-const Path = "/api/physician/questions";
+const Path = "/question";
 
 // Submit drug information request
 export function submitDrugInformationRequest(data) {
@@ -36,6 +36,9 @@ export function getDrugInformationRequestById(id) {
   return api.addAuthenticationHeader().get(`${Path}/${id}`);
 }
 
+export function createQuestion(data) {
+  return api.addAuthenticationHeader().post(`${path}`, data);
+}
 // Update drug information request status
 export function updateDrugInformationRequestStatus(id, status) {
   return api

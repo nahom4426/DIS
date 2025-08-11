@@ -57,13 +57,7 @@ export default [
     name: "Dashboard",
     icon: icons.dashboard,
   },
-    {
-    path: "/users",
-    name: "User Management",
-    icon: icons.user,
-    privilege: ["Create Employees"],
-  },
-   
+  
        {
     path: 'registration',
     name: "Registration",
@@ -117,6 +111,12 @@ export default [
     name: "Drug Management",
     icon: icons.drug,
 
+  },
+  {
+    path: "/users",
+    name: "User Management",
+    icon: icons.user,
+    // privilege: ["Create Employees"],
   },
 
   {

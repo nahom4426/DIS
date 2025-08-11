@@ -58,26 +58,26 @@ function update({ values }) {
     title="Update Role"
   >
     <PrivilegesDataProvider :pre-page="500" v-slot="{ privileges, pending }">
-      <RoleForm v-if="!pending" :selectPrivilege="role?.privilegeList" :privileges="privileges" :roles="roleStore" />
+      <RoleForm 
+        v-if="!pending && Object.keys(role).length" 
+        :selectPrivilege="role?.privileges || role?.privilegeList" 
+        :privileges="privileges" 
+        :roles="role" 
+      />
       <p v-else>Loading...</p>
     </PrivilegesDataProvider>
-      {{ privileges }}
 
     <template #bottom>
-
         <Button
           size="sm"
           type="primary"
           class="flex justify-center  items-center mt-3 gap-3 p-2 bg-primary"
-          :pending="req.pending.value"
+          :pending="updateReq.pending.value"
           @click.prevent="submit(update)"
         >
-          <!-- <i class="pb-[3px]" v-html="icons.plus" /> -->
           Update Role
         </Button>
     </template>
   
   </NewFormParent>
- 
-
 </template>

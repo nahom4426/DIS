@@ -28,11 +28,21 @@ watch(
     pagination.send();
   }
 );
+
+// Expose refresh method
+function refresh() {
+  pagination.send();
+}
+
+defineExpose({
+  refresh
+});
 </script>
 <template>
   <slot
     :roles="roles.roles"
     :pending="pagination.pending.value"
     :error="pagination.error.value"
+    :refresh="refresh"
   />
 </template>

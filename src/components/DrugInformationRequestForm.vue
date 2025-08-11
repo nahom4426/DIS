@@ -16,18 +16,18 @@ console.log(authStore.auth.userUuid);
 const formData = reactive({
   requestType: '',
   patientInfo: {
-    age: 0,                    // Number as per backend
-    sex: '',                   // Keep as 'sex' not 'gender'
-    weight: 0.1,               // Number with decimal
+    patientAge: 0,                    // Changed from 'age'
+    patientGender: '',                // Changed from 'sex' 
+    weight: 0.1,                      
     diagnosis: '',
     currentMedication: '',
-    concurrentMedications: '',
-    allergies: '',             // Keep this field
-    otherInfo: ''              // Keep this field
+    concurrentMedication: '',         // Changed from 'concurrentMedications'
+    allergies: '',             
+    otherInformation: ''              // Changed from 'otherInfo'
   },
-  requestQuestion: '',
-  preferredResponse: '',
-  responseNeeded: ''
+  description: '',                    // Changed from 'requestQuestion'
+  responseUrgency: '',                // Changed from 'preferredResponse'
+  patientType: 'PATIENT_SPECIFIC'     // Added new field
 });
 
 const showConfirmation = ref(false);
@@ -43,11 +43,11 @@ function validateForm() {
 
   // Validate patient info if patient specific is selected
   if (formData.requestType === 'patientSpecific') {
-    if (!formData.patientInfo.age || formData.patientInfo.age <= 0) {
+    if (!formData.patientInfo.patientAge || formData.patientInfo.patientAge <= 0) {
       errors.push('Age is required for patient specific requests');
     }
-    if (!formData.patientInfo.sex) {
-      errors.push('Sex is required for patient specific requests');
+    if (!formData.patientInfo.patientGender) {
+      errors.push('Gender is required for patient specific requests');
     }
     if (!formData.patientInfo.weight || formData.patientInfo.weight < 0.1) {
       errors.push('Weight is required for patient specific requests');
@@ -58,12 +58,12 @@ function validateForm() {
   }
 
   // Validate required fields
-  if (!formData.requestQuestion.trim()) {
-    errors.push('Request/Question field is required');
+  if (!formData.description.trim()) {
+    errors.push('Description field is required');
   }
 
-  if (!formData.responseNeeded) {
-    errors.push('Please select response time needed');
+  if (!formData.responseUrgency) {
+    errors.push('Please select response urgency');
   }
 
   return errors;
@@ -92,51 +92,23 @@ const auth=useAuthStore()
 
 function confirmSubmission() {
   const submissionData = {
-    requestType: formData.requestType,
-    patientInfo: {
-      age: Number(formData.patientInfo.age),
-      sex: formData.patientInfo.sex,
-      weight: Number(formData.patientInfo.weight),
-      diagnosis: formData.patientInfo.diagnosis,
-      currentMedication: formData.patientInfo.currentMedication,
-      concurrentMedications: formData.patientInfo.concurrentMedications,
-      allergies: formData.patientInfo.allergies,        // Include allergies
-      otherInfo: formData.patientInfo.otherInfo         // Include otherInfo
-    },
-    requestQuestion: formData.requestQuestion,
-    preferredResponse: formData.preferredResponse,
-    responseNeeded: formData.responseNeeded,
-    submittedAt: new Date().toISOString(),
-    submittedBy: authStore.auth?.userUuid || authStore.auth?.user?.userUuid || authStore.auth?.user?.id || 'Current User',
-    submitterName: authStore.auth?.user?.firstName + ' ' + (authStore.auth?.user?.lastName || authStore.auth?.user?.fatherName || ''),
-    status: 'Pending Review',
-    userUuid:auth.auth.userUuid
+    description: formData.description,
+    questionStatus: "UNANSWERED",
+    patientAge: Number(formData.patientInfo.patientAge),
+    patientType: formData.patientType,
+    patientGender: formData.patientInfo.patientGender,
+    weight: Number(formData.patientInfo.weight),
+    diagnosis: formData.patientInfo.diagnosis,
+    currentMedication: formData.patientInfo.currentMedication,
+    concurrentMedication: formData.patientInfo.concurrentMedication,
+    allergies: formData.patientInfo.allergies,
+    otherInformation: formData.patientInfo.otherInformation,
+    responseUrgency: formData.responseUrgency,
+    userUuid: auth.auth?.user?.userUuid || ''
   };
-
-  console.log('Submitting form data to API:', submissionData);
   
-  submitReq.send(
-    () => submitDrugInformationRequest(submissionData),
-    (response) => {
-      if (response.success) {
-        console.log('Request submitted successfully:', response.data);
-        
-        const existingRequests = JSON.parse(localStorage.getItem('drugInformationRequests') || '[]');
-        existingRequests.push({
-          ...submissionData,
-          requestId: response.data.requestId || Date.now().toString()
-        });
-        localStorage.setItem('drugInformationRequests', JSON.stringify(existingRequests));
-        
-        toasted(true, 'Drug information request submitted successfully!');
-        emit('submit', response.data);
-      } else {
-        console.error('Failed to submit request:', response.error);
-        toasted(false, response.error || 'Failed to submit request');
-      }
-      showConfirmation.value = false;
-    }
-  );
+  console.log('Submitting data:', submissionData);
+  emit('submit', submissionData);
 }
 
 function cancelSubmission() {
@@ -254,7 +226,7 @@ function goBack() {
                       <label class="block text-sm font-medium text-gray-700 mb-1">Age:</label>
                       <input 
                         type="number" 
-                        v-model.number="formData.patientInfo.age"
+                        v-model.number="formData.patientInfo.patientAge"
                         min="0"
                         max="150"
                         class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
@@ -262,9 +234,9 @@ function goBack() {
                       />
                     </div>
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Sex:</label>
+                      <label class="block text-sm font-medium text-gray-700 mb-1">Gender:</label>
                       <select 
-                        v-model="formData.patientInfo.sex"
+                        v-model="formData.patientInfo.patientGender"
                         class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
                       >
                         <option value="">Select...</option>
@@ -309,7 +281,7 @@ function goBack() {
                       <label class="block text-sm font-medium text-gray-700 mb-1">Concurrent medication/s:</label>
                       <input 
                         type="text" 
-                        v-model="formData.patientInfo.concurrentMedications"
+                        v-model="formData.patientInfo.concurrentMedication"
                         class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
                         placeholder="List concurrent medications"
                       />
@@ -326,7 +298,7 @@ function goBack() {
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-1">Other Information:</label>
                       <textarea 
-                        v-model="formData.patientInfo.otherInfo"
+                        v-model="formData.patientInfo.otherInformation"
                         rows="3"
                         class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none"
                         placeholder="Any other relevant patient information"
@@ -347,7 +319,7 @@ function goBack() {
               </td>
               <td class="border border-gray-400 p-4 min-w-[400px]">
                 <textarea 
-                  v-model="formData.requestQuestion"
+                  v-model="formData.description"
                   rows="6"
                   placeholder="Please describe your drug information request or question in detail..."
                   class="w-full h-32 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
@@ -366,7 +338,7 @@ function goBack() {
                   <label class="flex items-center">
                     <input 
                       type="radio" 
-                      v-model="formData.responseNeeded" 
+                      v-model="formData.responseUrgency" 
                       value="prompt"
                       class="mr-2"
                     />
@@ -375,7 +347,7 @@ function goBack() {
                   <label class="flex items-center">
                     <input 
                       type="radio" 
-                      v-model="formData.responseNeeded" 
+                      v-model="formData.responseUrgency" 
                       value="30-60-min"
                       class="mr-2"
                     />
@@ -384,7 +356,7 @@ function goBack() {
                   <label class="flex items-center">
                     <input 
                       type="radio" 
-                      v-model="formData.responseNeeded" 
+                      v-model="formData.responseUrgency" 
                       value="end-of-day"
                       class="mr-2"
                     />
@@ -393,7 +365,7 @@ function goBack() {
                   <label class="flex items-center">
                     <input 
                       type="radio" 
-                      v-model="formData.responseNeeded" 
+                      v-model="formData.responseUrgency" 
                       value="when-time-permits"
                       class="mr-2"
                     />
