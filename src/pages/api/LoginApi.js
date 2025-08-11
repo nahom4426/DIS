@@ -8,7 +8,7 @@ export function signup(data, config = {}) {
 }
 
 export function login(data, config = {}) {
-  return api.post(`${path}/login`, data, config);
+  return api.post(`${path}/signIn`, data, config);
 }
 
 // Send password reset code to email

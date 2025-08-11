@@ -37,51 +37,22 @@ let detiail = localStorage.getItem("userDetail");
 // }
 
 redirecting.value = false;
-
 const loginReq = useApiRequest();
 function handleLogin({ values }) {
   if (loginReq.pending.value) return;
   
-  // Temporary bypass - skip actual API call
-  // const mockResponse = {
-  //   success: true,
-  //   data: {
-  //     userUuid: 'temp-user-123',
-  //     email: values.email,
-  //     firstName: 'Test',
-  //     lastName: 'User',
-  //     roleName: 'Pharmacist',
-  //     authorities: ['All Privileges'],
-  //     token: 'temp-token-123',
-  //     firstTimeLogin: false
-  //   }
-  // };
 
-  // // Simulate the successful login flow
-  // auth.setAuth({
-  //   user: mockResponse.data,
-  //   imageData: mockResponse.data?.imageData,
-  //   accessToken: mockResponse.data?.token,
-  // });
-
-  // localStorage.setItem("userDetail", JSON.stringify(mockResponse.data));
-  // reRoute();
-  // toasted(true, "Successfully Logged In (Temporary Mode)", null);
-  
-  // Original code (commented out for temporary bypass)
   
   loginReq.send(
     () => login(values),
     (res) => {
       if (res.success) {
         auth.setAuth({
-          user: res.data,
+          user: resz.data,
           imageData:res.data?.imageData,
           accessToken: res.data?.token,
         });
-        if(!auth.auth?.user?.firstTimeLogin){
-          openModal('ChangePassword')
-        }
+      router.push('/dashboard')
         localStorage.setItem("userDetail", JSON.stringify(res.data));
         // reRoute(); // Comment this out
       }

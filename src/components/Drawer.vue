@@ -187,7 +187,62 @@ const toggleMenu = (name) => {
 
 <style scoped>
 .router-link-active {
-  @apply bg-primary text-white;
+  @apply bg-primary text-white border-primary shadow-sm;
+}
+
+.router-link-active i {
+  @apply text-white;
+}
+
+/* Enhanced scrollbar styling */
+div::-webkit-scrollbar {
+  width: 4px;
+}
+
+div::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+div::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 2px;
+}
+
+div::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* Smooth transitions for child items */
+.child-items-enter-active,
+.child-items-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.child-items-enter-from,
+.child-items-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+  max-height: 0;
+}
+
+.child-items-enter-to,
+.child-items-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 200px;
+}
+
+/* Hover effects */
+.group:hover i {
+  @apply scale-105;
+  transition: transform 0.2s ease;
+}
+
+/* Focus states for accessibility */
+button:focus,
+a:focus {
+  @apply outline-none ring-2 ring-primary/20 ring-offset-2;
 }
 
 /* Hide scrollbar */

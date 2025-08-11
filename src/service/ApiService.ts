@@ -89,7 +89,7 @@ export default class ApiService {
 
   addAuthenticationHeader() {
     const authStore = useAuthStore();
-    this.api.defaults.headers.common.Authorization = `Bearer ${authStore.auth?.accessToken}`;
+    this.api.defaults.headers.common.Authorization = `Bearer ${authStore.auth.token}`;
     return this;
   }
 }

@@ -61,10 +61,7 @@ function handleDelete(id) {
   }
 }
 
-function closeDetailModal() {
-  showDetailModal.value = false;
-  selectedprivilege.value = null;
-}
+
 
 </script>
 

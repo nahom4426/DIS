@@ -1,4 +1,4 @@
-ull<script setup>
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import icons from '@/utils/icons'
@@ -12,25 +12,43 @@ const inquiry = ref(null)
 const response = ref('')
 const chatHistory = ref([])
 const isLoading = ref(false)
+const attachedFiles = ref([])
+const fileInput = ref(null)
 
 async function sendResponse() {
   if (!response.value.trim()) return
   
   isLoading.value = true
   try {
-    // Add to chat history
+    // Create FormData for file uploads
+    const formData = new FormData()
+    formData.append('message', response.value)
+    formData.append('inquiryId', inquiryData.value.id)
+    
+    // Append files
+    attachedFiles.value.forEach((file, index) => {
+      formData.append(`attachments[${index}]`, file)
+    })
+    
+    // Add to chat history with attachments
     chatHistory.value.push({
       id: Date.now(),
       sender: 'pharmacist',
       message: response.value,
+      attachments: attachedFiles.value.map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type
+      })),
       timestamp: new Date().toISOString()
     })
     
-    // Clear response field
+    // Clear response and attachments
     response.value = ''
+    attachedFiles.value = []
     
-    // Here you would make an API call to send the response
-    console.log('Sending response:', response.value)
+    // Here you would make an API call to send the response with attachments
+    console.log('Sending response with attachments:', formData)
   } finally {
     isLoading.value = false
   }
@@ -61,6 +79,65 @@ onMounted(() => {
     }
   ]
 })
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function handleFileUpload(event) {
+  const files = Array.from(event.target.files)
+  
+  files.forEach(file => {
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert(`File "${file.name}" is too large. Maximum size is 10MB.`)
+      return
+    }
+    
+    // Validate file type
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain',
+      'image/jpeg',
+      'image/jpg', 
+      'image/png',
+      'image/gif'
+    ]
+    
+    if (!allowedTypes.includes(file.type)) {
+      alert(`File type "${file.type}" is not allowed.`)
+      return
+    }
+    
+    // Add to attached files
+    attachedFiles.value.push(file)
+  })
+  
+  // Clear the input
+  event.target.value = ''
+}
+
+function removeFile(index) {
+  attachedFiles.value.splice(index, 1)
+}
+
+function getFileIcon(fileType) {
+  if (fileType.includes('pdf')) return icons.pdf || icons.file
+  if (fileType.includes('word') || fileType.includes('document')) return icons.document || icons.file
+  if (fileType.includes('text')) return icons.text || icons.file
+  if (fileType.includes('image')) return icons.image || icons.file
+  return icons.file
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
 </script>
 
 <template>
@@ -123,6 +200,25 @@ onMounted(() => {
               ]"
             >
               <p class="text-sm">{{ message.message }}</p>
+              
+              <!-- Show attachments if any -->
+              <div v-if="message.attachments && message.attachments.length > 0" class="mt-2 space-y-1">
+                <div 
+                  v-for="attachment in message.attachments"
+                  :key="attachment.name"
+                  :class="[
+                    'flex items-center gap-2 p-2 rounded text-xs',
+                    message.sender === 'doctor' 
+                      ? 'bg-white text-gray-700' 
+                      : 'bg-blue-400 text-white'
+                  ]"
+                >
+                  <i v-html="getFileIcon(attachment.type)" class="flex-shrink-0"></i>
+                  <span class="truncate">{{ attachment.name }}</span>
+                  <span class="text-xs opacity-70">({{ formatFileSize(attachment.size) }})</span>
+                </div>
+              </div>
+              
               <p class="text-xs mt-1 opacity-70">
                 {{ new Date(message.timestamp).toLocaleTimeString() }}
               </p>
@@ -132,22 +228,94 @@ onMounted(() => {
 
         <!-- Response Input - Fixed at bottom -->
         <div class="p-6 border-t">
-          <div class="flex gap-3">
+          <div class="space-y-3">
+            <!-- Textarea -->
             <textarea
               v-model="response"
               placeholder="Type your response..."
-              class="flex-1 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows="3"
             ></textarea>
-            <Button 
-              @click="sendResponse"
-              :disabled="!response.trim() || isLoading"
-              type="primary"
-              class="self-end px-6"
-            >
-              <i v-html="icons.send"></i>
-              Send
-            </Button>
+            
+            <!-- File Attachment Section -->
+            <div class="flex items-center justify-between">
+              <!-- File Attachment Controls -->
+              <div class="flex items-center gap-3">
+                <!-- File Upload Button -->
+                <button
+                  @click="triggerFileInput"
+                  type="button"
+                  class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                  title="Attach file"
+                >
+                  <i v-html="icons.paperclip || icons.file" class="text-base"></i>
+                  <span>Attach File</span>
+                </button>
+                
+                <!-- Hidden File Input -->
+                <input
+                  ref="fileInput"
+                  type="file"
+                  multiple
+                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
+                  class="hidden"
+                  @change="handleFileUpload"
+                />
+                
+                <!-- File Count Indicator -->
+                <span v-if="attachedFiles.length > 0" class="text-xs text-gray-500">
+                  {{ attachedFiles.length }} file{{ attachedFiles.length > 1 ? 's' : '' }} attached
+                </span>
+              </div>
+              
+              <!-- Send Button -->
+              <Button 
+                @click="sendResponse"
+                :disabled="!response.trim() || isLoading"
+                type="primary"
+                class="px-6"
+              >
+                <i v-html="icons.send"></i>
+                Send
+              </Button>
+            </div>
+            
+            <!-- Attached Files Preview -->
+            <div v-if="attachedFiles.length > 0" class="space-y-2">
+              <div class="text-xs font-medium text-gray-700 mb-2">Attached Files:</div>
+              <div class="flex flex-wrap gap-2">
+                <div
+                  v-for="(file, index) in attachedFiles"
+                  :key="index"
+                  class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm"
+                >
+                  <!-- File Icon -->
+                  <i 
+                    v-html="getFileIcon(file.type)" 
+                    class="text-gray-500 flex-shrink-0"
+                  ></i>
+                  
+                  <!-- File Name -->
+                  <span class="text-gray-700 truncate max-w-32" :title="file.name">
+                    {{ file.name }}
+                  </span>
+                  
+                  <!-- File Size -->
+                  <span class="text-xs text-gray-500">
+                    ({{ formatFileSize(file.size) }})
+                  </span>
+                  
+                  <!-- Remove Button -->
+                  <button
+                    @click="removeFile(index)"
+                    class="text-red-500 hover:text-red-700 ml-1"
+                    title="Remove file"
+                  >
+                    <i v-html="icons.close || icons.x" class="text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

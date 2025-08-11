@@ -72,8 +72,8 @@ function out() {
 }
 
 .success {
-  background-color: #02676B;
-  color: #F6F7FA;
+  background-color: #16a34a;
+  color: #ffffff;
 }
 </style>
 
