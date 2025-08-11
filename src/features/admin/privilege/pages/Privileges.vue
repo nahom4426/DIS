@@ -4,10 +4,21 @@ import Table from "@/components/Table.vue";
 import DefaultPage from "@/components/DefaultPage.vue";
 import PrivilegesDataProvider from "../components/PrivilegesDataProvider.vue";
 import icons from "@/utils/icons";
-import Dropdown from "@/components/Dropdown.vue";
 import { useRouter } from "vue-router";
-const router=useRouter();
+import { useApiRequest } from "@/composables/useApiRequest";
+import { deletePrivilege } from "../Api/PrivilegeApi";
+import { toasted } from "@/utils/utils";
+
+const router = useRouter();
 const dataProvider = ref();
+
+// Add missing variables
+const selectedprivilege = ref(null);
+const showDetailModal = ref(false);
+
+// Add missing API request composable
+const deleteReq = useApiRequest();
+
 function toggleDropdown(event, rowId) {
   event.stopPropagation();
   closeAllDropdowns();
@@ -45,7 +56,7 @@ function handleDelete(id) {
   console.log('Attempting to delete privilege:', id);
   if (confirm("Are you sure you want to delete this privilege? This action cannot be undone.")) {
     deleteReq.send(
-      () => removeprivilegeById(id),
+      () => deletePrivilege(id),
       (res) => {
         console.log('Delete response:', res);
         if (res.success) {
@@ -60,9 +71,6 @@ function handleDelete(id) {
     );
   }
 }
-
-
-
 </script>
 
 <template>
@@ -90,17 +98,15 @@ function handleDelete(id) {
       <PrivilegesDataProvider
         ref="dataProvider"
         :search="search"
-        v-slot="{ privileges, pending,  }"
+        v-slot="{ privileges, pending }"
       >
-      
         <Table
           :pending="pending"
           :headers="{
             head: ['Privilege Name', 'Description', 'Category', 'Actions'],
-            row: ['privilegeName', 'description', 'category'],
+            row: ['privilegeName', 'privilegeDescription', 'privilegeCategory'],
           }"
-          :rows="privileges"
-        
+          :rows="Array.isArray(privileges) ? privileges : []"
         >
          <template #actions="{row}">
             <div class="dropdown-container relative w-full h-10 flex items-center">

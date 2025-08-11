@@ -1,7 +1,8 @@
 import ApiService from "@/service/ApiService";
 
-const api = new ApiService(import.meta.env?.vv_API_URI);
-const path = "api/auth";
+// Make sure to use the correct environment variable
+const api = new ApiService(import.meta.env.v_API_URI);
+const path = "/auth/users";
 
 export function signup(data, config = {}) {
   return api.post(`${path}/signUp`, data, config);

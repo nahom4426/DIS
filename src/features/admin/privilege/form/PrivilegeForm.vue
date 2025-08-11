@@ -21,7 +21,7 @@ const props = defineProps({
     id="privilegeForm"
   >
     <Input
-      name="name"
+      name="privilegeName"
       validation="required|minmax-3,50 (Minimum length is 3 characters.)"
       label="Privilege Name"
       :value="props.privilege?.privilegeName || ''"
@@ -31,23 +31,21 @@ const props = defineProps({
     />  
     <Input
       validation="required|minmax-3,50 (Minimum length is 3 characters.)"
-      name="description"
-      :value="props.privilege?.description || ''"
+      name="privilegeDescription"
+      :value="props.privilege?.privilegeDescription || ''"
       label="Privilege Description"
       :attributes="{
         placeholder: 'Enter Privilege description',
       }"
     />
     <Input
-      :value="props.privilege?.category || ''"
-      name="category"
+      :value="props.privilege?.privilegeCategory || ''"
+      name="privilegeCategory"
       label="Privilege Category"
       validation="required|minmax-3,50 (Minimum length is 3 characters.)"
       :attributes="{
         placeholder: 'Enter Privilege Category',
       }"
     />
-     
-   
   </Form>
 </template>

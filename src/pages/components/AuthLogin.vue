@@ -39,16 +39,17 @@ let detiail = localStorage.getItem("userDetail");
 redirecting.value = false;
 const loginReq = useApiRequest();
 function handleLogin({ values }) {
-  if (loginReq.pending.value) return;
+  // Debug: Check if env variable is loaded
+  console.log('🔍 Environment API URL:', import.meta.env.VITE_API_URI);
   
-
+  if (loginReq.pending.value) return;
   
   loginReq.send(
     () => login(values),
     (res) => {
       if (res.success) {
         auth.setAuth({
-          user: resz.data,
+          user: res.data,
           imageData:res.data?.imageData,
           accessToken: res.data?.token,
         });
@@ -74,7 +75,7 @@ const emit = defineEmits(["user"]);
       </div>
       <Input
         label="Email"
-        name="username"
+        name="email"
         validation="required|email"
         :attributes="{ placeholder: 'Enter your email' }"
       />
