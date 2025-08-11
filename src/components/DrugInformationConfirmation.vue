@@ -81,60 +81,26 @@ function goBack() {
         </div>
 
         <!-- Patient Information Card -->
-        <div v-if="formData.requestType.patientSpecific" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div class="bg-green-50 px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-              <svg class="w-5 h-5 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-              </svg>
-              Patient Information
-            </h3>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-4">
-                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="font-medium text-gray-600">Age:</span>
-                  <span class="text-gray-900 font-semibold">{{ formData.patientInfo.age }}</span>
-                </div>
-                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="font-medium text-gray-600">Sex:</span>
-                  <span class="text-gray-900 font-semibold capitalize">{{ formData.patientInfo.sex }}</span>
-                </div>
-              </div>
-              <div class="space-y-4">
-                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="font-medium text-gray-600">Weight:</span>
-                  <span class="text-gray-900 font-semibold">{{ formData.patientInfo.weight }} kg</span>
-                </div>
-                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="font-medium text-gray-600">Diagnosis:</span>
-                  <span class="text-gray-900 font-semibold">{{ formData.patientInfo.diagnosis }}</span>
-                </div>
-              </div>
+        <div v-if="formData.requestType === 'patientSpecific'" class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+          <h3 class="text-lg font-semibold text-gray-900 mb-3">Patient Information</h3>
+          <div class="bg-white p-4 rounded border space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><span class="font-medium">Age:</span> {{ formData.patientInfo.age }}</div>
+              <div><span class="font-medium">Sex:</span> {{ formData.patientInfo.sex }}</div>
+              <div><span class="font-medium">Weight:</span> {{ formData.patientInfo.weight }} kg</div>
+              <div><span class="font-medium">Diagnosis:</span> {{ formData.patientInfo.diagnosis }}</div>
             </div>
-            
-            <!-- Additional Patient Info -->
-            <div v-if="formData.patientInfo.currentMedication || formData.patientInfo.concurrentMedications || formData.patientInfo.allergies || formData.patientInfo.otherInfo" class="mt-6 pt-6 border-t border-gray-200">
-              <h4 class="font-medium text-gray-900 mb-4">Additional Information</h4>
-              <div class="space-y-4">
-                <div v-if="formData.patientInfo.currentMedication" class="bg-gray-50 p-4 rounded-lg">
-                  <span class="font-medium text-gray-600 block mb-1">Current Medication:</span>
-                  <span class="text-gray-900">{{ formData.patientInfo.currentMedication }}</span>
-                </div>
-                <div v-if="formData.patientInfo.concurrentMedications" class="bg-gray-50 p-4 rounded-lg">
-                  <span class="font-medium text-gray-600 block mb-1">Concurrent Medications:</span>
-                  <span class="text-gray-900">{{ formData.patientInfo.concurrentMedications }}</span>
-                </div>
-                <div v-if="formData.patientInfo.allergies" class="bg-gray-50 p-4 rounded-lg">
-                  <span class="font-medium text-gray-600 block mb-1">Allergies:</span>
-                  <span class="text-gray-900">{{ formData.patientInfo.allergies }}</span>
-                </div>
-                <div v-if="formData.patientInfo.otherInfo" class="bg-gray-50 p-4 rounded-lg">
-                  <span class="font-medium text-gray-600 block mb-1">Other Information:</span>
-                  <span class="text-gray-900">{{ formData.patientInfo.otherInfo }}</span>
-                </div>
-              </div>
+            <div v-if="formData.patientInfo.currentMedication" class="space-y-2">
+              <div><span class="font-medium">Current Medication:</span> {{ formData.patientInfo.currentMedication }}</div>
+            </div>
+            <div v-if="formData.patientInfo.concurrentMedications" class="space-y-2">
+              <div><span class="font-medium">Concurrent Medications:</span> {{ formData.patientInfo.concurrentMedications }}</div>
+            </div>
+            <div v-if="formData.patientInfo.allergies" class="space-y-2">
+              <div><span class="font-medium">Allergies:</span> {{ formData.patientInfo.allergies }}</div>
+            </div>
+            <div v-if="formData.patientInfo.otherInfo" class="space-y-2">
+              <div><span class="font-medium">Other Information:</span> {{ formData.patientInfo.otherInfo }}</div>
             </div>
           </div>
         </div>

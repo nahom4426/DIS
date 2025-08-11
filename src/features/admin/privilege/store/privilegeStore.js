@@ -5,7 +5,13 @@ export const usePrivilege = defineStore("Privilegestore", () => {
   const privilege = ref([]);
 
   function set(data) {
-    privilege.value = data;
+    console.log('🏪 Setting data in store:', data);
+    if (Array.isArray(data)) {
+      privilege.value = data;
+    } else {
+      console.warn('⚠️ Data is not an array:', data);
+      privilege.value = [];
+    }
   }
 
   function getAll() {

@@ -1,34 +1,49 @@
 <script setup>
-import { closeModal } from '@customizer/modal-x';
-import Button from './Button.vue';
-
 const props = defineProps({
-  data: Object,
+  data: {
+    type: Object,
+    required: true
+  }
 });
 
-function sendRequest() {
-  if (props.data?.onConfirm) {
-    props.data.onConfirm();
-  }
-  closeModal();
+const emit = defineEmits(['confirm', 'cancel']);
+
+function confirm() {
+  emit('confirm');
 }
 
 function cancel() {
-  closeModal();
+  emit('cancel');
 }
 
 function getRequestTypes() {
-  const types = [];
-  if (props.data?.formData?.requestType?.patientSpecific) types.push('Patient Specific');
-  if (props.data?.formData?.requestType?.academic) types.push('Academic');
- 
-  return types.join(', ');
+  const requestType = props.data?.requestType || props.data?.formData?.requestType;
+  switch(requestType) {
+    case 'patientSpecific':
+      return 'Patient Specific';
+    case 'academic':
+      return 'Academic';
+    case 'other':
+      return 'Other';
+    default:
+      return requestType || 'Not specified';
+  }
+}
+
+// Helper function to get patient info
+function getPatientInfo() {
+  return props.data?.patientInfo || props.data?.formData?.patientInfo || {};
+}
+
+// Helper function to get form data
+function getFormData() {
+  return props.data?.formData || props.data || {};
 }
 </script>
 
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
       <!-- Header -->
       <div class="bg-blue-600 text-white p-6 flex justify-between items-center">
         <div>
@@ -53,70 +68,66 @@ function getRequestTypes() {
               </svg>
               Request Type
             </h3>
-            <div class="bg-white p-3 rounded border">
-              <span class="text-blue-600 font-medium">{{ getRequestTypes() }}</span>
+            <div class="bg-white p-4 rounded border">
+              <span class="text-lg text-gray-900 font-medium">{{ getRequestTypes() }}</span>
             </div>
           </div>
 
-          <!-- Patient Information Card (if applicable) -->
-          <div v-if="data?.formData?.requestType?.patientSpecific" class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+          <!-- Patient Information Card -->
+          <div v-if="(data?.requestType === 'patientSpecific' || data?.formData?.requestType === 'patientSpecific')" class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
               </svg>
               Patient Information
             </h3>
-            <div class="bg-white p-4 rounded border space-y-3">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="flex justify-between">
-                  <span class="font-medium text-gray-600">Age:</span>
-                  <span class="text-gray-900">{{ data.formData.patientInfo.age }}</span>
+            <div class="bg-white p-6 rounded border">
+              <!-- Basic Patient Info Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="space-y-1">
+                  <label class="text-sm font-medium text-gray-600">Age:</label>
+                  <div class="text-gray-900 font-medium">{{ getPatientInfo().age || 'Not provided' }}</div>
                 </div>
-                <div class="flex justify-between">
-                  <span class="font-medium text-gray-600">Sex:</span>
-                  <span class="text-gray-900">{{ data.formData.patientInfo.sex }}</span>
+                <div class="space-y-1">
+                  <label class="text-sm font-medium text-gray-600">Sex:</label>
+                  <div class="text-gray-900 font-medium capitalize">{{ getPatientInfo().sex || 'Not provided' }}</div>
                 </div>
-                <div class="flex justify-between">
-                  <span class="font-medium text-gray-600">Weight:</span>
-                  <span class="text-gray-900">{{ data.formData.patientInfo.weight }} kg</span>
+                <div class="space-y-1">
+                  <label class="text-sm font-medium text-gray-600">Weight:</label>
+                  <div class="text-gray-900 font-medium">{{ getPatientInfo().weight ? `${getPatientInfo().weight} kg` : 'Not provided' }}</div>
                 </div>
-                <div class="flex justify-between">
-                  <span class="font-medium text-gray-600">Diagnosis:</span>
-                  <span class="text-gray-900">{{ data.formData.patientInfo.diagnosis }}</span>
-                </div>
-              </div>
-              
-              <div v-if="data.formData.patientInfo.currentMedication" class="border-t pt-3">
-                <div class="flex justify-between items-start">
-                  <span class="font-medium text-gray-600">Current Medication:</span>
-                  <span class="text-gray-900 text-right max-w-xs">{{ data.formData.patientInfo.currentMedication }}</span>
+                <div class="space-y-1">
+                  <label class="text-sm font-medium text-gray-600">Diagnosis:</label>
+                  <div class="text-gray-900 font-medium">{{ getPatientInfo().diagnosis || 'Not provided' }}</div>
                 </div>
               </div>
-              
-              <div v-if="data.formData.patientInfo.concurrentMedications" class="border-t pt-3">
-                <div class="flex justify-between items-start">
-                  <span class="font-medium text-gray-600">Concurrent Medications:</span>
-                  <span class="text-gray-900 text-right max-w-xs">{{ data.formData.patientInfo.concurrentMedications }}</span>
+
+              <!-- Medication Information -->
+              <div class="space-y-4">
+                <div v-if="getPatientInfo().currentMedication" class="border-t pt-4">
+                  <label class="text-sm font-medium text-gray-600 block mb-2">Current Medication:</label>
+                  <div class="text-gray-900 bg-gray-50 p-3 rounded border">{{ getPatientInfo().currentMedication }}</div>
                 </div>
-              </div>
-              
-              <div v-if="data.formData.patientInfo.allergies" class="border-t pt-3">
-                <div class="flex justify-between items-start">
-                  <span class="font-medium text-gray-600">Allergies:</span>
-                  <span class="text-gray-900 text-right max-w-xs">{{ data.formData.patientInfo.allergies }}</span>
+                
+                <div v-if="getPatientInfo().concurrentMedications" class="border-t pt-4">
+                  <label class="text-sm font-medium text-gray-600 block mb-2">Concurrent Medications:</label>
+                  <div class="text-gray-900 bg-gray-50 p-3 rounded border">{{ getPatientInfo().concurrentMedications }}</div>
                 </div>
-              </div>
-              
-              <div v-if="data.formData.patientInfo.otherInfo" class="border-t pt-3">
-                <div class="flex justify-between items-start">
-                  <span class="font-medium text-gray-600">Other Information:</span>
-                  <span class="text-gray-900 text-right max-w-xs">{{ data.formData.patientInfo.otherInfo }}</span>
+                
+                <div v-if="getPatientInfo().allergies" class="border-t pt-4">
+                  <label class="text-sm font-medium text-gray-600 block mb-2">Allergies:</label>
+                  <div class="text-gray-900 bg-gray-50 p-3 rounded border">{{ getPatientInfo().allergies }}</div>
+                </div>
+                
+                <div v-if="getPatientInfo().otherInfo" class="border-t pt-4">
+                  <label class="text-sm font-medium text-gray-600 block mb-2">Other Information:</label>
+                  <div class="text-gray-900 bg-gray-50 p-3 rounded border whitespace-pre-wrap">{{ getPatientInfo().otherInfo }}</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Request/Question Card -->
+          <!-- Request/Question Card - Should always be visible -->
           <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
             <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
               <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,42 +136,54 @@ function getRequestTypes() {
               Request/Question
             </h3>
             <div class="bg-white p-4 rounded border">
-              <p class="text-gray-900 whitespace-pre-wrap leading-relaxed">{{ data?.formData?.requestQuestion }}</p>
+              <p class="text-gray-900 whitespace-pre-wrap leading-relaxed">{{ getFormData().requestQuestion || 'No question provided' }}</p>
             </div>
           </div>
 
-          <!-- Response Time Card -->
-          <div v-if="data?.formData?.responseNeeded" class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-              <svg class="w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Response Time Needed
-            </h3>
-            <div class="bg-white p-3 rounded border">
-              <span class="text-orange-600 font-medium">{{ data?.formData?.responseNeeded }}</span>
+          <!-- Response Information - Should always be visible -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Preferred Response Card -->
+            <div v-if="getFormData().preferredResponse" class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Preferred Response
+              </h3>
+              <div class="bg-white p-3 rounded border">
+                <span class="text-gray-900 font-medium">{{ getFormData().preferredResponse }}</span>
+              </div>
+            </div>
+
+            <!-- Response Time Card -->
+            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Response Time Needed
+              </h3>
+              <div class="bg-white p-3 rounded border">
+                <span class="text-gray-900 font-medium">{{ getFormData().responseNeeded || 'Not specified' }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Footer with Send Button -->
-      <div class="bg-gray-50 px-6 py-4 border-t flex justify-between items-center">
+      <!-- Footer Actions -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
         <button 
           @click="cancel"
-          class="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors font-medium"
         >
           Cancel
         </button>
-        
         <button 
-          @click="sendRequest"
-          class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+          @click="confirm"
+          class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-          </svg>
-          Send Request
+          Confirm & Submit
         </button>
       </div>
     </div>

@@ -2,11 +2,11 @@ import ApiService from "@/service/ApiService";
 import { getQueryFormObject } from "@/utils/utils.js";
 
 const api = new ApiService();
-const path = "/role";
+const path = "/auth/role";
 
 export function getAllRole(query = {}) {
   const qr = getQueryFormObject(query);
-  return api.addAuthenticationHeader().get(`${path}/roles${qr}`);
+  return api.addAuthenticationHeader().get(`${path}/getAll${qr}`);
 }
 export function getAllHospitals(query = {}) {
   const qr = getQueryFormObject(query);

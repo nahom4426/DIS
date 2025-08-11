@@ -14,7 +14,6 @@ import providerRoutes from "./Provider.routes";
 import registrationRequestRoutes from "./registrationRequest.routes"
 
 
-
 import Profile from "@/features/profile/pages/profile.vue";
 
 // Debug and create safe routes
@@ -64,14 +63,14 @@ const router = createRouter({
         },
         
         ...adminRoutes,
-        // ...instutionSetingRoutes, // Fix typo if this exists
+     
         ...registrationRequestRoutes,
       ],
     },
     
     {
-      path: '/',
-      redirect: '/doctor-comm/dashboard'
+      path: '',
+      redirect: '/login'  
     }
   ]),
 });
@@ -105,6 +104,38 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore()
+  let storedUser = localStorage.getItem("userDetail");
+
+  auth.setAuth((storedUser ? JSON.parse(storedUser) : {}) as LoginResponse)
+  
+  // Handle root path with authentication check
+  if (to.path === '/') {
+    if (auth.auth?.accessToken || storedUser) {
+      // User is already logged in - redirect to dashboard
+      next('/dashboard')
+    } else {
+      // User not logged in - redirect to login
+      next('/login')
+    }
+    return
+  }
+  
+  // Protect authenticated routes
+  if (to.meta?.requiresAuth && (!auth.auth?.accessToken && !storedUser)) {
+    next('/login')
+    return
+  }
+  
+  // If user is logged in and tries to access login page, redirect to dashboard
+  if (to.path === '/login' && (auth.auth?.accessToken || storedUser)) {
+    next('/dashboard')
+    return
+  }
+  
+  next()
+})
 router.beforeEach(() => {
   const auth = useAuthStore()
   let storedUser = localStorage.getItem("userDetail");

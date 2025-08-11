@@ -9,6 +9,7 @@ import Congratulation from "./Congratulation.vue";
 const activeForm = ref(0);
 
 const form = [
+  
   {
     name: "authLogin",
     component: AuthLogin,
