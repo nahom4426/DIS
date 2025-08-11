@@ -44,7 +44,7 @@ watch(() => props.selectPrivilege, (newVal) => {
             <SelectPrivilegeInput 
                 label="Select Privileges" 
                 validation="required" 
-                name="privilegeUuids"
+                name="privileges"
                 :options="privileges" 
                 :selectedPrivilege="selectPrivilege || []" 
             />
