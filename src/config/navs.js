@@ -84,19 +84,19 @@ export default [
         path: "/doctor-comm/inquiries",
         name: "Recent Inquiries",
         icon: icons.inbox,
-        privilege: [""],
+       // privilege: [""],
       },
       {
         path: "/doctor-comm/history",
         name: "Full History",
         icon: icons.history,
-        privilege: [""],
+        //privilege: [""],
       },
       {
         path: "/doctor-comm/drug-lookup",
         name: "Drug Lookup Tool",
         icon: icons.search,
-        privilege: [""],
+        //privilege: [""],
       },
  
     ],
