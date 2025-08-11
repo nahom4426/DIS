@@ -61,7 +61,7 @@ export default [
     path: "/users",
     name: "User Management",
     icon: icons.user,
-    privilege: ["Create Employees"],
+    //privilege: ["Create Employees"],
   },
    
        {
