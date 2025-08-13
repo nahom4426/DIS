@@ -108,9 +108,10 @@ onUnmounted(() => {
       <RolesDataProvider
         ref="dataProvider"
         :search="search"
-        v-slot="{ roles, pending,  }"
+        v-slot="{ roles, pending }"
       >
-      
+        {{ console.log('Roles in template:', roles) }}
+        
         <Table 
           :pending="pending" 
           :headers="{

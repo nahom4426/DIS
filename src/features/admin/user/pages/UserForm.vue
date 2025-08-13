@@ -4,7 +4,7 @@ import Input from '@/components/new_form_elements/Input.vue';
 import InputPassword from '@/components/new_form_elements/InputPassword.vue';
 import Select from '@/components/new_form_elements/Select.vue';
 import Form from '@/components/new_form_builder/Form.vue';
-import { getAllHospitals, getAllRole } from '../../role/Api/RoleApi';
+import { getAllHospitals, getAllRoles } from '../../role/Api/RoleApi';
 import Spinner from '@/components/Spinner.vue';
 import InputLayout from '@/components/new_form_elements/NewInputLayout.vue';
 const props = defineProps({
@@ -58,29 +58,29 @@ const providersError = ref('');
 const providers = ref([]);
 const fetchProvidersPending = ref(false);
 
-// Ethiopian Hospital List
-const ethiopianHospitalList = [
-  { label: 'Tikur Anbessa Specialized Hospital', value: 'tikur-anbessa' },
-  { label: 'St. Paul\'s Hospital Millennium Medical College', value: 'st-pauls' },
-  { label: 'Zewditu Memorial Hospital', value: 'zewditu' },
-  { label: 'Alert Hospital', value: 'alert' },
-  { label: 'Yekatit 12 Hospital Medical College', value: 'yekatit-12' },
-  { label: 'Ras Desta Damtew Memorial Hospital', value: 'ras-desta' },
-  { label: 'Gandhi Memorial Hospital', value: 'gandhi' },
-  { label: 'Tirunesh Beijing Hospital', value: 'tirunesh-beijing' },
-  { label: 'Bethzatha General Hospital', value: 'bethzatha' },
-  { label: 'Hayat Medical College Hospital', value: 'hayat' },
-  { label: 'Myungsung Christian Medical Center', value: 'myungsung' },
-  { label: 'Korean Hospital', value: 'korean' },
-  { label: 'Cure Ethiopia Children\'s Hospital', value: 'cure-ethiopia' },
-  { label: 'International Clinical Laboratories', value: 'icl' },
-  { label: 'Hallelujah General Hospital', value: 'hallelujah' },
-  { label: 'St. Peter Specialized Hospital', value: 'st-peter' },
-  { label: 'Armed Forces Comprehensive Specialized Hospital', value: 'armed-forces' },
-  { label: 'Police Hospital', value: 'police' },
-  { label: 'Minilik II Hospital', value: 'minilik-ii' },
-  { label: 'Adera Medical Center', value: 'adera' }
-];
+// // Ethiopian Hospital List
+// const ethiopianHospitalList = [
+//   { label: 'Tikur Anbessa Specialized Hospital', value: 'tikur-anbessa' },
+//   { label: 'St. Paul\'s Hospital Millennium Medical College', value: 'st-pauls' },
+//   { label: 'Zewditu Memorial Hospital', value: 'zewditu' },
+//   { label: 'Alert Hospital', value: 'alert' },
+//   { label: 'Yekatit 12 Hospital Medical College', value: 'yekatit-12' },
+//   { label: 'Ras Desta Damtew Memorial Hospital', value: 'ras-desta' },
+//   { label: 'Gandhi Memorial Hospital', value: 'gandhi' },
+//   { label: 'Tirunesh Beijing Hospital', value: 'tirunesh-beijing' },
+//   { label: 'Bethzatha General Hospital', value: 'bethzatha' },
+//   { label: 'Hayat Medical College Hospital', value: 'hayat' },
+//   { label: 'Myungsung Christian Medical Center', value: 'myungsung' },
+//   { label: 'Korean Hospital', value: 'korean' },
+//   { label: 'Cure Ethiopia Children\'s Hospital', value: 'cure-ethiopia' },
+//   { label: 'International Clinical Laboratories', value: 'icl' },
+//   { label: 'Hallelujah General Hospital', value: 'hallelujah' },
+//   { label: 'St. Peter Specialized Hospital', value: 'st-peter' },
+//   { label: 'Armed Forces Comprehensive Specialized Hospital', value: 'armed-forces' },
+//   { label: 'Police Hospital', value: 'police' },
+//   { label: 'Minilik II Hospital', value: 'minilik-ii' },
+//   { label: 'Adera Medical Center', value: 'adera' }
+// ];
 
 // Provider options computation
 const providerOptions = computed(() => {
@@ -89,23 +89,25 @@ const providerOptions = computed(() => {
 
 // Role options with predefined roles including superadmin
 const predefinedRoles = [
-  { label: 'Super Admin', value: 'superadmin' },
+  { label: 'Super Admin', value: 'superdmin' },
   
 ];
 
 // Role options computation - combine API roles with predefined roles
 const roleOptions = computed(() => {
-  const apiRoles = roles.value.map(role => ({
+  return roles.value.map(role => ({
     label: role.roleName,
     value: role.roleUuid
   }));
-  
-  return [ ...apiRoles];
 });
 const hospitalOptions = computed(() => {
   return hospitals.value.map(hospital => ({
     label: hospital.name,
-    value: hospital.hospitalUuid
+    value: hospital.hospitalUuid,
+    email: hospital.email,
+    phone: hospital.phoneNumber,
+    location: `${hospital.city}, ${hospital.subCity}`,
+    isActive: hospital.isActive
   }));
 });
 
@@ -113,51 +115,60 @@ const hospitalOptions = computed(() => {
 async function fetchRoles() {
   try {
     fetchRolesPending.value = true;
-    rolesError.value = null;
+    rolesError.value = '';
     
     const response = await getAllRole({ page: 1, limit: 500 });
+    console.log('Roles response:', response);
     
-    if (!response?.data || !Array.isArray(response.data)) {
-      throw new Error('Invalid data format: missing content array');
-    }
-
-    roles.value = response.data.map(item => ({
-      roleUuid: item.roleUuid,
-      roleName: item.roleName,
-      roleDescription: item.roleDescription || '',
-      privilegeList: item.privilegeList || []
-    }));
-
-    if (roles.value.length === 0) {
+    if (response?.content && Array.isArray(response.content)) {
+      roles.value = response.content;
+      console.log('Roles loaded:', roles.value);
+    } else {
+      roles.value = [];
       rolesError.value = 'No roles available';
     }
   } catch (err) {
-    rolesError.value = 'Failed to load roles. Please try again.';
+    console.error('Error fetching roles:', err);
+    rolesError.value = 'Failed to load roles';
+    roles.value = [];
   } finally {
     fetchRolesPending.value = false;
   }
 }
 async function fetchHospitals() {
   try {
+    console.log('Starting to fetch hospitals...');
     fetchHospitalPending.value = true;
     hospitalError.value = null;
     
     const response = await getAllHospitals({ page: 1, limit: 500 });
+    console.log('Raw hospitals API response:', response);
     
-    if (!response?.data || !Array.isArray(response.data)) {
-      throw new Error('Invalid data format: missing content array');
-    }
-
-    hospitals.value = response.data.map(item => ({
-      hospitalUuid: item.hospitalUuid,
-      name: item.name,
-    }));
-
-    if (hospitals.value.length === 0) {
-      hospitalError.value = 'No Hospital available';
+    if (response?.content && Array.isArray(response.content)) {
+      hospitals.value = response.content.map(item => ({
+        hospitalUuid: item.providerUuid,
+        name: item.name,
+        email: item.email,
+        mobilePhone: item.mobilePhone,
+        region: item.region,
+        city: item.city,
+        subCity: item.subCity,
+        woreda: item.woreda,
+        kebele: item.kebele,
+        profilePicture: item.profilePicture,
+        isActive: item.isActive
+      }));
+      console.log('Mapped hospitals:', hospitals.value);
+      console.log('Hospital options computed:', hospitalOptions.value);
+    } else {
+      console.log('No hospitals content found in response');
+      hospitals.value = [];
+      hospitalError.value = 'No hospitals available';
     }
   } catch (err) {
-    hospitalError.value = 'Failed to load Hospital. Please try again.';
+    console.error('Hospital fetch error:', err);
+    hospitalError.value = 'Failed to load hospitals. Please try again.';
+    hospitals.value = [];
   } finally {
     fetchHospitalPending.value = false;
   }
@@ -169,9 +180,11 @@ const genderOptions = ['Female', 'Male'];
 
 // Initialize form data from props
 onMounted(async () => {
+  console.log('UserForm mounted, fetching roles...');
   await fetchRoles();
- 
-  await fetchHospitals(); 
+  await fetchHospitals();
+  
+  // Initialize form data after fetching
   if (props.initialData && Object.keys(props.initialData).length > 0) {
     email.value = props.initialData.email || '';
     password.value = props.initialData.password || '';
@@ -355,10 +368,10 @@ function handleSubmit() {
             name="hospitalUuid"
             required
             class="custom-input"
-            :disabled="!roleOptions.length"
+            :disabled="fetchHospitalPending || !hospitalOptions.length"
           >
             <option value="" disabled>
-              {{ hospitalOptions.length ? 'Select Hospital' : 'No Hospital available' }}
+              {{ fetchHospitalPending ? 'Loading hospitals...' : (hospitalOptions.length ? 'Select Hospital' : 'No hospitals available') }}
             </option>
             <option
               v-for="option in hospitalOptions"
@@ -370,32 +383,31 @@ function handleSubmit() {
           </select>
         </InputLayout>
         <p v-if="hospitalError" class="mt-2 text-sm text-red-600">{{ hospitalError }}</p>
+        <p v-if="fetchHospitalPending" class="mt-2 text-sm text-blue-600">Loading hospitals...</p>
       </div>
       <!-- Role -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-[#75778B]">
           Role <span class="text-red-500">*</span>
         </label>
-        <InputLayout>
-          <select
-            v-model="roleUuid"
-            name="roleUuid"
-            required
-            :disabled="!roleOptions.length"
-            class="custom-input"
+        <select
+          v-model="roleUuid"
+          name="roleUuid"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          :disabled="fetchRolesPending"
+        >
+          <option value="" disabled>
+            {{ fetchRolesPending ? 'Loading roles...' : 'Select a role' }}
+          </option>
+          <option
+            v-for="role in roles"
+            :key="role.roleUuid"
+            :value="role.roleUuid"
           >
-            <option value="" disabled>
-              {{ roleOptions.length ? 'Select role' : 'No roles available' }}
-            </option>
-            <option
-              v-for="option in roleOptions"
-              :key="option.value"
-              :value="option.value"
-            >
-              {{ option.label }}
-            </option>
-          </select>
-        </InputLayout>
+            {{ role.roleName }}
+          </option>
+        </select>
         <p v-if="rolesError" class="mt-2 text-sm text-red-600">{{ rolesError }}</p>
       </div>
     </div>

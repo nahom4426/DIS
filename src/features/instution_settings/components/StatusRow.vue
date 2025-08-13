@@ -43,7 +43,7 @@ const props = defineProps({
 });
 
 const { addToast } = useToast();
-const payersStore = institutions();
+const institutionsStore = institutions();
 
 function getStatusStyle(status) {
   if (status === 'ACTIVE' || status === 'Active') {
@@ -66,12 +66,12 @@ function handleImageError(event) {
 function handleEdit(row) {
   console.log('Edit button clicked with row data:', row);
   
-  openModal('EditPayer', { 
-    payerUuid: row.payerUuid, 
-    payer: row,
-    onUpdated: (updatedPayer) => {
-      console.log('Payer updated:', updatedPayer);
-      payersStore.update(updatedPayer.payerUuid, updatedPayer);
+  openModal('EditInstitution', { 
+    institutionUuid: row.institutionUuid, 
+    institution: row,
+    onUpdated: (updatedInstitution) => {
+      console.log('Institution updated:', updatedInstitution);
+      institutionsStore.update(updatedInstitution.institutionUuid, updatedInstitution);
     }
   });
 }
@@ -140,48 +140,48 @@ function handleViewWithClose(rowId) {
   props.onView(rowId);
 }
 
-async function handleActivateWithClose(payerUuid) {
+async function handleActivateWithClose(institutionUuid) {
   closeAllDropdowns();
   try {
-    const response = await changeInstutionStatus(payerUuid, 'ACTIVE');
+    const response = await changeInstutionStatus(institutionUuid, 'ACTIVE');
     if (response.success) {
       addToast({
         type: 'success',
         title: 'Status Updated',
-        message: 'Payer has been activated successfully'
+        message: 'Institution has been activated successfully'
       });
-      payersStore.update(payerUuid, { status: 'ACTIVE' });
+      institutionsStore.update(institutionUuid, { status: 'ACTIVE' });
     } else {
-      throw new Error(response.error || 'Failed to activate payer');
+      throw new Error(response.error || 'Failed to activate institution');
     }
   } catch (error) {
     addToast({
       type: 'error',
       title: 'Activation Failed',
-      message: error.message || 'An error occurred while activating the payer'
+      message: error.message || 'An error occurred while activating the institution'
     });
   }
 }
 
-async function handleDeactivateWithClose(payerUuid) {
+async function handleDeactivateWithClose(institutionUuid) {
   closeAllDropdowns();
   try {
-    const response = await changeInstutionStatus(payerUuid, 'INACTIVE');
+    const response = await changeInstutionStatus(institutionUuid, 'INACTIVE');
     if (response.success) {
       addToast({
         type: 'success',
         title: 'Status Updated',
-        message: 'Payer has been deactivated successfully'
+        message: 'Institution has been deactivated successfully'
       });
-      payersStore.update(payerUuid, { status: 'INACTIVE' });
+      institutionsStore.update(institutionUuid, { status: 'INACTIVE' });
     } else {
-      throw new Error(response.error || 'Failed to deactivate payer');
+      throw new Error(response.error || 'Failed to deactivate institution');
     }
   } catch (error) {
     addToast({
       type: 'error',
       title: 'Deactivation Failed',
-      message: error.message || 'An error occurred while deactivating the payer'
+      message: error.message || 'An error occurred while deactivating the institution'
     });
   }
 }

@@ -17,7 +17,14 @@
         
         <!-- Profile Header - Compact -->
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
-          <div class="flex items-center gap-6">
+          <!-- Loading State -->
+          <div v-if="loading" class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span class="ml-3 text-gray-600">Loading profile...</span>
+          </div>
+          
+          <!-- Profile Content -->
+          <div v-else class="flex items-center gap-6">
             <div class="relative">
               <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg overflow-hidden">
                 <img 
@@ -34,7 +41,6 @@
               >
                 <i class="text-gray-600 text-xs">📷</i>
               </button>
-              <!-- Hidden file input -->
               <input 
                 ref="fileInput"
                 type="file" 
@@ -45,10 +51,11 @@
             </div>
             <div class="flex-1">
               <h1 class="text-2xl font-bold text-gray-900 mb-1">
-                Dr. {{ profileData.firstName || 'User' }} {{ profileData.lastName || 'Name' }}
+                {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.lastName || 'Name' }}
               </h1>
               <p class="text-base text-gray-600 mb-1">{{ profileData.department || 'Department' }}</p>
-              <p class="text-sm text-gray-500 mb-3">{{ profileData.email || 'email@example.com' }}</p>
+              <p class="text-sm text-gray-500 mb-1">{{ profileData.email || 'email@example.com' }}</p>
+              <p class="text-sm text-gray-500 mb-3">{{ profileData.roleName || 'Role' }}</p>
               <div class="flex gap-2">
                 <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">Active</span>
                 <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Verified</span>
@@ -56,12 +63,19 @@
             </div>
             <div>
               <button
+                @click="fetchUserDetails"
+                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium mr-2"
+                :disabled="loading"
+              >
+                🔄 Refresh
+              </button>
+              <button
                 @click="toggleEdit"
                 :class="[
-                  'px-4 py-2 rounded-lg font-medium transition-all duration-200 text-sm',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                   isEditing 
-                    ? 'bg-gray-500 hover:bg-gray-600 text-white' 
-                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                    ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                 ]"
               >
                 {{ isEditing ? 'Cancel' : 'Edit Profile' }}
@@ -77,6 +91,21 @@
           <form @submit.prevent="saveProfile" class="h-full flex flex-col">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
               <div class="space-y-2">
+                <label class="block text-xs font-medium text-gray-700">Title</label>
+                <input 
+                  type="text" 
+                  v-model="profileData.title"
+                  :disabled="!isEditing"
+                  :class="[
+                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                    isEditing 
+                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
+                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                  ]"
+                >
+              </div>
+              
+              <div class="space-y-2">
                 <label class="block text-xs font-medium text-gray-700">First Name</label>
                 <input 
                   type="text" 
@@ -88,6 +117,64 @@
                       ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
                       : 'border-gray-200 bg-gray-50 cursor-not-allowed'
                   ]"
+                >
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-xs font-medium text-gray-700">Father's Name</label>
+                <input 
+                  type="text" 
+                  v-model="profileData.fatherName"
+                  :disabled="!isEditing"
+                  :class="[
+                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                    isEditing 
+                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
+                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                  ]"
+                >
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-xs font-medium text-gray-700">Grandfather's Name</label>
+                <input 
+                  type="text" 
+                  v-model="profileData.grandFatherName"
+                  :disabled="!isEditing"
+                  :class="[
+                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                    isEditing 
+                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
+                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                  ]"
+                >
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-xs font-medium text-gray-700">Gender</label>
+                <select 
+                  v-model="profileData.gender"
+                  :disabled="!isEditing"
+                  :class="[
+                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                    isEditing 
+                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
+                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                  ]"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-xs font-medium text-gray-700">Role</label>
+                <input 
+                  type="text" 
+                  v-model="profileData.roleName"
+                  disabled
+                  class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
                 >
               </div>
               
@@ -268,15 +355,18 @@ import { ref, reactive, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useApiRequest } from '@/composables/useApiRequest';
 import { updateProfileData } from '@/features/profile/api/profileApi';
+import { getUserById } from '@/features/admin/user/Api/UserApi';
 import { toasted } from '@/utils/utils';
 
 const emit = defineEmits(['back']);
 const authStore = useAuthStore();
 const api = useApiRequest();
+const userApi = useApiRequest();
 
 const isEditing = ref(false);
 const originalData = ref({});
 const fileInput = ref(null);
+const loading = ref(false);
 
 const profileData = reactive({
   firstName: '',
@@ -288,24 +378,100 @@ const profileData = reactive({
   specialization: '',
   experience: 0,
   location: '',
-  profileImage: null
+  profileImage: null,
+  title: '',
+  fatherName: '',
+  grandFatherName: '',
+  gender: '',
+  mobilePhone: '',
+  roleUuid: '',
+  roleName: ''
 });
 
-// Load user data from auth store on mount
-onMounted(() => {
+// Fetch user details from API
+async function fetchUserDetails() {
+  loading.value = true;
+  try {
+    const userUuid = authStore.auth?.user?.userUuid;
+    if (!userUuid) {
+      console.error('No user UUID found');
+      loadFromAuthStore();
+      return;
+    }
+
+    userApi.send(
+      () => getUserById(userUuid),
+      (response) => {
+        if (response.success && response.data) {
+          const userData = response.data;
+          console.log('Fetched user data:', userData);
+          
+          // Update profile data with fetched information
+          profileData.firstName = userData.firstName || '';
+          profileData.lastName = userData.lastName || userData.fatherName || '';
+          profileData.fatherName = userData.fatherName || '';
+          profileData.grandFatherName = userData.grandFatherName || '';
+          profileData.email = userData.email || '';
+          profileData.phone = userData.mobilePhone || '';
+          profileData.mobilePhone = userData.mobilePhone || '';
+          profileData.department = userData.department || 'Internal Medicine';
+          profileData.licenseNumber = userData.licenseNumber || '';
+          profileData.specialization = userData.specialization || 'Infectious Diseases';
+          profileData.experience = userData.experience || 0;
+          profileData.location = userData.location || 'Addis Ababa, Ethiopia';
+          profileData.title = userData.title || 'Dr.';
+          profileData.gender = userData.gender || '';
+          profileData.roleUuid = userData.roleUuid || '';
+          profileData.roleName = userData.roleName || '';
+          profileData.profileImage = userData.imageData ? `data:image/png;base64,${userData.imageData}` : null;
+          
+          // Update auth store with fresh data
+          authStore.setAuth({
+            ...authStore.auth,
+            user: userData
+          });
+          
+        } else {
+          console.error('Failed to fetch user details:', response.error);
+          loadFromAuthStore(); // Fallback to auth store data
+        }
+        loading.value = false;
+      }
+    );
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    loadFromAuthStore(); // Fallback to auth store data
+    loading.value = false;
+  }
+}
+
+// Fallback to load from auth store
+function loadFromAuthStore() {
   const user = authStore.auth?.user;
   if (user) {
     profileData.firstName = user.firstName || '';
     profileData.lastName = user.lastName || user.fatherName || '';
+    profileData.fatherName = user.fatherName || '';
+    profileData.grandFatherName = user.grandFatherName || '';
     profileData.email = user.email || '';
     profileData.phone = user.mobilePhone || '';
+    profileData.mobilePhone = user.mobilePhone || '';
     profileData.department = user.department || 'Internal Medicine';
     profileData.licenseNumber = user.licenseNumber || '';
     profileData.specialization = user.specialization || 'Infectious Diseases';
     profileData.experience = user.experience || 0;
     profileData.location = user.location || 'Addis Ababa, Ethiopia';
+    profileData.title = user.title || 'Dr.';
+    profileData.gender = user.gender || '';
+    profileData.roleUuid = user.roleUuid || '';
+    profileData.roleName = user.roleName || '';
     profileData.profileImage = user.imageData ? `data:image/png;base64,${user.imageData}` : null;
   }
+}
+
+// Load user data on mount
+onMounted(() => {
+  fetchUserDetails();
 });
 
 function getInitials(firstName, lastName) {

@@ -4,7 +4,7 @@ import NewFormParent from "@/components/NewFormParent.vue";
 import UserForm from "./UserForm.vue";
 import { closeModal } from "@customizer/modal-x";
 import { ref, onMounted } from "vue";
-import { CreateUser } from "../Api/UserApi";
+import { createUser } from "../Api/UserApi";
 import { useUsers } from "../store/userStore";
 import { useToast } from '@/toast/store/toast';
 

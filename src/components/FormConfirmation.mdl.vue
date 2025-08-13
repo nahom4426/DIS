@@ -39,11 +39,19 @@ function getPatientInfo() {
 function getFormData() {
   return props.data?.formData || props.data || {};
 }
+
+function getQuestionText() {
+  return getFormData().description || 
+         getFormData().requestQuestion || 
+         props.data?.description || 
+         props.data?.requestQuestion || 
+         'No question provided';
+}
 </script>
 
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh]">
       <!-- Header -->
       <div class="bg-blue-600 text-white p-6 flex justify-between items-center">
         <div>
@@ -181,9 +189,9 @@ function getFormData() {
         </button>
         <button 
           @click="confirm"
-          class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+          class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors font-medium"
         >
-          Confirm & Submit
+          Confirm
         </button>
       </div>
     </div>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import Button from '@/components/Button.vue';
 import { openModal } from '@customizer/modal-x';
 import { submitDrugInformationRequest } from '@/features/service/api/drugInformationApi';
@@ -9,8 +9,21 @@ import { toasted } from '@/utils/utils';
 import FormConfirmation from '@/components/FormConfirmation.mdl.vue';
 
 const authStore = useAuthStore();
+console.log('Auth store:', authStore);
+console.log('Auth data:', authStore.auth);
+
+// Add a computed property to get userUuid
+const currentUserUuid = computed(() => {
+  return authStore.auth?.user?.userUuid || 
+         authStore.auth?.userUuid || 
+         authStore.user?.userUuid || 
+         '';
+});
+
+console.log('Current user UUID:', currentUserUuid.value);
+
 const submitReq = useApiRequest();
-const id =authStore.auth.userUuid;
+const id = authStore.auth.userUuid;
 console.log(authStore.auth.userUuid);
 
 const formData = reactive({
@@ -91,24 +104,52 @@ function handleSubmit() {
 const auth=useAuthStore()
 
 function confirmSubmission() {
+  // Get the correct userUuid from auth store
+  const userUuid = auth.auth?.user?.userUuid || auth.auth?.userUuid || '';
+  
+  console.log('Auth object:', auth.auth);
+  console.log('User UUID:', userUuid);
+  
+  if (!userUuid) {
+    alert('User not authenticated. Please login again.');
+    return;
+  }
+
   const submissionData = {
     description: formData.description,
     questionStatus: "UNANSWERED",
-    patientAge: Number(formData.patientInfo.patientAge),
+    patientAge: Number(formData.patientInfo.patientAge) || 0,
     patientType: formData.patientType,
-    patientGender: formData.patientInfo.patientGender,
-    weight: Number(formData.patientInfo.weight),
-    diagnosis: formData.patientInfo.diagnosis,
-    currentMedication: formData.patientInfo.currentMedication,
-    concurrentMedication: formData.patientInfo.concurrentMedication,
-    allergies: formData.patientInfo.allergies,
-    otherInformation: formData.patientInfo.otherInformation,
+    patientGender: formData.patientInfo.patientGender === 'male' ? 'Male' : 
+                   formData.patientInfo.patientGender === 'female' ? 'Female' : 
+                   formData.patientInfo.patientGender, // Capitalize first letter
+    weight: Number(formData.patientInfo.weight) || 0,
+    diagnosis: formData.patientInfo.diagnosis || "",
+    currentMedication: formData.patientInfo.currentMedication || "",
+    concurrentMedication: formData.patientInfo.concurrentMedication || "",
+    allergies: formData.patientInfo.allergies || "",
+    otherInformation: formData.patientInfo.otherInformation || "",
     responseUrgency: formData.responseUrgency,
-    userUuid: auth.auth?.user?.userUuid || ''
+    userUuid: userUuid
   };
   
-  console.log('Submitting data:', submissionData);
-  emit('submit', submissionData);
+  console.log('Submitting data to API:', submissionData);
+  
+  submitDrugInformationRequest(submissionData)
+    .then((response) => {
+      if (response.success) {
+        console.log('Question submitted successfully');
+        showConfirmation.value = false;
+        emit('submit', response.data);
+      } else {
+        console.error('Submission failed:', response.error);
+        alert('Failed to submit question: ' + response.error);
+      }
+    })
+    .catch((error) => {
+      console.error('Submission error:', error);
+      alert('Error submitting question: ' + error.message);
+    });
 }
 
 function cancelSubmission() {
@@ -240,8 +281,8 @@ function goBack() {
                         class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
                       >
                         <option value="">Select...</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                       </select>
                     </div>
                     <div>

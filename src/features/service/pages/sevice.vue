@@ -10,7 +10,7 @@ import { openModal } from "@customizer/modal-x";
 import DrugInformationRequestForm from "@/components/DrugInformationRequestForm.vue";
 import { useDrugInformationStore } from '@/features/doctor-communication/store/drugInformationStore';
 
-const items = ["Pending Requests", "In Progress", "Completed"];
+const items = ["Pending Requests", "Completed"];
 const active = ref(0);
 
 const setActive = (item) => {
@@ -26,10 +26,6 @@ const components = [
   {
     name: "Pending Requests",
     component: PendingRequests,
-  },
-  {
-    name: "In Progress", 
-    component: DoctorRequests,
   },
   {
     name: "Completed",
@@ -97,8 +93,7 @@ function closeForm() {
             >
               {{ item }}
               <span v-if="index === 0" class="ml-2 bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">.</span>
-              <span v-if="index === 1" class="ml-2 bg-yellow-100 text-yellow-600 text-xs px-2 py-1 rounded-full">.</span>
-              <span v-if="index === 2" class="ml-2 bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">.</span>
+              <span v-if="index === 1" class="ml-2 bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">.</span>
             </button>
           </div>
         </div>

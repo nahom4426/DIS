@@ -57,13 +57,7 @@ export default [
     name: "Dashboard",
     icon: icons.dashboard,
   },
-  
-       {
-    path: 'registration',
-    name: "Registration",
-    icon: icons.register,
-    // privilege: ["MANAGE_REGISTRATION_REQUESTS"],
-  },
+ 
    {
     name: "Pharmacist Communication",
     icon: icons.pharmacist,
@@ -111,6 +105,13 @@ export default [
     name: "Drug Management",
     icon: icons.drug,
 
+  },
+   
+       {
+    path: 'registration',
+    name: "Registration",
+    icon: icons.register,
+    // privilege: ["MANAGE_REGISTRATION_REQUESTS"],
   },
   {
     path: "/users",

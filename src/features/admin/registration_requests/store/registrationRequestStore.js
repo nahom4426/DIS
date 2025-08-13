@@ -1,46 +1,46 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
-export const useRegistrationRequestStore = defineStore("registrationRequestStore", () => {
+export const useRegistrationRequestStore = defineStore('registrationRequests', () => {
   const requests = ref([]);
-  const request = ref(null);
+  const loading = ref(false);
+  const error = ref(null);
 
-  const set = (data) => {
-    requests.value = data;
-  };
+  function set(data) {
+    requests.value = data || [];
+  }
 
-  const add = (data) => {
-    requests.value.push(data);
-  };
+  function add(request) {
+    requests.value.unshift(request);
+  }
 
-  const update = (id, data) => {
-    const index = requests.value.findIndex(req => req.requestId === id);
+  function update(userUuid, updates) {
+    const index = requests.value.findIndex(req => req.userUuid === userUuid);
     if (index !== -1) {
-      requests.value[index] = { ...requests.value[index], ...data };
+      requests.value[index] = { ...requests.value[index], ...updates };
     }
-  };
+  }
 
-  const remove = (id) => {
-    requests.value = requests.value.filter(req => req.requestId !== id);
-  };
+  function remove(userUuid) {
+    const index = requests.value.findIndex(req => req.userUuid === userUuid);
+    if (index !== -1) {
+      requests.value.splice(index, 1);
+    }
+  }
 
-  const setRequest = (data) => {
-    request.value = data;
-  };
-
-  const getById = (id) => {
-    return requests.value.find(req => req.requestId === id);
-  };
+  function getByUuid(userUuid) {
+    return requests.value.find(req => req.userUuid === userUuid);
+  }
 
   return {
     requests,
-    request,
+    loading,
+    error,
     set,
     add,
     update,
     remove,
-    setRequest,
-    getById
+    getByUuid
   };
 });
 

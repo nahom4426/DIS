@@ -1,7 +1,7 @@
 <script setup>
 import { watch } from "vue";
 import { removeUndefined } from "@/utils/utils.js";
-import { getAllRole } from "../Api/RoleApi";
+import { getAllRoles } from "../Api/RoleApi";
 import { useRoles } from "../store/roleStore";
 import { usePagination } from "@/composables/usePagination";
 
@@ -13,23 +13,26 @@ const roles = useRoles();
 
 const pagination = usePagination({
   store: roles,
-  cb: (data) =>
-    getAllRole({ ...data, ...removeUndefined({ search: props.search }) }),
+  cb: (data) => {
+    console.log('🚀 Pagination callback data:', data);
+    return getAllRoles({ ...data, ...removeUndefined({ search: props.search }) });
+  },
   auto: false,
 });
 
 if (!roles.roles.length) {
+  console.log('📡 Sending initial roles request...');
   pagination.send();
 }
 
 watch(
   () => props.search,
   () => {
+    console.log('🔍 Search changed, sending new roles request...');
     pagination.send();
   }
 );
 
-// Expose refresh method
 function refresh() {
   pagination.send();
 }

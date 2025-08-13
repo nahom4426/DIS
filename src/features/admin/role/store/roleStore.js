@@ -5,7 +5,15 @@ export const useRoles = defineStore("allRoleStore", () => {
   const roles = ref([]);
 
   function set(data) {
-    roles.value = data;
+    console.log('🏪 Setting roles data in store:', data);
+    if (Array.isArray(data)) {
+      roles.value = data;
+      console.log('✅ Roles set successfully:', roles.value.length, 'roles');
+      console.log('📋 First role sample:', roles.value[0]);
+    } else {
+      console.warn('⚠️ Data is not an array:', data);
+      roles.value = [];
+    }
   }
 
   function getAll() {

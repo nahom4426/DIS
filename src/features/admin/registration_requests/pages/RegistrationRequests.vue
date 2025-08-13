@@ -63,14 +63,14 @@ const tableHeaders = {
 
     <template #default="{ search }">
       <div class="bg-white rounded-lg shadow">
-        <!-- Debug info -->
+        <!-- Debug info
         <div class="p-4 bg-gray-100 text-sm">
           <p>Store requests count: {{ requestStore.requests.length }}</p>
           <p>Filtered count: {{ filteredRequests(search).length }}</p>
           <p>Loading: {{ loading }}</p>
           <p>Search: "{{ search }}"</p>
         </div>
-        
+         -->
         <Table
           :headers="tableHeaders"
           :rows="filteredRequests(search)"

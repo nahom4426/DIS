@@ -3,28 +3,27 @@ import { getQueryFormObject } from "@/utils/utils.js";
 
 // Create a new API service instance with the specific base URL
 const api = new ApiService(import.meta.env.v_API_URI);
-const path = "/api/admin/user";
+const path = "/auth/users";
 
-export function CreateUser(data) {
-  const formattedData = {
-    ...data,
-    gender: data.gender?.toLowerCase(),
-  };
-
-  return api
-    .addAuthenticationHeader()
-    .post(`${path}`, formattedData)
-    .catch((error) => {
-      return {
-        success: false,
-        error: error.message || "Failed to create user. Server error.",
-        data: null,
-      };
-    });
+export async function createUser(userData) {
+  try {
+    const response = await api.addAuthenticationHeader().post(`${path}/auth/user/create`, userData);
+    return {
+      success: true,
+      data: response,
+      message: 'User created successfully'
+    };
+  } catch (error) {
+    console.error('Create user error:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Failed to create user'
+    };
+  }
 }
 export function getAllUser(query = {}) {
   const qr = getQueryFormObject(query);
-  return api.addAuthenticationHeader().get(`${path}/users${qr}`);
+  return api.addAuthenticationHeader().get(`${path}/all${qr}`);
 }
 export function getUserById(id) {
   return api.addAuthenticationHeader().get(`${path}/${id}`);

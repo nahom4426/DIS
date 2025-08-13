@@ -2,7 +2,7 @@
 import { useRoute, useRouter } from "vue-router";
 import { useApiRequest } from "@/composables/useApiRequest";
 import { getUserById, updateUserById } from "../Api/UserApi";
-import { getAllRole } from "../../role/Api/RoleApi";
+import { getAllRoles } from "../../role/Api/RoleApi";
 import { allRequest, toasted } from "@/utils/utils";
 import { useUsers } from "../store/userStore";
 import NewFormParent from "../../role/components/NewFormParent.vue";
