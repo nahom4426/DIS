@@ -41,7 +41,7 @@ export function getAllRoles(query = {}) {
 }
 export function getAllHospitals(query = {}) {
   const qr = getQueryFormObject(query);
-  return api.addAuthenticationHeader().get(`/hospital/hospitals${qr}`);
+  return api.addAuthenticationHeader().get(`/provider/list/all${qr}`);
 }
 export function createRole(data) {
   return api.addAuthenticationHeader().post(`${path}`, data);

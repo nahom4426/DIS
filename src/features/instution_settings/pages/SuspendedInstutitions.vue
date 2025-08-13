@@ -6,10 +6,11 @@ import DefaultPage from "@/components/DefaultPage.vue";
 import InActiveInstitutionsDataProvider from "../components/InActiveInstitutionsDataProvider.vue";
 import Button from "@/components/Button.vue";
 import { Status } from "@/types/interface";
-import { institutions } from "../store/InstitutionsStore";
+
 import { addToast } from "@/toast";
 // import EditInstitutionModal from "../components/EditInstitutionModal.vue";
 import StatusRow from "../components/StatusRow.vue";
+import { institutions } from "../store/InstitutionsStore";
 
 const router = useRouter();
 const dataProvider = ref();

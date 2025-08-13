@@ -190,7 +190,7 @@ function handleImageError(event) {
         ref="dataProvider"
         :search="search"
         v-slot="{
-          institutions,
+          drugs,
           pending,
           currentPage,
           itemsPerPage,
@@ -212,13 +212,13 @@ function handleImageError(event) {
             row: [
               'drugName',
               'drugCode',
-              'category',
+              'categories',
               'dosage',
               'storage',
               'status',
             ],
           }"
-          :rows="institutions"
+          :rows="drugs"
           :rowCom="StatusRow"
           :cells="{
             // Remove the location cell mapping since we're now showing drug data
@@ -242,7 +242,7 @@ function handleImageError(event) {
           }" -->
           <template #row>
             <StatusRow
-              :rowData="institutions"
+              :rowData="drugs"
               :rowKeys="[
                 'payerName',
                 'email',

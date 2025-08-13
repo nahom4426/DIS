@@ -220,11 +220,12 @@ const props = defineProps({
           </div>
           
           <div class="hidden md:flex flex-col items-start">
+           
             <span class="text-sm font-semibold text-gray-800 line-clamp-1 max-w-[120px]">
-              {{ authStore.auth.user?.firstName + " " + authStore.auth.user?.fatherName || "User" }}
+              {{ authStore.auth?.firstName + " " + authStore.auth?.fatherName  }}
             </span>
             <span class="text-xs px-2 py-0.5 rounded-full font-medium bg-primary/10 text-primary">
-              {{ authStore.auth?.user?.roleName || 'Admin' }}
+              {{ authStore.auth?.roleName }}
             </span>
           </div>
           

@@ -21,7 +21,8 @@ export async function createUser(userData) {
     };
   }
 }
-export function getAllUser(query = {}) {
+export function 
+getAllUser(query = {}) {
   const qr = getQueryFormObject(query);
   return api.addAuthenticationHeader().get(`${path}/all${qr}`);
 }

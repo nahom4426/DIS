@@ -12,11 +12,11 @@ export const useAuthStore = defineStore('myAuthStore', () => {
     firstName: '',
     fatherName: '',
     grandFatherName: '',
-    gender: 'Male ',
+    gender: ' ',
     mobilePhone: '',
     userStatus: 'ACTIVE',
     roles: [],
-    userType: 'Payer',
+    userType: '',
     payerUuid: '',
     privileges: []
   })

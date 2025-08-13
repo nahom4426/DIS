@@ -100,16 +100,7 @@ const roleOptions = computed(() => {
     value: role.roleUuid
   }));
 });
-const hospitalOptions = computed(() => {
-  return hospitals.value.map(hospital => ({
-    label: hospital.name,
-    value: hospital.hospitalUuid,
-    email: hospital.email,
-    phone: hospital.phoneNumber,
-    location: `${hospital.city}, ${hospital.subCity}`,
-    isActive: hospital.isActive
-  }));
-});
+
 
 // Fetch roles function
 async function fetchRoles() {
@@ -117,11 +108,12 @@ async function fetchRoles() {
     fetchRolesPending.value = true;
     rolesError.value = '';
     
-    const response = await getAllRole({ page: 1, limit: 500 });
+    const response = await getAllRoles({ page: 1, limit: 500 });
     console.log('Roles response:', response);
     
-    if (response?.content && Array.isArray(response.content)) {
-      roles.value = response.content;
+    // Corrected: Check response.data instead of response.content
+    if (response?.data && Array.isArray(response.data)) {
+      roles.value = response.data;
       console.log('Roles loaded:', roles.value);
     } else {
       roles.value = [];
@@ -135,6 +127,15 @@ async function fetchRoles() {
     fetchRolesPending.value = false;
   }
 }
+
+
+const hospitalOptions = computed(() => {
+  return hospitals.value.map(hospital => ({
+    value: hospital.hospitalUuid,
+    label: hospital.name
+  }));
+});
+
 async function fetchHospitals() {
   try {
     console.log('Starting to fetch hospitals...');
@@ -144,12 +145,13 @@ async function fetchHospitals() {
     const response = await getAllHospitals({ page: 1, limit: 500 });
     console.log('Raw hospitals API response:', response);
     
-    if (response?.content && Array.isArray(response.content)) {
-      hospitals.value = response.content.map(item => ({
+    // Fix: Check response.data.content instead of response.content
+    if (response?.data?.content && Array.isArray(response.data.content)) {
+      hospitals.value = response.data.content.map(item => ({
         hospitalUuid: item.providerUuid,
         name: item.name,
         email: item.email,
-        mobilePhone: item.mobilePhone,
+        phoneNumber: item.phoneNumber,
         region: item.region,
         city: item.city,
         subCity: item.subCity,
@@ -159,7 +161,6 @@ async function fetchHospitals() {
         isActive: item.isActive
       }));
       console.log('Mapped hospitals:', hospitals.value);
-      console.log('Hospital options computed:', hospitalOptions.value);
     } else {
       console.log('No hospitals content found in response');
       hospitals.value = [];
@@ -173,6 +174,9 @@ async function fetchHospitals() {
     fetchHospitalPending.value = false;
   }
 }
+console.log('UserForm mounted, fetching hospitals...');
+
+
 
 // Title options
 const titleOptions = ['Mr', 'Ms.', 'Dr.', 'Prof'];
@@ -357,59 +361,58 @@ function handleSubmit() {
       </div>
 
       <!-- Provider -->
-    
-  <div class="space-y-2">
-        <label class="block text-sm font-medium text-[#75778B]">
-          Hospital <span class="text-red-500">*</span>
-        </label>
-        <InputLayout>
-          <select
-            v-model="hospitalUuid"
-            name="hospitalUuid"
-            required
-            class="custom-input"
-            :disabled="fetchHospitalPending || !hospitalOptions.length"
-          >
-            <option value="" disabled>
-              {{ fetchHospitalPending ? 'Loading hospitals...' : (hospitalOptions.length ? 'Select Hospital' : 'No hospitals available') }}
-            </option>
-            <option
-              v-for="option in hospitalOptions"
-              :key="option.value"
-              :value="option.value"
-            >
-              {{ option.label }}
-            </option>
-          </select>
-        </InputLayout>
-        <p v-if="hospitalError" class="mt-2 text-sm text-red-600">{{ hospitalError }}</p>
-        <p v-if="fetchHospitalPending" class="mt-2 text-sm text-blue-600">Loading hospitals...</p>
-      </div>
+ <div class="space-y-2">
+  <label class="block text-sm font-medium text-[#75778B]">
+    Hospital <span class="text-red-500">*</span>
+  </label>
+  <InputLayout>
+    <select
+      v-model="hospitalUuid"
+      name="hospitalUuid"
+      required
+      class="custom-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      :disabled="fetchHospitalPending || !hospitalOptions.length"
+    >
+      <option value="" disabled>
+        {{ fetchHospitalPending ? 'Loading hospitals...' : (hospitalOptions.length ? 'Select Hospital' : 'No hospitals available') }}
+      </option>
+      <option
+        v-for="option in hospitalOptions"
+        :key="option.value"
+        :value="option.value"
+      >
+        {{ option.label }}
+      </option>
+    </select>
+  </InputLayout>
+  <p v-if="hospitalError" class="mt-2 text-sm text-red-600">{{ hospitalError }}</p>
+  <p v-if="fetchHospitalPending" class="mt-2 text-sm text-blue-600">Loading hospitals...</p>
+</div>
       <!-- Role -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-[#75778B]">
-          Role <span class="text-red-500">*</span>
-        </label>
-        <select
-          v-model="roleUuid"
-          name="roleUuid"
-          required
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          :disabled="fetchRolesPending"
-        >
-          <option value="" disabled>
-            {{ fetchRolesPending ? 'Loading roles...' : 'Select a role' }}
-          </option>
-          <option
-            v-for="role in roles"
-            :key="role.roleUuid"
-            :value="role.roleUuid"
-          >
-            {{ role.roleName }}
-          </option>
-        </select>
-        <p v-if="rolesError" class="mt-2 text-sm text-red-600">{{ rolesError }}</p>
-      </div>
+  <label class="block text-sm font-medium text-[#75778B]">
+    Role <span class="text-red-500">*</span>
+  </label>
+  <select
+    v-model="roleUuid"
+    name="roleUuid"
+    required
+    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+    :disabled="fetchRolesPending || !roleOptions.length"
+  >
+    <option value="" disabled>
+      {{ fetchRolesPending ? 'Loading roles...' : (roleOptions.length ? 'Select a role' : 'No roles available') }}
+    </option>
+    <option
+      v-for="option in roleOptions"
+      :key="option.value"
+      :value="option.value"
+    >
+      {{ option.label }}
+    </option>
+  </select>
+  <p v-if="rolesError" class="mt-2 text-sm text-red-600">{{ rolesError }}</p>
+</div>
     </div>
 
     <!-- Form Actions -->

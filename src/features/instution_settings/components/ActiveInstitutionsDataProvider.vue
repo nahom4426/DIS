@@ -1,10 +1,10 @@
-<!-- Consider renaming this file to ActiveProvidersDataProvider.vue -->
-<script setup lang="ts">
+<script setup>
 import { usePagination } from "@/composables/usePagination";
-import { getActiveInstitutions } from "../api/institutionsApi";
-import { institutions } from "../store/InstitutionsStore";
 import { watch, computed, onMounted } from "vue";
 import { debounce } from "@/utils/debounce";
+import { getAllDrugs } from "@/features/service/api/drugApi";
+import { useDrugStore } from "../store/DrugStore";
+
 
 const props = defineProps({
   search: {
@@ -13,20 +13,19 @@ const props = defineProps({
   },
 });
 
-const store = institutions();
+const store = useDrugStore();
 
 const pagination = usePagination({
   store: store,
   auto: true,
   reset: true,
   cb: (data) =>
-    getActiveInstitutions({
+    getAllDrugs({
       ...data,
       search: props.search.trim() || undefined,
     }),
 });
 
-// Initialize with current search term
 onMounted(() => {
   if (props.search) {
     pagination.search.value = props.search;
@@ -34,8 +33,7 @@ onMounted(() => {
   }
 });
 
-// Debounced search watcher
-const debouncedSearch = debounce((newSearch: string) => {
+const debouncedSearch = debounce((newSearch) => {
   pagination.search.value = newSearch;
   pagination.send();
 }, 300);
@@ -47,7 +45,6 @@ watch(
   }
 );
 
-// Expose methods and properties
 defineExpose({
   refresh: pagination.send,
   currentPage: computed(() => store.currentPage),
@@ -59,7 +56,7 @@ defineExpose({
 
 <template>
   <slot
-    :institutions="store.institutions"
+    :drugs="store.drugs"               
     :pending="pagination.pending.value"
     :currentPage="store.currentPage"
     :itemsPerPage="store.itemsPerPage"

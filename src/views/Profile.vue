@@ -33,6 +33,15 @@
             </div>
 
             <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <input 
+                v-model="userProfile.title"
+                type="text" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+            </div>
+
+            <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
               <input 
                 v-model="userProfile.firstName"
@@ -42,9 +51,18 @@
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Father's Name</label>
               <input 
-                v-model="userProfile.lastName"
+                v-model="userProfile.fatherName"
+                type="text" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Grandfather's Name</label>
+              <input 
+                v-model="userProfile.grandFatherName"
                 type="text" 
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
@@ -58,11 +76,52 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
             </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mobile Phone</label>
+              <input 
+                v-model="userProfile.mobilePhone"
+                type="text" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+              <select 
+                v-model="userProfile.gender"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
             
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
               <input 
                 v-model="userProfile.roleName"
+                type="text" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                readonly
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+              <input 
+                v-model="userProfile.userType"
+                type="text" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                readonly
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <input 
+                v-model="userProfile.userStatus"
                 type="text" 
                 class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
                 readonly
