@@ -15,7 +15,7 @@
     <div class="flex-1 p-6 pt-4">
       <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 h-full flex flex-col">
         
-        <!-- Profile Header - Compact -->
+        <!-- Profile Header -->
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
           <!-- Loading State -->
           <div v-if="loading" class="flex items-center justify-center py-8">
@@ -28,12 +28,12 @@
             <div class="relative">
               <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg overflow-hidden">
                 <img 
-                  v-if="profileData.profileImage" 
-                  :src="profileData.profileImage" 
+                  v-if="profileData.imageData" 
+                  :src="'data:image/png;base64,' + profileData.imageData" 
                   alt="Profile" 
                   class="w-full h-full object-cover"
                 />
-                <span v-else>{{ getInitials(profileData.firstName, profileData.lastName) }}</span>
+                <span v-else>{{ getInitials(profileData.firstName, profileData.fatherName) }}</span>
               </div>
               <button 
                 @click="triggerFileUpload"
@@ -51,14 +51,18 @@
             </div>
             <div class="flex-1">
               <h1 class="text-2xl font-bold text-gray-900 mb-1">
-                {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.lastName || 'Name' }}
+                {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.fatherName || 'Name' }}
               </h1>
-              <p class="text-base text-gray-600 mb-1">{{ profileData.department || 'Department' }}</p>
+              <p class="text-base text-gray-600 mb-1">{{ profileData.userType || 'User Type' }}</p>
               <p class="text-sm text-gray-500 mb-1">{{ profileData.email || 'email@example.com' }}</p>
-              <p class="text-sm text-gray-500 mb-3">{{ profileData.roleName || 'Role' }}</p>
+              <p class="text-sm text-gray-500 mb-3">{{ profileData.mobilePhone || 'Phone' }}</p>
               <div class="flex gap-2">
-                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">Active</span>
-                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">Verified</span>
+                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                  {{ profileData.userStatus || 'Status' }}
+                </span>
+                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                  {{ profileData.userType || 'Type' }}
+                </span>
               </div>
             </div>
             <div>
@@ -136,10 +140,10 @@
               </div>
 
               <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Grandfather's Name</label>
+                <label class="block text-xs font-medium text-gray-700">Username</label>
                 <input 
                   type="text" 
-                  v-model="profileData.grandFatherName"
+                  v-model="profileData.userName"
                   :disabled="!isEditing"
                   :class="[
                     'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
@@ -162,34 +166,18 @@
                       : 'border-gray-200 bg-gray-50 cursor-not-allowed'
                   ]"
                 >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
                 </select>
               </div>
 
               <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Role</label>
+                <label class="block text-xs font-medium text-gray-700">User Type</label>
                 <input 
                   type="text" 
-                  v-model="profileData.roleName"
+                  v-model="profileData.userType"
                   disabled
                   class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
-                >
-              </div>
-              
-              <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Last Name</label>
-                <input 
-                  type="text" 
-                  v-model="profileData.lastName"
-                  :disabled="!isEditing"
-                  :class="[
-                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                    isEditing 
-                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  ]"
                 >
               </div>
               
@@ -209,10 +197,10 @@
               </div>
               
               <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Phone</label>
+                <label class="block text-xs font-medium text-gray-700">Mobile Phone</label>
                 <input 
                   type="tel" 
-                  v-model="profileData.phone"
+                  v-model="profileData.mobilePhone"
                   :disabled="!isEditing"
                   :class="[
                     'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
@@ -224,107 +212,34 @@
               </div>
               
               <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Department</label>
-                <select 
-                  v-model="profileData.department"
-                  :disabled="!isEditing"
-                  :class="[
-                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                    isEditing 
-                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  ]"
+                <label class="block text-xs font-medium text-gray-700">User Status</label>
+                <input 
+                  type="text" 
+                  v-model="profileData.userStatus"
+                  disabled
+                  class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
                 >
-                  <option>Internal Medicine</option>
-                  <option>Pedietdacs</option>
-                  <option>Surcers</option>
-                  <option>Obstutgics & Gynecery</option>
-                  <option>Embrgency Mestcine</option>
-                  <option>Cardiology & Gynecology</option>
-                  <option>Nemeolory</option>
-                  <option>Orthopgdicscy Medicine</option>
-                  <option>Drdmatoloiy</option>
-                  <option>Psyohiatrg</option>
-                 <option>Raoiology</option>
-                  <option>Aoesthnsiology</option>
-                  <option>Neurology</option>
-                  <option>Orthopedics</option>
-                  <option>Dermatology</option>
-                  <option>Psychiatry</option>
-                  <option>Radiology</option>
-                  <option>Anesthesiology</option>
-                </select>
               </div>
               
-              <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">License Number</label>
+              <!-- <div class="space-y-2">
+                <label class="block text-xs font-medium text-gray-700">Provider UUID</label>
                 <input 
                   type="text" 
-                  v-model="profileData.licenseNumber"
-                  :disabled="!isEditing"
-                  :class="[
-                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                    isEditing 
-                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  ]"
+                  v-model="profileData.providerUuid"
+                  disabled
+                  class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
                 >
               </div>
 
               <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Specialization</label>
+                <label class="block text-xs font-medium text-gray-700">Role UUID</label>
                 <input 
                   type="text" 
-                  v-model="profileData.specialization"
-                  :disabled="!isEditing"
-                  :class="[
-                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                    isEditing 
-                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  ]"
+                  v-model="profileData.roleUuid"
+                  disabled
+                  class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
                 >
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Years of Experience</label>
-                <input 
-                  type="number" 
-                  v-model="profileData.experience"
-                  :disabled="!isEditing"
-                  :class="[
-                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                    isEditing 
-                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  ]"
-                >
-              </div>
-
-              <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Location</label>
-                <select 
-                  v-model="profileData.location"
-                  :disabled="!isEditing"
-                  :class="[
-                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                    isEditing 
-                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  ]"
-                >
-                  <option>Addis Ababa, Ethiopia</option>
-                  <option>Bahir Dar, Amhara</option>
-                  <option>Mekelle, Tigray</option>
-                  <option>Hawassa, SNNPR</option>
-                  <option>Adama, Oromia</option>
-                  <option>Dire Dawa, Ethiopia</option>
-                  <option>Gondar, Amhara</option>
-                  <option>Jimma, Oromia</option>
-                  <option>Dessie, Amhara</option>
-                  <option>Harar, Harari</option>
-                </select>
-              </div>
+              </div> -->
             </div>
 
             <div v-if="isEditing" class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
@@ -369,23 +284,18 @@ const fileInput = ref(null);
 const loading = ref(false);
 
 const profileData = reactive({
-  firstName: '',
-  lastName: '',
   email: '',
-  phone: '',
-  department: '',
-  licenseNumber: '',
-  specialization: '',
-  experience: 0,
-  location: '',
-  profileImage: null,
   title: '',
+  firstName: '',
+  userName: '',
   fatherName: '',
-  grandFatherName: '',
-  gender: '',
+  gender: 'Male',
   mobilePhone: '',
+  userStatus: '',
+  userType: '',
+  providerUuid: '',
   roleUuid: '',
-  roleName: ''
+  imageData: null
 });
 
 // Fetch user details from API
@@ -403,44 +313,31 @@ async function fetchUserDetails() {
       () => getUserById(userUuid),
       (response) => {
         if (response.success && response.data) {
-          const userData = response.data;
-          console.log('Fetched user data:', userData);
-          
-          // Update profile data with fetched information
-          profileData.firstName = userData.firstName || '';
-          profileData.lastName = userData.lastName || userData.fatherName || '';
-          profileData.fatherName = userData.fatherName || '';
-          profileData.grandFatherName = userData.grandFatherName || '';
-          profileData.email = userData.email || '';
-          profileData.phone = userData.mobilePhone || '';
-          profileData.mobilePhone = userData.mobilePhone || '';
-          profileData.department = userData.department || 'Internal Medicine';
-          profileData.licenseNumber = userData.licenseNumber || '';
-          profileData.specialization = userData.specialization || 'Infectious Diseases';
-          profileData.experience = userData.experience || 0;
-          profileData.location = userData.location || 'Addis Ababa, Ethiopia';
-          profileData.title = userData.title || 'Dr.';
-          profileData.gender = userData.gender || '';
-          profileData.roleUuid = userData.roleUuid || '';
-          profileData.roleName = userData.roleName || '';
-          profileData.profileImage = userData.imageData ? `data:image/png;base64,${userData.imageData}` : null;
+          Object.assign(profileData, response.data);
           
           // Update auth store with fresh data
           authStore.setAuth({
             ...authStore.auth,
-            user: userData
+            user: response.data
           });
           
+          // Update localStorage
+          localStorage.setItem("userDetail", JSON.stringify(response.data));
         } else {
-          console.error('Failed to fetch user details:', response.error);
-          loadFromAuthStore(); // Fallback to auth store data
+          console.error('No user data found in response:', response);
+          loadFromAuthStore();
         }
+        loading.value = false;
+      },
+      (error) => {
+        console.error('API call failed:', error);
+        loadFromAuthStore();
         loading.value = false;
       }
     );
   } catch (error) {
     console.error('Error fetching user details:', error);
-    loadFromAuthStore(); // Fallback to auth store data
+    loadFromAuthStore();
     loading.value = false;
   }
 }
@@ -449,23 +346,20 @@ async function fetchUserDetails() {
 function loadFromAuthStore() {
   const user = authStore.auth?.user;
   if (user) {
-    profileData.firstName = user.firstName || '';
-    profileData.lastName = user.lastName || user.fatherName || '';
-    profileData.fatherName = user.fatherName || '';
-    profileData.grandFatherName = user.grandFatherName || '';
-    profileData.email = user.email || '';
-    profileData.phone = user.mobilePhone || '';
-    profileData.mobilePhone = user.mobilePhone || '';
-    profileData.department = user.department || 'Internal Medicine';
-    profileData.licenseNumber = user.licenseNumber || '';
-    profileData.specialization = user.specialization || 'Infectious Diseases';
-    profileData.experience = user.experience || 0;
-    profileData.location = user.location || 'Addis Ababa, Ethiopia';
-    profileData.title = user.title || 'Dr.';
-    profileData.gender = user.gender || '';
-    profileData.roleUuid = user.roleUuid || '';
-    profileData.roleName = user.roleName || '';
-    profileData.profileImage = user.imageData ? `data:image/png;base64,${user.imageData}` : null;
+    Object.assign(profileData, {
+      email: user.email || '',
+      title: user.title || '',
+      firstName: user.firstName || '',
+      userName: user.userName || '',
+      fatherName: user.fatherName || '',
+      gender: user.gender || 'Male',
+      mobilePhone: user.mobilePhone || '',
+      userStatus: user.userStatus || '',
+      userType: user.userType || '',
+      providerUuid: user.providerUuid || '',
+      roleUuid: user.roleUuid || '',
+      imageData: user.imageData || null
+    });
   }
 }
 
@@ -474,8 +368,8 @@ onMounted(() => {
   fetchUserDetails();
 });
 
-function getInitials(firstName, lastName) {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+function getInitials(firstName, fatherName) {
+  return `${firstName?.charAt(0) || ''}${fatherName?.charAt(0) || ''}`.toUpperCase();
 }
 
 function toggleEdit() {
@@ -494,53 +388,41 @@ function cancelEdit() {
 
 function saveProfile() {
   const updateData = {
+    title: profileData.title,
     firstName: profileData.firstName,
-    lastName: profileData.lastName,
-    email: profileData.email,
-    mobilePhone: profileData.phone,
-    department: profileData.department,
-    licenseNumber: profileData.licenseNumber,
-    specialization: profileData.specialization,
-    experience: profileData.experience,
-    location: profileData.location
+    userName: profileData.userName,
+    fatherName: profileData.fatherName,
+    gender: profileData.gender,
+    mobilePhone: profileData.mobilePhone,
+    email: profileData.email
   };
 
   api.send(
     () => updateProfileData(authStore.auth?.user?.userUuid, updateData),
     (res) => {
       if (res.success) {
-        // Update auth store with new profile data
         const updatedUser = {
           ...authStore.auth.user,
-          firstName: profileData.firstName,
-          lastName: profileData.lastName,
-          fatherName: profileData.lastName, // Keep fatherName in sync
-          email: profileData.email,
-          mobilePhone: profileData.phone,
-          department: profileData.department,
-          licenseNumber: profileData.licenseNumber,
-          specialization: profileData.specialization,
-          experience: profileData.experience,
-          location: profileData.location
+          ...updateData
         };
 
-        // Update the auth store
         authStore.setAuth({
           ...authStore.auth,
           user: updatedUser
         });
 
-        // Update localStorage
-        localStorage.setItem(
-          "userDetail",
-          JSON.stringify(updatedUser)
-        );
+        localStorage.setItem("userDetail", JSON.stringify(updatedUser));
 
         isEditing.value = false;
         toasted(true, 'Profile updated successfully!');
+        fetchUserDetails();
       } else {
         toasted(false, res.error || 'Failed to update profile');
       }
+    },
+    (error) => {
+      console.error('Profile update failed:', error);
+      toasted(false, 'Failed to update profile');
     }
   );
 }
@@ -551,55 +433,39 @@ function triggerFileUpload() {
 
 function handleFileUpload(event) {
   const file = event.target.files[0];
-  if (file) {
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toasted(false, 'Please select a valid image file.');
-      return;
-    }
-    
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toasted(false, 'File size must be less than 5MB.');
-      return;
-    }
-    
-    // Create file reader to convert to base64
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      profileData.profileImage = e.target.result;
-      
-      // Update auth store with new profile image
-      const updatedUser = {
-        ...authStore.auth.user,
-        imageData: e.target.result.split(',')[1] // Remove data:image/png;base64, prefix
-      };
-      
-      authStore.setAuth({
-        ...authStore.auth,
-        user: updatedUser
-      });
+  if (!file) return;
 
-      // Update localStorage
-      localStorage.setItem(
-        "userDetail",
-        JSON.stringify(updatedUser)
-      );
-      
-      console.log('Profile image updated');
-    };
-    reader.readAsDataURL(file);
+  if (!file.type.startsWith('image/')) {
+    toasted(false, 'Please select a valid image file.');
+    return;
   }
+  
+  if (file.size > 5 * 1024 * 1024) {
+    toasted(false, 'File size must be less than 5MB.');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const base64Data = e.target.result.split(',')[1];
+    profileData.imageData = base64Data;
+    
+    const updatedUser = {
+      ...authStore.auth.user,
+      imageData: base64Data
+    };
+    
+    authStore.setAuth({
+      ...authStore.auth,
+      user: updatedUser
+    });
+
+    localStorage.setItem("userDetail", JSON.stringify(updatedUser));
+    toasted(true, 'Profile image updated successfully!');
+  };
+  reader.onerror = () => {
+    toasted(false, 'Failed to process image. Please try again.');
+  };
+  reader.readAsDataURL(file);
 }
 </script>
-
-
-
-
-
-
-
-
-
-
-

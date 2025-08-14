@@ -202,7 +202,7 @@ function handleImageError(event) {
           :headers="{
             head: [
               'Drug Name',
-              'Drug Code', 
+              // 'Drug Code', 
               'Category',
               'Dosage',
               'Storage',
@@ -211,7 +211,7 @@ function handleImageError(event) {
             ],
             row: [
               'drugName',
-              'drugCode',
+              // 'drugCode',
               'categories',
               'dosage',
               'storage',

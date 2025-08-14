@@ -35,7 +35,7 @@ const pagination = usePagination({
           <button  @click.prevent="openModal('AddUser')"
             class="flex justify-center items-center gap-2 rounded-md px-6 py-4 bg-primary text-white">
                <i v-html="icons.plus_circle"></i>
-            Add User
+            Add Users
           </button>
         </div>
       </div>
@@ -47,11 +47,11 @@ const pagination = usePagination({
             'Fullname',
             'Email',
             'phoneNumber',
-            // 'User Type',
+            //  'User Type',
             'providerName',
             'Role Name',
             'Gender',
-            'Status',
+            'userStatus',
             'Actions',
           ],
           row: [
@@ -61,7 +61,6 @@ const pagination = usePagination({
             // 'userType',
             'providerName',
             'roleName',
-            
             'gender',
             'status',
           ]

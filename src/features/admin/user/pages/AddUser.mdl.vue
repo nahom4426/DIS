@@ -4,7 +4,7 @@ import NewFormParent from "@/components/NewFormParent.vue";
 import UserForm from "./UserForm.vue";
 import { closeModal } from "@customizer/modal-x";
 import { ref, onMounted } from "vue";
-import { createUser } from "../Api/UserApi";
+import {  createUser } from "../Api/UserApi";
 import { useUsers } from "../store/userStore";
 import { useToast } from '@/toast/store/toast';
 
@@ -31,15 +31,17 @@ async function handleSubmit(formValues) {
     formPending.value = true;
     console.log('Form submitted with values:', formValues);
     
-    // Make sure payerUuid is included
+    // Map hospitalUuid to providerUuid for the API
     const userData = {
       ...formValues,
-      payerUuid: modalData.value.payerUuid || formValues.payerUuid
+      providerUuid: formValues.hospitalUuid || modalData.value.providerUuid,
+      // Remove hospitalUuid since API doesn't expect it
+      hospitalUuid: undefined
     };
     
     console.log('Submitting user data:', userData);
     
-    const result = await CreateUser(userData);
+    const result = await createUser(userData);
     
     if (result.success) {
       console.log('User created successfully:', result.data);
@@ -93,7 +95,7 @@ async function handleSubmit(formValues) {
           :onSubmit="handleSubmit"
           :onCancel="() => closeModal()"
           :roleName="modalData.roleName"
-          :payerUuid="modalData.payerUuid"
+          :providerUuid="modalData.providerUuid"
         />
       </div>
     </NewFormParent>

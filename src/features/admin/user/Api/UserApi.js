@@ -7,7 +7,7 @@ const path = "/auth/users";
 
 export async function createUser(userData) {
   try {
-    const response = await api.addAuthenticationHeader().post(`${path}/auth/user/create`, userData);
+    const response = await api.addAuthenticationHeader().post(`${path}/create/user`, userData);
     return {
       success: true,
       data: response,
