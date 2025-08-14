@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --host --force",
+    "dev:clean": "vite --host --force",
     "build": "run-p \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
@@ -44,3 +45,4 @@
     "vue-tsc": "^2.0.21"
   }
 }
+

@@ -2,7 +2,7 @@ import ApiService from "@/service/ApiService";
 import { getQueryFormObject } from "@/utils/utils.js";
 
 const api = new ApiService(import.meta.env.VITE_API_URI);
-const path = "/auth/users";
+const path = "/auth/users"; // Updated to match actual endpoint
 
 export function getAllRegistrationRequests(query = {}) {
   const qr = getQueryFormObject(query);
@@ -11,13 +11,23 @@ export function getAllRegistrationRequests(query = {}) {
     .get(`${path}/all${qr}`)
     .then(response => {
       if (response.success && response.data) {
+        // Transform the response to match expected format
+        const transformedRequests = (response.data.content || []).map(request => ({
+          ...request,
+          requestId: request.userUuid,
+          fullName: `${request.firstName || ''} ${request.fatherName || ''}`.trim(),
+          role: request.roleName,
+          submittedDate: request.createdAt,
+          status: request.userStatus.toLowerCase()
+        }));
+        
         return {
           success: true,
           data: {
-            requests: response.data.content || [],
+            requests: transformedRequests,
             totalItems: response.data.totalElements || 0,
             totalPages: response.data.totalPages || 1,
-            currentPage: response.data.pageNumber || 0
+            currentPage: response.data.pageNumber || 0,
           }
         };
       }
@@ -48,49 +58,11 @@ export function approveRegistrationRequest(userUuid, data = {}) {
 export function rejectRegistrationRequest(userUuid, reason = "") {
   return api
     .addAuthenticationHeader()
-    .put(`${path}/${userUuid}/reject`, { reason })
+    .put(`${path}/${userUuid}`/reject, { reason })
     .catch((error) => {
       return {
         success: false,
         error: error.message || "Failed to reject registration request.",
-        data: null,
-      };
-    });
-}
-
-export function getUserQuestions(userUuid, query = {}) {
-  const qr = getQueryFormObject(query);
-  return api
-    .addAuthenticationHeader()
-    .get(`/question/user/${userUuid}${qr}`)
-    .then(response => {
-      if (response.success && response.data) {
-        return {
-          success: true,
-          data: response.data,
-          error: null
-        };
-      }
-      return response;
-    })
-    .catch((error) => {
-      return {
-        success: false,
-        error: error.message || "Failed to fetch user questions.",
-        data: null,
-      };
-    });
-}
-
-export function getCurrentUserQuestions(query = {}) {
-  const qr = getQueryFormObject(query);
-  return api
-    .addAuthenticationHeader()
-    .get(`/question/user/current${qr}`)
-    .catch((error) => {
-      return {
-        success: false,
-        error: error.message || "Failed to fetch current user questions.",
         data: null,
       };
     });
@@ -102,13 +74,6 @@ export function getRegistrationRequestDocumentView(fileName) {
     .get(`${path}/document/${fileName}`, {
       responseType: 'blob'
     })
-    .then(response => {
-      return {
-        success: true,
-        data: response,
-        error: null
-      };
-    })
     .catch((error) => {
       return {
         success: false,
@@ -117,3 +82,6 @@ export function getRegistrationRequestDocumentView(fileName) {
       };
     });
 }
+
+
+

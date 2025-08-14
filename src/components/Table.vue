@@ -3,7 +3,7 @@ import DataTable from "./DataTable.vue";
 import { inject, ref, useAttrs, watch, computed } from "vue";
 import GenericTableRow from "./GenericTableRow.vue";
 import TableRowSkeleton from "./TableRowSkeleton.vue";
-import icons from "@/utils/icons";
+import  icons  from "@/utils/icons";
 import Button from "./Button.vue";
 
 const emit = defineEmits([
@@ -238,3 +238,4 @@ const showEmptyState = computed(() => {
     </div>
   </div>
 </template>
+

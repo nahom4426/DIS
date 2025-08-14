@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import icons from '@/utils/icons'
 
 const props = defineProps({
   path: {
@@ -33,3 +34,4 @@ const iconSize = computed(() => props.size ?? 16)
     <slot />
   </span>
 </template>
+

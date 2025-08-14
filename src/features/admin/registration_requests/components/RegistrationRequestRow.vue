@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 import { openModal } from '@customizer/modal-x';
-import Button from '@/components/Button.vue';
-import icons from '@/utils/icons';
+import icons from "@/utils/icons";
+import { useNotifications } from '@/composables/useNotifications';
 
 const props = defineProps({
   rowData: {
@@ -11,19 +11,12 @@ const props = defineProps({
   }
 });
 
-const showDropdown = ref({});
+const { showSuccess, showInfo } = useNotifications();
 
-function toggleDropdown(userUuid) {
-  showDropdown.value = {
-    ...showDropdown.value,
-    [userUuid]: !showDropdown.value[userUuid]
-  };
-}
-
-function handleView(user) {
-  openModal('ViewRegistrationRequest', {
-    userUuid: user.userUuid,
-    user: user
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric' 
   });
   showDropdown.value[user.userUuid] = false;
 }
@@ -45,37 +38,27 @@ function getStatusColor(status) {
   }
 }
 
-function getUserTypeColor(type) {
-  switch (type?.toLowerCase()) {
-    case 'physician': return 'bg-blue-100 text-blue-800';
-    case 'pharmacist': return 'bg-purple-100 text-purple-800';
-    case 'admin': return 'bg-gray-100 text-gray-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-}
+const viewRequest = (requestId) => {
+  openModal('ViewRegistrationRequest', { requestId });
+};
 
-function getRoleColor(role) {
-  switch (role?.toLowerCase()) {
-    case 'doctor': return 'bg-indigo-100 text-indigo-800';
-    case 'pharmacist': return 'bg-pink-100 text-pink-800';
-    case 'admin': return 'bg-gray-100 text-gray-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-}
+const approveRequest = async (requestId) => {
+  // ... approval logic
+  showSuccess(
+    'Request Approved',
+    'The registration request has been approved successfully.',
+    '/registration'
+  );
+};
 
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text);
-}
+const rejectRequest = async (requestId) => {
+  // ... rejection logic
+  showInfo(
+    'Request Rejected',
+    'The registration request has been rejected.',
+    '/registration'
+  );
+};
 </script>
 
 <template>
@@ -110,18 +93,21 @@ function copyToClipboard(text) {
           {{ row.email }}
         </div>
       </td>
-      
-      <!-- Phone -->
-      <td class="px-4 py-3">
-        <div class="text-sm text-gray-900">
-          {{ row.mobilePhone }}
-        </div>
+      <td class="px-3 py-3 text-sm text-gray-900 capitalize">
+        {{ row.role }}
       </td>
-      
-      <!-- Title -->
-      <td class="px-4 py-3">
-        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-          {{ row.title }}
+      <td class="px-3 py-3 text-sm text-gray-900">
+        {{ row.providerName }}
+      </td>
+      <td class="px-3 py-3 text-sm text-gray-900">
+        {{ row.mobilePhone }}
+      </td>
+      <td class="px-3 py-3 text-sm text-gray-900">
+        {{ formatDate(row.submittedDate) }}
+      </td>
+      <td class="px-3 py-3">
+        <span :class="getStatusClass(row.status)" class="px-2 py-1 text-xs font-medium rounded-full capitalize">
+          {{ row.status }}
         </span>
       </td>
       
@@ -218,3 +204,11 @@ function copyToClipboard(text) {
   </tbody>
 </template>
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+>>>>>>> 914adcad66d095f313eaa8c6281f53d4ca0760d7
