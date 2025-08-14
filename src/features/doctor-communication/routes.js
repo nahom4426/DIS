@@ -1,6 +1,5 @@
 import MainLayout from '@/layouts/MainLayout.vue'
 import DoctorCommDashboard from './pages/DoctorCommDashboard.vue'
-import DoctorInquiries from './pages/DoctorInquiries.vue'
 import InquiryHistory from './pages/InquiryHistory.vue'
 import DrugLookup from './pages/DrugLookup.vue'
 import RespondToInquiry from './pages/RespondToInquiry.vue'
@@ -27,11 +26,6 @@ export default [
         component: DoctorCommDashboard,
       },
       {
-        path: 'inquiries',
-        name: 'DoctorInquiries',
-        component: DoctorInquiries,
-      },
-      {
         path: 'history',
         name: 'InquiryHistory',
         component: InquiryHistory,
@@ -54,4 +48,5 @@ export default [
     ],
   },
 ]
+
 

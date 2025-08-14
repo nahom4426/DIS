@@ -1,6 +1,7 @@
 <script setup>
 import { openModal } from '@customizer/modal-x';
 import icons from "@/utils/icons";
+import { useNotifications } from '@/composables/useNotifications';
 
 const props = defineProps({
   rowData: {
@@ -16,6 +17,8 @@ const props = defineProps({
     required: true
   }
 });
+
+const { showSuccess, showInfo } = useNotifications();
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', { 
@@ -40,6 +43,24 @@ const getStatusClass = (status) => {
 const viewRequest = (requestId) => {
   openModal('ViewRegistrationRequest', { requestId });
 };
+
+const approveRequest = async (requestId) => {
+  // ... approval logic
+  showSuccess(
+    'Request Approved',
+    'The registration request has been approved successfully.',
+    '/registration'
+  );
+};
+
+const rejectRequest = async (requestId) => {
+  // ... rejection logic
+  showInfo(
+    'Request Rejected',
+    'The registration request has been rejected.',
+    '/registration'
+  );
+};
 </script>
 
 <template>
@@ -55,10 +76,13 @@ const viewRequest = (requestId) => {
         {{ row.email }}
       </td>
       <td class="px-3 py-3 text-sm text-gray-900 capitalize">
-        {{ row.userType }}
+        {{ row.role }}
       </td>
       <td class="px-3 py-3 text-sm text-gray-900">
-        {{ row.licenseNumber }}
+        {{ row.providerName }}
+      </td>
+      <td class="px-3 py-3 text-sm text-gray-900">
+        {{ row.mobilePhone }}
       </td>
       <td class="px-3 py-3 text-sm text-gray-900">
         {{ formatDate(row.submittedDate) }}
@@ -79,6 +103,8 @@ const viewRequest = (requestId) => {
     </tr>
   </tbody>
 </template>
+
+
 
 
 

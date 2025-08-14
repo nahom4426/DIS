@@ -1,4 +1,4 @@
-import icons from "@/utils/icons";
+import  icons from "@/utils/icons";
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
@@ -61,14 +61,14 @@ export default [
     path: "/users",
     name: "User Management",
     icon: icons.user,
-    //privilege: ["Create Employees"],
+    privilege: ["Create Employees"],
   },
    
        {
     path: 'registration',
     name: "Registration",
     icon: icons.register,
-    // privilege: ["MANAGE_REGISTRATION_REQUESTS"],
+     privilege: ["MANAGE_REGISTRATION_REQUESTS"],
   },
    {
     name: "Pharmacist Communication",
@@ -81,23 +81,18 @@ export default [
     icon: icons.communication, // Add appropriate icon
     
   },
-      {
-        path: "/doctor-comm/inquiries",
-        name: "Recent Inquiries",
-        icon: icons.inbox,
-        // privilege: [""],
-      },
+     
       {
         path: "/doctor-comm/history",
         name: "Full History",
         icon: icons.history,
-        // privilege: [""],
+         //privilege: ["pharmacist"],
       },
       {
         path: "/doctor-comm/drug-lookup",
         name: "Drug Lookup Tool",
         icon: icons.search,
-        // privilege: [""],
+         //privilege: ["pharmacist"],
       },
  
     ],
@@ -105,17 +100,20 @@ export default [
   {
     path: "/home",
     name: "Home",
-    icon: icons.request
+    icon: icons.request,
+     privilege: ["pharmacist"],
   },
   {
     path: "/doctor-requests",
     name: "Requests",
     icon: icons.request,
+    privilege: ["pharmacist"],
   },
   {
     path: "drug-management",
     name: "Drug Management",
     icon: icons.drug,
+    privilege: ["pharmacist"],
 
   },
 
@@ -123,13 +121,13 @@ export default [
     path: "/roles",
     name: "Roles & Permissions",
     icon: icons.role,
-    // privilege: ["MANAGE_ROLES"],
+    //privilege: ["MANAGE_ROLES"],
   },
     {
     path: "/privileges",
     name: "Privilege",
     icon: icons.privilege,
-    // privilege: ["CREATE_USER"],
+     //privilege: ["CREATE_USER"],
   },
  
   // {

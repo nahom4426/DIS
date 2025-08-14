@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useToast } from "./store/toast.js";
-import icons from "@/utils/icons.js";
+import  icons from "@/utils/icons.js";
 //import { mdiClose } from '@mdi/js'
 const { removeToast } = useToast();
 const props = defineProps({
@@ -119,3 +119,6 @@ function out() {
   }
 }
 </style>
+
+
+

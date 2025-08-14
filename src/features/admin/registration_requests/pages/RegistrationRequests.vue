@@ -37,15 +37,16 @@ const filteredRequests = (search) => {
   return requestStore.requests.filter(request => 
     request.fullName.toLowerCase().includes(searchTerm) ||
     request.email.toLowerCase().includes(searchTerm) ||
-    request.userType.toLowerCase().includes(searchTerm) ||
-    request.licenseNumber.toLowerCase().includes(searchTerm) ||
+    request.role.toLowerCase().includes(searchTerm) ||
+    request.providerName.toLowerCase().includes(searchTerm) ||
+    request.mobilePhone.toLowerCase().includes(searchTerm) ||
     request.status.toLowerCase().includes(searchTerm)
   );
 };
 
 const tableHeaders = {
-  head: ['Name', 'Email', 'Type', 'License', 'Date', 'Status', 'Actions'],
-  row: ['index', 'fullName', 'email', 'userType', 'licenseNumber', 'submittedDate', 'status', 'actions'],
+  head: ['Name', 'Email', 'Role', 'Provider', 'Mobile', 'Date', 'Status', 'Actions'],
+  row: ['fullName', 'email', 'role', 'providerName', 'mobilePhone', 'submittedDate', 'status', 'actions'],
 };
 </script>
 
@@ -65,22 +66,53 @@ const tableHeaders = {
       <div class="bg-white rounded-lg shadow">
         <!-- Debug info -->
         <div class="p-4 bg-gray-100 text-sm">
-          <p>Store requests count: {{ requestStore.requests.length }}</p>
-          <p>Filtered count: {{ filteredRequests(search).length }}</p>
-          <p>Loading: {{ loading }}</p>
-          <p>Search: "{{ search }}"</p>
+          <p class="text-sm text-gray-600 bold">Store requests count: {{ requestStore.requests.length }}</p>
         </div>
         
-        <Table
-          :headers="tableHeaders"
-          :rows="filteredRequests(search)"
-          :rowCom="RegistrationRequestRow"
-          :pending="loading"
-          :Fallback="TableRowSkeleton"
-        />
+        <!-- Scrollable table container -->
+        <div class="overflow-x-auto custom-scrollbar">
+          <Table
+            :headers="tableHeaders"
+            :rows="filteredRequests(search)"
+            :rowCom="RegistrationRequestRow"
+            :pending="loading"
+            :Fallback="TableRowSkeleton"
+          />
+        </div>
       </div>
     </template>
   </DefaultPage>
 </template>
+
+
+
+
+
+<style scoped>
+/* Custom horizontal scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+</style>
 
 
