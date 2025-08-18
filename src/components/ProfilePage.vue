@@ -51,9 +51,10 @@
             </div>
             <div class="flex-1">
               <h1 class="text-2xl font-bold text-gray-900 mb-1">
-                {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.fatherName || 'Name' }}
+                {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.fatherName || 'Name' }} {{ profileData.grandFatherName || '' }}
               </h1>
               <p class="text-base text-gray-600 mb-1">{{ profileData.userType || 'User Type' }}</p>
+              <p class="text-base text-gray-600 mb-1">{{ profileData.roleName || '' }}</p>
               <p class="text-sm text-gray-500 mb-1">{{ profileData.email || 'email@example.com' }}</p>
               <p class="text-sm text-gray-500 mb-3">{{ profileData.mobilePhone || 'Phone' }}</p>
               <div class="flex gap-2">
@@ -221,25 +222,30 @@
                 >
               </div>
               
-              <!-- <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Provider UUID</label>
+              <div class="space-y-2">
+                <label class="block text-xs font-medium text-gray-700">Grandfather's Name</label>
                 <input 
                   type="text" 
-                  v-model="profileData.providerUuid"
-                  disabled
-                  class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
+                  v-model="profileData.grandFatherName"
+                  :disabled="!isEditing"
+                  :class="[
+                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                    isEditing 
+                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
+                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                  ]"
                 >
               </div>
 
               <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Role UUID</label>
+                <label class="block text-xs font-medium text-gray-700">Role Name</label>
                 <input 
                   type="text" 
-                  v-model="profileData.roleUuid"
+                  v-model="profileData.roleName"
                   disabled
                   class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
                 >
-              </div> -->
+              </div>
             </div>
 
             <div v-if="isEditing" class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
@@ -289,6 +295,8 @@ const profileData = reactive({
   firstName: '',
   userName: '',
   fatherName: '',
+  grandFatherName: '', // <-- Add this line
+  roleName: '',        // <-- Add this line
   gender: 'Male',
   mobilePhone: '',
   userStatus: '',
@@ -344,7 +352,7 @@ async function fetchUserDetails() {
 
 // Fallback to load from auth store
 function loadFromAuthStore() {
-  const user = authStore.auth?.user;
+  const user = authStore.auth?.user || JSON.parse(localStorage.getItem('userDetail') || '{}');
   if (user) {
     Object.assign(profileData, {
       email: user.email || '',
@@ -352,6 +360,8 @@ function loadFromAuthStore() {
       firstName: user.firstName || '',
       userName: user.userName || '',
       fatherName: user.fatherName || '',
+      grandFatherName: user.grandFatherName || '', // <-- Add this line
+      roleName: user.roleName || '',               // <-- Add this line
       gender: user.gender || 'Male',
       mobilePhone: user.mobilePhone || '',
       userStatus: user.userStatus || '',
