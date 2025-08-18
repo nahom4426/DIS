@@ -104,7 +104,7 @@ export default [
     path: "/home",
     name: "Home",
     icon: icons.request,
-    privileges: ["ROLE_change_password"],
+    //  privilege: ["pharmacist"],
   },
   {
     path: "/doctor-requests",
