@@ -19,13 +19,13 @@ const emit = defineEmits(["toggle-sidebar", "toggle-menu"]);
 const userData = computed(() => auth.auth?.user || {});
 const hasPrivilege = (requiredPrivileges) => {
   if (!requiredPrivileges || requiredPrivileges.length === 0) return true;
-  const userPrivileges = userData.value.authorities || [];
+  const userPrivileges = userData.value.privileges || [];
 
   const userRole = userData.value.roleName;
   return (
     userRole === "Super Admin" ||
     userPrivileges.includes("All Privileges") ||
-    requiredPrivileges.some((priv) => userPrivileges.includes(`ROLE_${priv}`))
+    requiredPrivileges.some((priv) => userPrivileges.includes(priv))
   );
 };
 

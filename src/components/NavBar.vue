@@ -120,7 +120,7 @@ const props = defineProps({
     <div class="hidden md:block">
       <div class="bg-gradient-to-r from-primary/10 to-secondary/10 px-4 py-2 rounded-lg shadow-inner backdrop-blur-sm border border-white/50">
         <span class="text-primary font-medium text-sm md:text-base animate-pulse">
-          {{ authStore.auth?.user?.companyName || 'Admin Dashboard' }}
+          {{ authStore.auth?.roleName+ " "+"Dashboard" }}
         </span>
       </div>
     </div>

@@ -62,38 +62,40 @@ export default [
     path: "/users",
     name: "User Management",
     icon: icons.user,
-    privilege: ["Create Employees"],
+    privileges: ["Create Employees"],
   },
    
        {
     path: 'registration',
     name: "Registration",
     icon: icons.register,
-     privilege: ["MANAGE_REGISTRATION_REQUESTS"],
+    privileges: ["MANAGE_REGISTRATION_REQUEST"],
   },
    {
     name: "Pharmacist Communication",
     icon: icons.pharmacist,
-    privilege: [""],
+   privileges: ["ROLE_change password","ROLE_view_answers","ROLE_edit_profile","ROLE_create_answers", "ROLE_view_questions", "ROLE_search_drug"],
     navs: [
        {
     path: "/doctor-comm/dashboard",
     name: "Doctor Communication",
     icon: icons.communication, // Add appropriate icon
-    
+   privilages:["ROLE_change password"] ,
   },
      
       {
         path: "/doctor-comm/history",
         name: "Full History",
         icon: icons.history,
-         //privilege: ["pharmacist"],
+        privilages:[,"ROLE_view_answers","ROLE_edit_profile","ROLE_create_answers", "ROLE_view_questions", "ROLE_search_drug"] ,
+         
       },
       {
         path: "/doctor-comm/drug-lookup",
         name: "Drug Lookup Tool",
         icon: icons.search,
-         //privilege: ["pharmacist"],
+        privilages:[]
+         
       },
  
     ],
@@ -102,19 +104,20 @@ export default [
     path: "/home",
     name: "Home",
     icon: icons.request,
-     privilege: ["pharmacist"],
+    privileges: ["ROLE_change_password"],
   },
   {
     path: "/doctor-requests",
     name: "Requests",
     icon: icons.request,
-    privilege: ["pharmacist"],
+    privileges: ["ROLE_create_questions","ROLE_view_answers", "ROLE_view_questions"],
+
   },
   {
     path: "drug-management",
     name: "Drug Management",
     icon: icons.drug,
-    privilege: ["pharmacist"],
+  privileges: ["pharmacist"],
 
   },
    
@@ -122,26 +125,26 @@ export default [
     path: 'registration',
     name: "Registration",
     icon: icons.register,
-    // privilege: ["MANAGE_REGISTRATION_REQUESTS"],
+    privileges: ["MANAGE_REGISTRATION_REQUESTS"],
   },
   {
     path: "/users",
     name: "User Management",
     icon: icons.user,
-    // privilege: ["Create Employees"],
+    privileges: ["Role_Create Employees"],
   },
 
   {
     path: "/roles",
     name: "Roles & Permissions",
     icon: icons.role,
-    //privilege: ["MANAGE_ROLES"],
+    privileges: ["MANAGE_ROLES"],
   },
     {
     path: "/privileges",
     name: "Privilege",
     icon: icons.privilege,
-     //privilege: ["CREATE_USER"],
+   privileges:["CREATE_USER"],
   },
  
   // {

@@ -1,12 +1,14 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import icons from '@/utils/icons'
 import Button from '@/components/Button.vue'
-import Table from '@/components/Table.vue'
 import { openModal } from '@customizer/modal-x'
+import { getAllInquiries } from '../api/inquiryApi'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const analytics = ref({
   weeklyInquiries: 0,
@@ -15,11 +17,12 @@ const analytics = ref({
   commonTopics: []
 })
 
-const recentInquiries = ref([])
+const allInquiries = ref([])
 const searchQuery = ref('')
 const selectedFilter = ref('all')
 const dateFilter = ref('all')
 const showFilters = ref(false)
+const openDropdownId = ref(null)
 
 const filterOptions = [
   { value: 'all', label: 'All Status' },
@@ -35,27 +38,22 @@ const dateFilterOptions = [
   { value: 'month', label: 'This Month' }
 ]
 
-const tableHeaders = {
-  head: ['Date', 'Doctor', 'Subject', 'Status', 'Actions'],
-  row: ['date', 'doctorName', 'subject', 'status']
-}
-
 const filteredInquiries = computed(() => {
-  let filtered = recentInquiries.value
+  let filtered = allInquiries.value
 
   // Search filter
   if (searchQuery.value) {
     const search = searchQuery.value.toLowerCase()
     filtered = filtered.filter(inquiry => 
-      inquiry.doctorName.toLowerCase().includes(search) ||
-      inquiry.subject.toLowerCase().includes(search)
+      inquiry.doctorName?.toLowerCase().includes(search) ||
+      inquiry.subject?.toLowerCase().includes(search)
     )
   }
 
   // Status filter
   if (selectedFilter.value !== 'all') {
     filtered = filtered.filter(inquiry => 
-      inquiry.status.toLowerCase() === selectedFilter.value
+      inquiry.status?.toLowerCase() === selectedFilter.value
     )
   }
 
@@ -66,7 +64,6 @@ const filteredInquiries = computed(() => {
     
     filtered = filtered.filter(inquiry => {
       const inquiryDate = new Date(inquiry.date)
-      
       switch (dateFilter.value) {
         case 'today':
           return inquiryDate >= today
@@ -82,11 +79,13 @@ const filteredInquiries = computed(() => {
     })
   }
 
-  return filtered
+  // Limit to 5 most recent
+  return filtered.slice(0, 5)
 })
 
 function respondToInquiry(inquiryId) {
   router.push(`/doctor-comm/respond/${inquiryId}`)
+  closeAllDropdowns()
 }
 
 function deleteInquiry(inquiryId) {
@@ -98,10 +97,11 @@ function deleteInquiry(inquiryId) {
     },
     (confirmed) => {
       if (confirmed) {
-        recentInquiries.value = recentInquiries.value.filter(inquiry => inquiry.id !== inquiryId)
+        allInquiries.value = allInquiries.value.filter(inquiry => inquiry.id !== inquiryId)
       }
     }
   )
+  closeAllDropdowns()
 }
 
 function goToFullHistory() {
@@ -114,8 +114,41 @@ function clearFilters() {
   dateFilter.value = 'all'
 }
 
-onMounted(() => {
-  // Mock data - replace with actual API calls
+function showDropdown(event, inquiry) {
+  event.stopPropagation();
+  openDropdownId.value = inquiry.id;
+}
+
+function closeAllDropdowns() {
+  openDropdownId.value = null;
+}
+
+function handleDropdownAction(action) {
+  closeAllDropdowns();
+  action();
+}
+
+onMounted(async () => {
+  // Example: get userUuid from auth store
+  const userUuid = authStore.auth?.userUuid || authStore.auth?.user?.userUuid
+  if (!userUuid) return
+
+  // Fetch inquiries from backend (same as InquiryHistory)
+  const response = await getAllInquiries(userUuid)
+  if (response && response.success && Array.isArray(response.data)) {
+    // Transform to match table fields
+    allInquiries.value = response.data.map(inquiry => ({
+      id: inquiry.questionUuid,
+      date: new Date(inquiry.createdAt).toLocaleDateString(),
+      doctorName: inquiry.firstName || 'Unknown Doctor',
+      subject: inquiry.description || 'No subject',
+      status: inquiry.questionStatus || 'Pending'
+    }))
+  } else {
+    allInquiries.value = []
+  }
+
+  // Example analytics (keep your cards)
   analytics.value = {
     weeklyInquiries: 24,
     monthlyInquiries: 89,
@@ -123,31 +156,13 @@ onMounted(() => {
     commonTopics: ['Drug Interactions', 'Dosage Questions', 'Side Effects', 'Contraindications']
   }
 
-  recentInquiries.value = [
-    {
-      id: 1,
-      date: '2024-01-15',
-      doctorName: 'Dr. John Smith',
-      subject: 'Drug interaction between Warfarin and Aspirin',
-      status: 'Pending'
-    },
-    {
-      id: 2,
-      date: '2024-01-14',
-      doctorName: 'Dr. Sarah Johnson',
-      subject: 'Dosage adjustment for elderly patients',
-      status: 'Responded'
-    },
-    {
-      id: 3,
-      date: '2024-01-13',
-      doctorName: 'Dr. Michael Brown',
-      subject: 'Side effects of new medication',
-      status: 'Pending'
-    }
-  ]
+  document.addEventListener('click', closeAllDropdowns);
+})
+onUnmounted(() => {
+  document.removeEventListener('click', closeAllDropdowns)
 })
 </script>
+
 <template>
   <div class="p-6 space-y-6">
     <!-- Welcome Section -->
@@ -248,12 +263,12 @@ onMounted(() => {
 
         <!-- Results Count -->
         <div class="ml-auto text-sm text-gray-600">
-          Showing {{ filteredInquiries.length }} of {{ recentInquiries.length }} inquiries
+          Showing {{ filteredInquiries.length }} of {{ allInquiries.length }} inquiries
         </div>
       </div>
     </div>
 
-    <!-- Recent Inquiries Table -->
+    <!-- Recent Inquiries Table (same as InquiryHistory, 5-row limit) -->
     <div class="bg-white rounded-lg shadow mb-8">
       <div class="p-6 border-b flex justify-between items-center">
         <h2 class="text-lg font-semibold">Recent Inquiries</h2>
@@ -268,32 +283,136 @@ onMounted(() => {
         </Button>
       </div>
       <div class="overflow-x-auto">
-        <Table :rows="filteredInquiries" :headers="tableHeaders">
-          <template #actions="{ row }">
-            <div class="flex items-center gap-2">
-              <Button 
-                @click="respondToInquiry(row.id)"
-                size="sm"
-                type="primary"
-                class="flex items-center gap-1"
-              >
-                <i v-html="icons.reply"></i>
-                Respond
-              </Button>
-              <button
-                @click="deleteInquiry(row.id)"
-                class="px-2 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded text-sm"
-                title="Delete inquiry"
-              >
-                <i v-html="icons.delete"></i>
-              </button>
-            </div>
-          </template>
-        </Table>
+        <table class="w-full table-fixed">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th class="w-32 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+              <th class="w-64 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+              <th class="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="w-32 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="row in filteredInquiries" :key="row.id" class="hover:bg-gray-50 relative">
+              <!-- Date -->
+              <td class="w-24 px-3 py-4">
+                <div class="text-sm text-gray-900 text-ellipsis overflow-hidden whitespace-nowrap" :title="row.date">
+                  {{ row.date }}
+                </div>
+              </td>
+              <!-- Doctor -->
+              <td class="w-32 px-3 py-4">
+                <span class="text-sm font-medium text-gray-900 text-ellipsis overflow-hidden whitespace-nowrap flex-1" :title="row.doctorName">
+                  {{ row.doctorName }}
+                </span>
+              </td>
+              <!-- Subject -->
+              <td class="w-64 px-3 py-4">
+                <div class="text-sm text-gray-900 text-ellipsis overflow-hidden whitespace-nowrap" :title="row.subject">
+                  {{ row.subject }}
+                </div>
+              </td>
+              <!-- Status -->
+              <td class="w-24 px-3 py-4">
+                <span class="inline-block px-2 py-1 rounded-full text-xs font-medium text-ellipsis overflow-hidden whitespace-nowrap max-w-full" :class="{
+                  'bg-yellow-100 text-yellow-800': row.status.toLowerCase() === 'pending',
+                  'bg-green-100 text-green-800': row.status.toLowerCase() === 'responded',
+                  'bg-blue-100 text-blue-800': row.status.toLowerCase() === 'in-progress'
+                }" :title="row.status">
+                  {{ row.status }}
+                </span>
+              </td>
+              <!-- Actions -->
+              <td class="w-32 px-3 py-4 relative">
+                <div class="flex items-center gap-1">
+                  <Button 
+                    @click="respondToInquiry(row.id)"
+                    size="sm"
+                    type="primary"
+                    class="text-xs px-2 py-1 flex-shrink-0"
+                    :title="'Respond to Inquiry'"
+                  >
+                    Respond
+                  </Button>
+                  <!-- Three dots dropdown -->
+                  <div class="relative flex-shrink-0">
+                    <button
+                      @click="showDropdown($event, row)"
+                      class="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100"
+                      title="More options"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="5" cy="12" r="2"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <circle cx="19" cy="12" r="2"/>
+                      </svg>
+                    </button>
+                    <!-- Dropdown menu -->
+                    <div 
+                      v-if="openDropdownId === row.id"
+                      :id="`dropdown-${row.id}`"
+                      class="dropdown-menu absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-[9999]"
+                    >
+                      <div class="py-1">
+                        <button
+                          @click="handleDropdownAction(() => respondToInquiry(row.id))"
+                          class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2"
+                        >
+                          <i v-html="icons.reply" class="w-4 h-4"></i>
+                          Respond
+                        </button>
+                        <button
+                          @click="handleDropdownAction(() => deleteInquiry(row.id))"
+                          class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        >
+                          <i v-html="icons.delete" class="w-4 h-4"></i>
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="filteredInquiries.length === 0">
+              <td colspan="5" class="text-center py-6 text-gray-400">No recent inquiries found.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.text-ellipsis {
+  text-overflow: ellipsis;
+}
+table {
+  table-layout: fixed;
+}
+td, th {
+  word-wrap: break-word;
+  overflow: hidden;
+}
+.max-w-full {
+  max-width: 100%;
+}
+.dropdown-menu {
+  z-index: 99999 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 25px -3px rgba(0, 0, 0, 0.1) !important;
+}
+.bg-white.rounded-lg.shadow,
+.overflow-x-auto,
+table, thead, tbody, tr, td, th {
+  overflow: visible !important;
+}
+.dropdown-trigger {
+  position: relative;
+  z-index: 1;
+}
+</style>
 
 
 

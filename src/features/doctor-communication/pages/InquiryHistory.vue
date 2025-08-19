@@ -22,6 +22,8 @@ const selectedInquiries = ref(new Set())
 const selectAll = ref(false)
 const statusFilter = ref('all')
 const openDropdownId = ref(null)
+const sortBy = ref('createdAt'); // default sort field
+const sortOrder = ref('desc');   // default sort order
 
 const filterOptions = [
   { value: 'all', label: 'All Status' },
@@ -39,7 +41,7 @@ const dateFilterOptions = [
 ]
 
 const statusFilterOptions = [
-  { value: 'all', label: 'All Status' },
+  { value: 'all', label: 'Select' },
   { value: 'unanswered', label: 'Unanswered Only' },
   { value: 'answered', label: 'Answered Only' },
   { value: 'in_progress', label: 'In Progress Only' }
@@ -51,23 +53,39 @@ const tableHeaders = {
 }
 
 // Transform API data to display format
-const transformInquiry = (inquiry) => ({
-  id: inquiry.questionUuid,
-  questionUuid: inquiry.questionUuid,
-  createdAt: new Date(inquiry.createdAt).toLocaleDateString(),
-  firstName: inquiry.firstName || 'Unknown Doctor',
-  description: inquiry.description || 'No description provided',
-  responseUrgency: inquiry.responseUrgency || 'Normal',
-  questionStatus: inquiry.questionStatus?.toLowerCase() || 'unanswered',
-  patientAge: inquiry.patientAge,
-  patientGender: inquiry.patientGender,
-  patientType: inquiry.patientType?.replace('_', ' ') || 'N/A',
-  weight: inquiry.weight,
-  diagnosis: inquiry.diagnosis,
-  currentMedication: inquiry.currentMedication,
-  hasAnswer: !!inquiry.answer,
-  answer: inquiry.answer
-})
+const transformInquiry = (inquiry) => {
+  const dateObj = new Date(inquiry.createdAt);
+  const date = dateObj.toLocaleDateString();
+  const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return {
+    id: inquiry.questionUuid,
+    questionUuid: inquiry.questionUuid,
+    createdAt: date,
+    createdTime: time, // <-- add this
+    firstName: inquiry.firstName || 'Unknown Doctor',
+    description: inquiry.description || 'No description provided',
+    responseUrgency: inquiry.responseUrgency || 'Normal',
+    questionStatus: inquiry.questionStatus?.toLowerCase() || 'unanswered',
+    patientAge: inquiry.patientAge,
+    patientGender: inquiry.patientGender,
+    patientType: inquiry.patientType?.replace('_', ' ') || 'N/A',
+    weight: inquiry.weight,
+    diagnosis: inquiry.diagnosis,
+    currentMedication: inquiry.currentMedication,
+    hasAnswer: !!inquiry.answer,
+    answer: inquiry.answer
+  }
+}
+
+function sortTable(field) {
+  if (sortBy.value === field) {
+    // Toggle order if same field
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortBy.value = field;
+    sortOrder.value = 'asc';
+  }
+}
 
 const filteredInquiries = computed(() => {
   let filtered = allInquiries.value
@@ -129,6 +147,22 @@ const filteredInquiries = computed(() => {
       }
     })
   }
+
+  // Sorting
+  filtered = [...filtered].sort((a, b) => {
+    let aVal = a[sortBy.value];
+    let bVal = b[sortBy.value];
+
+    // For date/time, sort by timestamp
+    if (sortBy.value === 'createdAt') {
+      aVal = new Date(a.createdAt + ' ' + a.createdTime);
+      bVal = new Date(b.createdAt + ' ' + b.createdTime);
+    }
+
+    if (aVal < bVal) return sortOrder.value === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortOrder.value === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   return filtered
 })
@@ -345,6 +379,20 @@ onUnmounted(() => {
           Filters
         </button>
 
+        <!-- Sort Dropdown -->
+        <select
+          v-model="sortBy"
+          @change="sortOrder = 'desc'"
+          class="px-3 py-2 border border-blue-300 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500"
+          style="min-width: 140px;"
+        >
+          <option value="createdAt">Sort by Date</option>
+          <option value="firstName">Sort by Doctor</option>
+          <option value="description">Sort by Description</option>
+          <option value="responseUrgency">Sort by Urgency</option>
+          <option value="questionStatus">Sort by Status</option>
+        </select>
+     
         <div v-if="showFilters" class="flex flex-wrap items-center gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <!-- Status Filter -->
           <select
@@ -399,22 +447,46 @@ onUnmounted(() => {
     <div class="bg-white rounded-lg shadow">
       <div class="overflow-x-auto">
         <table class="w-full table-fixed">
+          <!-- Table Headers -->
           <thead class="bg-gray-50">
             <tr>
-              <th class="w-12 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <input
-                  type="checkbox"
-                  :checked="selectAll"
-                  @change="toggleSelectAll"
-                  class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                />
+              <th class="w-12 px-3 py-3"></th>
+              <th class="w-24 px-3 py-3 cursor-pointer" @click="sortTable('createdAt')">
+                Date
+                <span v-if="sortBy === 'createdAt'">
+                  <i v-if="sortOrder === 'asc'" class="fas fa-arrow-up"></i>
+                  <i v-else class="fas fa-arrow-down"></i>
+                </span>
               </th>
-              <th class="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th class="w-32 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
-              <th class="w-64 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th class="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urgency</th>
-              <th class="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="w-32 px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th class="w-32 px-3 py-3 cursor-pointer" @click="sortTable('firstName')">
+                Doctor
+                <span v-if="sortBy === 'firstName'">
+                  <i v-if="sortOrder === 'asc'" class="fas fa-arrow-up"></i>
+                  <i v-else class="fas fa-arrow-down"></i>
+                </span>
+              </th>
+              <th class="w-64 px-3 py-3 cursor-pointer" @click="sortTable('description')">
+                Description
+                <span v-if="sortBy === 'description'">
+                  <i v-if="sortOrder === 'asc'" class="fas fa-arrow-up"></i>
+                  <i v-else class="fas fa-arrow-down"></i>
+                </span>
+              </th>
+              <th class="w-24 px-3 py-3 cursor-pointer" @click="sortTable('responseUrgency')">
+                Urgency
+                <span v-if="sortBy === 'responseUrgency'">
+                  <i v-if="sortOrder === 'asc'" class="fas fa-arrow-up"></i>
+                  <i v-else class="fas fa-arrow-down"></i>
+                </span>
+              </th>
+              <th class="w-24 px-3 py-3 cursor-pointer" @click="sortTable('questionStatus')">
+                Status
+                <span v-if="sortBy === 'questionStatus'">
+                  <i v-if="sortOrder === 'asc'" class="fas fa-arrow-up"></i>
+                  <i v-else class="fas fa-arrow-down"></i>
+                </span>
+              </th>
+              <th class="w-32 px-3 py-3">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -430,9 +502,10 @@ onUnmounted(() => {
               </td>
               
               <!-- Date -->
-              <td class="w-24 px-3 py-4">
-                <div class="text-sm text-gray-900 text-ellipsis overflow-hidden whitespace-nowrap" :title="row.createdAt">
-                  {{ row.createdAt }}
+              <td class="w-24 px-3 py-4 date-cell">
+                <div :title="row.createdAt + ' ' + row.createdTime">
+                  <div class="text-sm text-gray-900">{{ row.createdAt }}</div>
+                  <div class="text-xs text-gray-500">{{ row.createdTime }}</div>
                 </div>
               </td>
               
@@ -481,61 +554,38 @@ onUnmounted(() => {
               <!-- Actions -->
               <td class="w-32 px-3 py-4 relative">
                 <div class="flex items-center gap-1">
-                  <Button 
+                  <button
                     @click="respondToInquiry(row.questionUuid)"
-                    size="sm"
-                    type="primary"
-                    class="text-xs px-2 py-1 flex-shrink-0"
-                    :title="row.hasAnswer ? 'View Response' : 'Respond to Inquiry'"
+                    class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded flex items-center gap-2"
                   >
-                    {{ row.hasAnswer ? 'View' : 'Reply' }}
-                  </Button>
-                  
-                  <!-- Three dots dropdown -->
-                  <div class="relative flex-shrink-0">
+                    <i v-html="icons.reply" class="w-4 h-4"></i>
+                    {{ row.hasAnswer ? 'View Response' : 'Respond' }}
+                  </button>
+                  <div class="relative dropdown-trigger">
                     <button
-                      @click="showDropdown($event, row)"
-                      class="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100"
-                      title="More options"
+                      @click.stop="showDropdown($event, row)"
+                      class="px-2 py-2 text-gray-500 hover:text-gray-700 rounded-full"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <circle cx="5" cy="12" r="2"/>
-                        <circle cx="12" cy="12" r="2"/>
-                        <circle cx="19" cy="12" r="2"/>
-                      </svg>
+                      <i v-html="icons.more"></i>
                     </button>
-                    
-                    <!-- Dropdown menu - appears below button, over table content -->
-                    <div 
+                    <div
                       v-if="openDropdownId === row.questionUuid"
-                      :id="`dropdown-${row.questionUuid}`"
-                      class="dropdown-menu absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-[9999]"
+                      class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg dropdown-menu"
                     >
-                      <div class="py-1">
-                        <button
-                          @click="handleDropdownAction(() => respondToInquiry(row.questionUuid))"
-                          class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2"
-                        >
-                          <i v-html="icons.reply" class="w-4 h-4"></i>
-                          {{ row.hasAnswer ? 'View Response' : 'Respond' }}
-                        </button>
-                        
-                        <button
-                          @click="handleDropdownAction(() => toggleSelectInquiry(row.questionUuid))"
-                          class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-2"
-                        >
-                          <i v-html="icons.check" class="w-4 h-4"></i>
-                          Select
-                        </button>
-                        
-                        <button
-                          @click="handleDropdownAction(() => deleteInquiry(row.questionUuid))"
-                          class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                        >
-                          <i v-html="icons.delete" class="w-4 h-4"></i>
-                          Delete
-                        </button>
-                      </div>
+                      <button
+                        @click="handleDropdownAction(() => toggleSelectInquiry(row.questionUuid))"
+                        class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-2"
+                      >
+                        <i v-html="icons.check" class="w-4 h-4"></i>
+                        Select
+                      </button>
+                      <button
+                        @click="handleDropdownAction(() => deleteInquiry(row.questionUuid))"
+                        class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                      >
+                        <i v-html="icons.delete" class="w-4 h-4"></i>
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </div>

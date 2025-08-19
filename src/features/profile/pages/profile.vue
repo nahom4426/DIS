@@ -9,11 +9,13 @@ import { updateProfileData, uploadProfilePicture } from "../api/profileApi";
 import { convertBase64Image, toasted } from "@/utils/utils";
 import { useForm } from "@/components/new_form_builder/useForm";
 import icons from "@/utils/icons";
-import imageSrc from '@/assets/img/profile.png'
+import imageSrc from '@/assets/img/profile.png'; // fallback image
+import cardImage from '@/assets/img/profile.png'; // your provided image
 
 const auth = useAuthStore();
+const user = auth.auth?.user || {};
 
-const profilePicture = ref(auth.auth?.user?.imageData || null);
+const profilePicture = ref(user.imageData || cardImage || imageSrc);
 
 async function processProfilePicture() {
   if (profilePicture.value && !profilePicture.value.startsWith("data:image/")) {
@@ -92,7 +94,6 @@ const handleFileChange = (event) => {
 };
 
 
-
 const active = ref(0);
 
 const setActive = (item) => {
@@ -122,7 +123,10 @@ function handleUpdateProfile({values}){
   })
 }
 
-
+function goToAdminDashboard() {
+  // Replace with your actual route
+  window.location.href = '/admin/dashboard';
+}
 </script>
 <template>
   <div class="max-w-full min-h-full">
@@ -183,6 +187,94 @@ function handleUpdateProfile({values}){
         </div>
       </div>
     </div>
+    <!-- Breadcrumb and Admin Dashboard Button -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-gray-500">home /</span>
+        <span class="font-semibold text-gray-700">profile</span>
+      </div>
+      <Button @click="goToAdminDashboard" type="primary" class="bg-blue-500 text-white px-4 py-2 rounded shadow">
+        Admin Dashboard
+      </Button>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="bg-gradient-to-r from-blue-100 to-blue-200 rounded-xl p-8 flex items-center justify-between mb-8 shadow">
+      <div class="flex items-center gap-6">
+        <div class="relative">
+          <img
+            :src="profilePicture"
+            alt="Profile"
+            class="w-24 h-24 rounded-lg object-cover border-4 border-white shadow"
+          />
+          <!-- Camera icon overlay (optional) -->
+          <span class="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0020 6.382V5a2 2 0 00-2-2H6a2 2 0 00-2 2v1.382a2 2 0 00.447 1.342L9 10m6 0v4a2 2 0 01-2 2H7a2 2 0 01-2-2v-4m6 0l-6-3"/>
+            </svg>
+          </span>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Dr. {{ user.firstName || "User Name" }} {{ user.lastName || "" }}</h2>
+          <p class="text-gray-600">{{ user.department || "Department" }}</p>
+          <p class="text-gray-500">{{ user.email || "email@example.com" }}</p>
+          <div class="flex gap-2 mt-2">
+            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">Active</span>
+            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">Verified</span>
+          </div>
+        </div>
+      </div>
+      <Button type="primary" class="bg-blue-500 text-white px-4 py-2 rounded shadow">
+        Edit Profile
+      </Button>
+    </div>
+
+    <!-- Personal Information Table -->
+    <div class="bg-white rounded-xl shadow p-8">
+      <h3 class="text-lg font-semibold mb-4">Personal Information</h3>
+      <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">First Name</label>
+          <div class="text-gray-800 font-medium">{{ user.firstName || "" }}</div>
+        </div>
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">Last Name</label>
+          <div class="text-gray-800 font-medium">{{ user.lastName || "" }}</div>
+        </div>
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">Email</label>
+          <div class="text-gray-800 font-medium">{{ user.email || "" }}</div>
+        </div>
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">Phone</label>
+          <div class="text-gray-800 font-medium">{{ user.phone || "" }}</div>
+        </div>
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">Department</label>
+          <div class="text-gray-800 font-medium">{{ user.department || "" }}</div>
+        </div>
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">License Number</label>
+          <div class="text-gray-800 font-medium">{{ user.licenseNumber || "" }}</div>
+        </div>
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">Specialization</label>
+          <div class="text-gray-800 font-medium">{{ user.specialization || "" }}</div>
+        </div>
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">Years of Experience</label>
+          <div class="text-gray-800 font-medium">{{ user.yearsOfExperience || "0" }}</div>
+        </div>
+        <div>
+          <label class="block text-gray-500 text-sm mb-1">Location</label>
+          <div class="text-gray-800 font-medium">{{ user.location || "" }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+/* Add any custom styles here if needed */
+</style>
 
