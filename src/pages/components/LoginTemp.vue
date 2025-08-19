@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import AuthLogin from "./AuthLogin.vue";
 import Confirmation from "./Confirmation.vue";
 import ForgetPassword from "./ForgetPassword.vue";
@@ -48,6 +48,45 @@ const next = (value) => {
 function prevous() {
   if (activeForm.value > 0) activeForm.value = 0;
 }
+
+const profileData = reactive({
+  email: '',
+  title: '',
+  firstName: '',
+  userName: '',
+  fatherName: '',
+  grandFatherName: '', // <-- Add this
+  roleName: '',        // <-- Add this
+  gender: '',
+  mobilePhone: '',
+  userStatus: '',
+  userType: '',
+  providerUuid: '',
+  roleUuid: '',
+  imageData: null
+});
+
+function loadFromAuthStore() {
+  const user = authStore.auth?.user || JSON.parse(localStorage.getItem('userDetail') || '{}');
+  if (user) {
+    Object.assign(profileData, {
+      email: user.email || '',
+      title: user.title || '',
+      firstName: user.firstName || '',
+      userName: user.userName || '',
+      fatherName: user.fatherName || '',
+      grandFatherName: user.grandFatherName || '', // <-- Add this
+      roleName: user.roleName || '',               // <-- Add this
+      gender: user.gender || 'Male',
+      mobilePhone: user.mobilePhone || '',
+      userStatus: user.userStatus || '',
+      userType: user.userType || '',
+      providerUuid: user.providerUuid || '',
+      roleUuid: user.roleUuid || '',
+      imageData: user.imageData || null
+    });
+  }
+}
 </script>
 <template>
   <div
@@ -70,5 +109,33 @@ function prevous() {
       :confirmationCode="confirmationCode"
     >
     </component>
+    <div>
+      {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.fatherName || 'Name' }} {{ profileData.grandFatherName || '' }}
+    </div>
+    <p class="text-base text-gray-600 mb-1">{{ profileData.roleName || '' }}</p>
+
+    <div class="space-y-2">
+      <label class="block text-xs font-medium text-gray-700">Grandfather's Name</label>
+      <input 
+        type="text" 
+        v-model="profileData.grandFatherName"
+        :disabled="!isEditing"
+        :class="[
+          'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
+          isEditing 
+            ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
+            : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+        ]"
+      >
+    </div>
+    <div class="space-y-2">
+      <label class="block text-xs font-medium text-gray-700">Role Name</label>
+      <input 
+        type="text" 
+        v-model="profileData.roleName"
+        disabled
+        class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
+      >
+    </div>
   </div>
 </template>
