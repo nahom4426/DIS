@@ -15,8 +15,7 @@ import cardImage from '@/assets/img/profile.png'; // your provided image
 const auth = useAuthStore();
 const user = auth.auth?.user || {};
 
-//const profilePicture = ref(profileData.imageData || cardImage || imageSrc);
-const profilePicture = computed(() => profileData.imageData || cardImage || imageSrc);
+const profilePicture = ref(user.imageData || cardImage || imageSrc);
 
 async function processProfilePicture() {
   if (profilePicture.value && !profilePicture.value.startsWith("data:image/")) {
