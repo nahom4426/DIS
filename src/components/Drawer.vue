@@ -16,14 +16,14 @@ const props = defineProps({
 });
 const emit = defineEmits(["toggle-sidebar", "toggle-menu"]);
 
-const userData = computed(() => auth.auth?.user || {});
+const userData = computed(() => auth.auth || []);
 const hasPrivilege = (requiredPrivileges) => {
   if (!requiredPrivileges || requiredPrivileges.length === 0) return true;
   const userPrivileges = userData.value.privileges || [];
 
   const userRole = userData.value.roleName;
   return (
-    userRole === "Super Admin" ||
+    userRole === "SuperAdmin" ||
     userPrivileges.includes("All Privileges") ||
     requiredPrivileges.some((priv) => userPrivileges.includes(priv))
   );

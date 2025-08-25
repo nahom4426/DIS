@@ -15,8 +15,26 @@ const pagination = usePagination({
   cb: getAllUser,
 });
 
+// When creating a new user object:
+const newUser = {
+  // ...other fields...
+  status: "Active", // or userStatus: "Active"
+  // ...other fields...
+};
 
+// Example using Axios
+import axios from 'axios';
 
+async function deactivateUser(userId) {
+  try {
+    const response = await axios.patch(`/auth/users/${userId}/status`, {
+      status: 'Inactive'
+    });
+    // Handle success (e.g., show a toast, refresh user list)
+  } catch (error) {
+    // Handle error (e.g., show error message)
+  }
+}
 </script>
 
 <template>

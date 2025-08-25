@@ -204,11 +204,8 @@ const rejectRequest = async (requestId) => {
   </tbody>
 </template>
 
-<<<<<<< HEAD
-=======
 
 
 
 
 
->>>>>>> 914adcad66d095f313eaa8c6281f53d4ca0760d7

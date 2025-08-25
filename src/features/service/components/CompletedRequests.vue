@@ -27,6 +27,7 @@ function loadRequests() {
         status: request.status,
         priority: getPriority(request.responseNeeded),
         completedBy: request.completedBy || 'Dr. Amanda Ross',
+        pharmacistResponse: request.pharmacistResponse || '', // <-- Add this line
         originalData: request,
         originalIndex: requests.indexOf(request)
       }));
@@ -117,45 +118,14 @@ function printReport(request) {
   
   printWindow.document.write(`
     <html>
-      <head>
-        <title>Drug Information Request Report - ${request.id}</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 20px; }
-          .header { text-align: center; margin-bottom: 30px; }
-          .section { margin-bottom: 20px; }
-          .label { font-weight: bold; }
-          .patient-info { background: #f5f5f5; padding: 15px; border-radius: 5px; }
-        </style>
-      </head>
+
       <body>
-        <div class="header">
-          <h1>Drug Information Request Report</h1>
-          <h2>Request ID: ${request.id}</h2>
-        </div>
         
-        <div class="section">
-          <div class="label">Request Type:</div>
-          <div>${request.requestType}</div>
-        </div>
+      
         
-        ${request.requestType === 'Patient Specific' && data.patientInfo ? `
-          <div class="section">
-            <div class="label">Patient Information:</div>
-            <div class="patient-info">
-              <p><strong>Age:</strong> ${data.patientInfo.age || 'N/A'}</p>
-              <p><strong>Sex:</strong> ${data.patientInfo.sex || 'N/A'}</p>
-              <p><strong>Weight:</strong> ${data.patientInfo.weight || 'N/A'} kg</p>
-              <p><strong>Diagnosis:</strong> ${data.patientInfo.diagnosis || 'N/A'}</p>
-              ${data.patientInfo.currentMedication ? `<p><strong>Current Medication:</strong> ${data.patientInfo.currentMedication}</p>` : ''}
-              ${data.patientInfo.allergies ? `<p><strong>Allergies:</strong> ${data.patientInfo.allergies}</p>` : ''}
-            </div>
-          </div>
-        ` : ''}
+     
         
-        <div class="section">
-          <div class="label">Question/Request:</div>
-          <div style="background: #f5f5f5; padding: 15px; border-radius: 5px;">${data.requestQuestion}</div>
-        </div>
+        
         
         <div class="section">
           <div class="label">Response Time Needed:</div>
@@ -225,8 +195,8 @@ const filteredRequests = computed(() => {
         :pending="false"
         :rows="filteredRequests"
         :headers="{
-          head: ['Request ID', 'Patient', 'Type', 'Question', 'Completed By', 'Priority', 'Completed', 'Actions'],
-          row: ['id', 'patientName', 'requestType', 'question', 'completedBy', 'priority', 'completedAt']
+          head: ['Request ID', 'Patient', 'Type', 'Question', 'Completed By', 'Priority', 'Completed','Pharmacist Response', 'Actions'],
+          row: ['id', 'patientName', 'requestType', 'question', 'completedBy', 'priority', 'completedAt','Pharmacist Response']
         }"
       >
         <template #requestType="{ row }">
@@ -248,6 +218,13 @@ const filteredRequests = computed(() => {
             {{ row.priority }}
           </span>
         </template>
+        <template #pharmacistResponse="{ row }">
+  <div class="max-w-xs">
+    <p class="text-sm text-green-700" :title="row.pharmacistResponse">
+      {{ row.pharmacistResponse || 'No response yet' }}
+    </p>
+  </div>
+</template>
 
         <template #actions="{ row }">
           <div class="flex gap-2">

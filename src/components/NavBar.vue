@@ -4,6 +4,8 @@ import { useAuthStore } from "@/stores/auth";
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import imageSrc from '@/assets/img/profile.png'
+import { useApiRequest } from '@/composables/useApiRequest';
+import { getNotifications } from '@/api/notificationApi';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -77,6 +79,17 @@ function goToSettings() {
 const props = defineProps({
   breadcrumbs: Object,
 });
+console.log(authStore.auth);
+
+const api=useApiRequest()
+  api.send(
+    () => getNotifications(authStore.auth?.userUuid),
+    (res) => {
+      if (res.success) {
+      }
+    }
+  );
+
 </script>
 
 <template>
@@ -172,10 +185,9 @@ const props = defineProps({
     />
     <!-- Badge -->
     <span
-      v-if="notificationCount > 0"
       class="absolute top-0 right-0 inline-flex items-center justify-center px-1 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full"
     >
-      {{ notificationCount }}
+      {{ (api.response.value?.length ?? []) }}
     </span>
   </button>
 

@@ -5,20 +5,17 @@ import { getAllRegistrationRequests } from '../Api/RegistrationRequestApi';
 import RegistrationRequestRow from '../components/RegistrationRequestRow.vue';
 import TableRowSkeleton from '@/components/TableRowSkeleton.vue';
 import DefaultPage from "@/components/DefaultPage.vue";
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const requestStore = useRegistrationRequestStore();
 const loading = ref(false);
 
-// Initialize store with data on mount
 onMounted(async () => {
   loading.value = true;
   try {
     const response = await getAllRegistrationRequests();
-    console.log('API Response:', response);
     if (response.success) {
-      requestStore.set(response.data.requests);
-      console.log('Store after set:', requestStore.requests);
+      requestStore.set(response.data);
     }
   } catch (error) {
     console.error('Error loading registration requests:', error);
@@ -27,92 +24,83 @@ onMounted(async () => {
   }
 });
 
-// Search functionality
 const filteredRequests = (search) => {
+  const list = requestStore.requests?.value || [];
+
   if (!search || search.trim() === '') {
-    return requestStore.requests;
+    return list;
   }
   
   const searchTerm = search.toLowerCase().trim();
-  return requestStore.requests.filter(request => 
-    request.fullName.toLowerCase().includes(searchTerm) ||
-    request.email.toLowerCase().includes(searchTerm) ||
-    request.role.toLowerCase().includes(searchTerm) ||
-    request.providerName.toLowerCase().includes(searchTerm) ||
-    request.mobilePhone.toLowerCase().includes(searchTerm) ||
-    request.status.toLowerCase().includes(searchTerm)
+  return list.filter(request => 
+    request.fullName?.toLowerCase().includes(searchTerm) ||
+    request.email?.toLowerCase().includes(searchTerm) ||
+    request.roleName?.toLowerCase().includes(searchTerm) ||
+    request.providerName?.toLowerCase().includes(searchTerm) ||
+    request.mobilePhone?.toLowerCase().includes(searchTerm) ||
+    request.userStatus?.toLowerCase().includes(searchTerm) ||
+    request.userType?.toLowerCase().includes(searchTerm) ||
+    request.gender?.toLowerCase().includes(searchTerm)
   );
 };
 
 const tableHeaders = {
   head: ['Name', 'Email', 'Role', 'Provider', 'Mobile', 'Date', 'Status', 'Actions'],
-  row: ['fullName', 'email', 'role', 'providerName', 'mobilePhone', 'submittedDate', 'status', 'actions'],
+  row: ['fullName', 'email', 'roleName', 'providerName', 'mobilePhone', 'createdAt', 'userStatus'],
 };
 </script>
-
 <template>
-  <DefaultPage placeholder="Search registration requests...">
-    <template #first>
-      <div class="flex items-center justify-between w-full">
-        <div class="flex flex-col gap-1">
-          <h1 class="text-2xl font-bold text-gray-900">Registration Requests</h1>
-          <p class="text-sm text-gray-600">Review and manage doctor and pharmacist registration requests</p>
-          <p class="text-xs text-blue-600">Total requests: {{ requestStore.requests.length }}</p>
+  <DefaultPage v-slot="{ search }">
+    <div class="p-4">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-2">
+          <span class=" flex justify-center items-center p-4 bg-primary/10 rounded">
+            <div class=" bg-[#263558] rounded-full size-3"></div>
+            
+          </span>
+          <h3>Users</h3>
         </div>
-      </div>
-    </template>
 
-    <template #default="{ search }">
-      <div class="bg-white rounded-lg shadow">
-        <!-- Debug info
-        <div class="p-4 bg-gray-100 text-sm">
-          <p class="text-sm text-gray-600 bold">Store requests count: {{ requestStore.requests.length }}</p>
-        </div>
-        
-        <!-- Scrollable table container -->
-        <div class="overflow-x-auto custom-scrollbar">
-          <Table
-            :headers="tableHeaders"
-            :rows="filteredRequests(search)"
-            :rowCom="RegistrationRequestRow"
-            :pending="loading"
-            :Fallback="TableRowSkeleton"
-          />
+        <div class="flex items-center space-x-4">
+          <button  @click.prevent="openModal('AddUser')"
+            class="flex justify-center items-center gap-2 rounded-md px-6 py-4 bg-primary text-white">
+               <i v-html="icons.plus_circle"></i>
+            Add Users
+          </button>
         </div>
       </div>
-    </template>
+
+      <Table 
+        :pending="pagination.pending.value" 
+        :headers="{
+          head: [
+            'Fullname',
+            'Email',
+            'phoneNumber',
+            //  'User Type',
+            'providerName',
+            'Role Name',
+            'Gender',
+            'userStatus',
+            'Actions',
+          ],
+          row: [
+            'fullname',
+            'email',
+            'mobilePhone',
+            // 'userType',
+            'providerName',
+            'roleName',
+            'gender',
+            'status',
+          ]
+        }" 
+        :rows="usersStore.users"
+          :rowCom="UserStatusRow"
+        :Fallback="TableRowSkeleton"
+      >
+       
+      </Table>
+    </div>
   </DefaultPage>
 </template>
-
-
-
-
-
-<style scoped>
-/* Custom horizontal scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  height: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
-
-/* For Firefox */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 #f1f1f1;
-}
-</style>
-
-
