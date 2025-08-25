@@ -14,8 +14,9 @@ export const useAuthStore = defineStore('myAuthStore', () => {
     grandFatherName: '',
     gender: ' ',
     mobilePhone: '',
-    userStatus: 'ACTIVE',
+    userStatus: '',
     roles: [],
+    profilePicture: null,
     userType: '',
     payerUuid: '',
     privileges: []

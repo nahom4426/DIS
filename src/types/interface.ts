@@ -81,7 +81,7 @@ export interface User {
   grandFatherName: string;
   gender: Gender;
   mobilePhone: string;
-  userStatus: Status;
+  userStatus: UserStatus;
   roles: Role[];
   userType: UserType;
   payerUuid: string;

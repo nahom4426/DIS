@@ -1,0 +1,102 @@
+<script setup>
+import { ref } from 'vue';
+import { openModal } from '@customizer/modal-x';
+import icons from "@/utils/icons";
+import { useNotifications } from '@/composables/useNotifications';
+import { getColumnValue } from '@/utils/utils';
+
+const props = defineProps({
+  rowData: {
+    type: Array,
+    required: true
+  },
+     rowKeys: {
+    type: Array,
+    required: true
+  },
+  headKeys: {
+    type: Array,
+    required: true
+  },
+});
+
+const { showSuccess, showInfo } = useNotifications();
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric' 
+  });
+  showDropdown.value[user.userUuid] = false;
+}
+
+function handleEdit(user) {
+  openModal('EditUser', {
+    userUuid: user.userUuid,
+    user: user
+  });
+  showDropdown.value[user.userUuid] = false;
+}
+
+function getStatusColor(status) {
+  switch (status?.toLowerCase()) {
+    case 'active': return 'bg-green-100 text-green-800 border-green-200';
+    case 'inactive': return 'bg-red-100 text-red-800 border-red-200';
+    case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+}
+
+const viewRequest = (requestId) => {
+  openModal('ViewRegistrationRequest', { requestId });
+};
+
+const approveRequest = async (requestId) => {
+  // ... approval logic
+  showSuccess(
+    'Request Approved',
+    'The registration request has been approved successfully.',
+    '/registration'
+  );
+};
+
+const rejectRequest = async (requestId) => {
+  // ... rejection logic
+  showInfo(
+    'Request Rejected',
+    'The registration request has been rejected.',
+    '/registration'
+  );
+};
+</script>
+<template>
+   <tr
+    class="bg-white border-b-[0.2px] border-[#F6F7FA]"
+    :key="idx"
+    v-for="(row, idx) in rowData"
+  > 
+      
+    <td class="p-3 text-base-clr">{{ idx + 1 }}</td>
+    <td class="p-3" :key="key" v-for="key in rowKeys">
+     
+     
+      <span class="text-base-clr">
+        {{ getColumnValue(key, row) }}
+      </span>
+    </td>
+
+        <!-- <div class="flex items-center justify-center">
+          <img 
+            v-if="row.profilePicture" 
+            :src="row.profilePicture" 
+            :alt="`${row.firstName} ${row.fatherName}`"
+            class="h-12 w-12 rounded-full object-cover border-2 border-gray-200 shadow-sm"
+          />
+          <div v-else class="h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center border-2 border-gray-200 shadow-sm">
+            <span class="text-white font-semibold text-sm">{{ row.firstName?.charAt(0) }}{{ row.fatherName?.charAt(0) }}</span>
+          </div>
+        </div> -->
+        
+    
+    </tr>
+</template>

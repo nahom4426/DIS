@@ -272,7 +272,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted,computed} from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useApiRequest } from '@/composables/useApiRequest';
 import { updateProfileData } from '@/features/profile/api/profileApi';
@@ -288,6 +288,82 @@ const isEditing = ref(false);
 const originalData = ref({});
 const fileInput = ref(null);
 const loading = ref(false);
+// const profilePicture = computed(() => profileData.imageData || cardImage || imageSrc);
+
+// async function processProfilePicture() {
+//   if (profilePicture.value && !profilePicture.value.startsWith("data:image/")) {
+//     profilePicture.value = `data:image/png;base64,${profilePicture.value}`;
+//     return
+//   }
+
+// }
+
+// processProfilePicture();
+
+
+const profileApi=useApiRequest()
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    toasted(false, "Please select a valid image file.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("profilePicture", file);
+
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+    const base64Image = e.target.result;
+
+    profileApi.send(
+      () => uploadProfilePicture(formData),
+      (res) => {
+        if (res.success) {
+          profilePicture.value = base64Image;
+          authStore.setProfile(base64Image);
+
+          // Update the user object with new image data
+          const updatedUser = {
+            ...(authStore.auth?.user || {}),
+            imageData: base64Image,
+            profilePicture: base64Image
+          };
+          
+          authStore.setAuth({
+            ...authStore.auth,
+            user: updatedUser
+          });
+
+          // Update both localStorage keys for compatibility
+          localStorage.setItem("userDetail", JSON.stringify(updatedUser));
+          localStorage.setItem("doctorCommUser", JSON.stringify(updatedUser));
+
+          // Dispatch custom event to notify DoctorCommLayout
+          window.dispatchEvent(new CustomEvent('profileUpdated'));
+
+          toasted(true, "Profile picture updated successfully!");
+        } else {
+          toasted(false, res.error || "Failed to update profile picture.");
+        }
+      }
+    );
+  };
+
+  reader.onerror = () => {
+    toasted(false, "Error reading image file.");
+  };
+
+  reader.readAsDataURL(file); // Trigger FileReader to get base64
+};
 
 const profileData = reactive({
   email: '',
@@ -310,7 +386,7 @@ const profileData = reactive({
 async function fetchUserDetails() {
   loading.value = true;
   try {
-    const userUuid = authStore.auth?.user?.userUuid;
+    const userUuid = authStore.auth?.userUuid;
     if (!userUuid) {
       console.error('No user UUID found');
       loadFromAuthStore();
@@ -408,18 +484,15 @@ function saveProfile() {
   };
 
   api.send(
-    () => updateProfileData(authStore.auth?.user?.userUuid, updateData),
+    () => updateProfileData(authStore.auth?.userUuid, updateData),
     (res) => {
       if (res.success) {
         const updatedUser = {
-          ...authStore.auth.user,
+          ...authStore.auth,
           ...updateData
         };
 
-        authStore.setAuth({
-          ...authStore.auth,
-          user: updatedUser
-        });
+        authStore.setAuth(updatedUser);
 
         localStorage.setItem("userDetail", JSON.stringify(updatedUser));
 

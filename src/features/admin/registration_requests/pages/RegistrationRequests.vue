@@ -1,118 +1,121 @@
-<script setup>
-import Table from '@/components/Table.vue';
-import { useRegistrationRequestStore } from '../store/registrationRequestStore';
-import { getAllRegistrationRequests } from '../Api/RegistrationRequestApi';
-import RegistrationRequestRow from '../components/RegistrationRequestRow.vue';
-import TableRowSkeleton from '@/components/TableRowSkeleton.vue';
-import DefaultPage from "@/components/DefaultPage.vue";
-import { ref, onMounted, computed } from 'vue';
-
-const requestStore = useRegistrationRequestStore();
-const loading = ref(false);
-
-// Initialize store with data on mount
-onMounted(async () => {
-  loading.value = true;
-  try {
-    const response = await getAllRegistrationRequests();
-    console.log('API Response:', response);
-    if (response.success) {
-      requestStore.set(response.data.requests);
-      console.log('Store after set:', requestStore.requests);
-    }
-  } catch (error) {
-    console.error('Error loading registration requests:', error);
-  } finally {
-    loading.value = false;
-  }
-});
-
-// Search functionality
-const filteredRequests = (search) => {
-  if (!search || search.trim() === '') {
-    return requestStore.requests;
-  }
-  
-  const searchTerm = search.toLowerCase().trim();
-  return requestStore.requests.filter(request => 
-    request.fullName.toLowerCase().includes(searchTerm) ||
-    request.email.toLowerCase().includes(searchTerm) ||
-    request.role.toLowerCase().includes(searchTerm) ||
-    request.providerName.toLowerCase().includes(searchTerm) ||
-    request.mobilePhone.toLowerCase().includes(searchTerm) ||
-    request.status.toLowerCase().includes(searchTerm)
-  );
-};
-
-const tableHeaders = {
-  head: ['Name', 'Email', 'Role', 'Provider', 'Mobile', 'Date', 'Status', 'Actions'],
-  row: ['fullName', 'email', 'role', 'providerName', 'mobilePhone', 'submittedDate', 'status', 'actions'],
-};
-</script>
-
 <template>
-  <DefaultPage placeholder="Search registration requests...">
-    <template #first>
-      <div class="flex items-center justify-between w-full">
-        <div class="flex flex-col gap-1">
-          <h1 class="text-2xl font-bold text-gray-900">Registration Requests</h1>
-          <p class="text-sm text-gray-600">Review and manage doctor and pharmacist registration requests</p>
-          <p class="text-xs text-blue-600">Total requests: {{ requestStore.requests.length }}</p>
-        </div>
-      </div>
-    </template>
+  <div class="p-4">
+    <h2 class="text-xl font-semibold mb-2">Registration Requests</h2>
+    <p class="text-sm text-gray-500 mb-4">
+      * Actions history is retained for 24 hours.
+    </p>
 
-    <template #default="{ search }">
-      <div class="bg-white rounded-lg shadow">
-        <!-- Debug info
-        <div class="p-4 bg-gray-100 text-sm">
-          <p class="text-sm text-gray-600 bold">Store requests count: {{ requestStore.requests.length }}</p>
-        </div>
-        
-        <!-- Scrollable table container -->
-        <div class="overflow-x-auto custom-scrollbar">
-          <Table
-            :headers="tableHeaders"
-            :rows="filteredRequests(search)"
-            :rowCom="RegistrationRequestRow"
-            :pending="loading"
-            :Fallback="TableRowSkeleton"
-          />
-        </div>
-      </div>
-    </template>
-  </DefaultPage>
+    <table class="min-w-full border border-gray-300">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-2 text-left">Full Name</th>
+          <th class="px-4 py-2 text-left">Email</th>
+          <th class="px-4 py-2 text-left">Phone</th>
+          <th class="px-4 py-2 text-left">Role</th>
+          <th class="px-4 py-2 text-left">Provider</th>
+          <th class="px-4 py-2 text-left">Status</th>
+          <th class="px-4 py-2 text-left">Date</th>
+          <th class="px-4 py-2 text-left">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <RegistrationRequestRow
+          v-for="req in visibleRequests"
+          :key="req.userUuid"
+          :request="req"
+          @approve="askConfirm('approve', req)"
+          @reject="askConfirm('reject', req)"
+          @deactivate="askConfirm('deactivate', req)"
+        />
+      </tbody>
+    </table>
+
+    <!-- Confirmation Modal -->
+    <ConfirmActionModal
+      v-if="confirmModal.open"
+      :title="confirmModal.title"
+      :message="confirmModal.message"
+      :actionType="confirmModal.type"
+      @cancel="confirmModal.open = false"
+      @confirm="performAction"
+    />
+  </div>
 </template>
 
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import { useRegistrationRequestStore } from '../store/registrationRequestStore';
+import {
+  getAllRegistrationRequests,
+  approveRegistrationRequest,
+  rejectRegistrationRequest,
+  deactivateRegistrationRequest,
+} from "../Api/RegistrationRequestApi";
+import RegistrationRequestRow from '../components/RegistrationRequestRow.vue';
+import ConfirmActionModal from "../components/ConfirmActionModal.vue";
 
+const store = useRegistrationRequestStore();
+const confirmModal = ref({
+  open: false,
+  type: null,
+  request: null,
+  title: "",
+  message: ""
+});
 
-
-
-<style scoped>
-/* Custom horizontal scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  height: 8px;
+async function fetchRequests() {
+  const res = await getAllRegistrationRequests();
+  if (res.success) {
+    store.set(res.data.requests);
+  }
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+// ✅ retain for 24 hours
+const visibleRequests = computed(() => {
+  const now = Date.now();
+  return store.requests.filter(req => {
+    if (!req.lastActionTime) return true;
+    return now - req.lastActionTime < 24 * 60 * 60 * 1000;
+  });
+});
+
+function askConfirm(type, request) {
+  confirmModal.value = {
+    open: true,
+    type,
+    request,
+    title:
+      type === "approve"
+        ? "Approve Request"
+        : type === "reject"
+        ? "Reject Request"
+        : "Deactivate User",
+    message:
+      type === "approve"
+        ? `Are you sure you want to approve ${request.fullName}?`
+        : type === "reject"
+        ? `Are you sure you want to reject ${request.fullName}?`
+        : `Are you sure you want to deactivate ${request.fullName}?`
+  };
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+async function performAction() {
+  const { type, request } = confirmModal.value;
+  confirmModal.value.open = false;
+
+  if (!request) return;
+
+  if (type === "approve") {
+    await approveRegistrationRequest(request.userUuid);
+    store.markLocally(request.userUuid, "Active");
+  } else if (type === "reject") {
+    await rejectRegistrationRequest(request.userUuid);
+    store.markLocally(request.userUuid, "Rejected");
+  } else if (type === "deactivate") {
+    await deactivateRegistrationRequest(request.userUuid);
+    store.markLocally(request.userUuid, "Deactivated");
+  }
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
-
-/* For Firefox */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 #f1f1f1;
-}
-</style>
-
-
+onMounted(fetchRequests);
+</script>

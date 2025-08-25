@@ -1,0 +1,47 @@
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+
+export const useRegistrationRequestStore = defineStore('registrationRequests', () => {
+  const requests = ref([]);
+  const loading = ref(false);
+  const error = ref(null);
+
+  function set(data) {
+    requests.value = data || [];
+  }
+
+  function add(request) {
+    requests.value.unshift(request);
+  }
+
+  function update(userUuid, updates) {
+    const index = requests.value.findIndex(req => req.userUuid === userUuid);
+    if (index !== -1) {
+      requests.value[index] = { ...requests.value[index], ...updates };
+    }
+  }
+
+  function remove(userUuid) {
+    const index = requests.value.findIndex(req => req.userUuid === userUuid);
+    if (index !== -1) {
+      requests.value.splice(index, 1);
+    }
+  }
+
+  function getByUuid(userUuid) {
+    return requests.value.find(req => req.userUuid === userUuid);
+  }
+
+  return {
+    requests,
+    loading,
+    error,
+    set,
+    add,
+    update,
+    remove,
+    getByUuid
+  };
+});
+
+
