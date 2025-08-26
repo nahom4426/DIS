@@ -3,6 +3,10 @@ import Table from "@/components/Table.vue";
 import { ref, computed, onMounted } from "vue";
 import { openModal } from "@customizer/modal-x";
 import icons from "@/utils/icons";
+import { getUserQuestions } from "@/features/service/api/questionApi";
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore();
 
 const props = defineProps({
   search: String,
@@ -11,31 +15,32 @@ const props = defineProps({
 const drugInformationRequests = ref([]);
 
 // Load and watch for new requests
-function loadRequests() {
-  const stored = localStorage.getItem('drugInformationRequests');
-  if (stored) {
-    const requests = JSON.parse(stored);
-    drugInformationRequests.value = requests
-      .filter(request => request.status === 'Pending Review')
-      .map((request, index) => ({
+async function loadRequests() {
+  const userUuid = authStore.auth?.userUuid;
+  if (!userUuid) return;
+  const response = await getUserQuestions(userUuid);
+  if (response.success && Array.isArray(response.data)) {
+    drugInformationRequests.value = response.data
+      .filter(q => !q.answer && (q.questionStatus === "PENDING" || q.questionStatus === "UNANSWERED"))
+      .map((q, index) => ({
         id: `DI-${String(index + 1).padStart(3, '0')}`,
-        requestType: getRequestTypeDisplay(request.requestType),
-        patientName: getPatientDisplay(request),
-        question: request.requestQuestion,
-        responseNeeded: request.responseNeeded,
-        submittedAt: formatDate(request.submittedAt),
-        status: request.status,
-        priority: getPriority(request.responseNeeded),
-        assignedTo: request.assignedTo || 'Unassigned',
-        originalData: request,
-        originalIndex: requests.indexOf(request)
+        requestType: q.patientType === "PATIENT_SPECIFIC" ? "Patient Specific" : "Academic",
+        patientName: q.firstName || "N/A",
+        question: q.description,
+        responseNeeded: q.responseUrgency,
+        submittedAt: q.createdAt,
+        status: q.questionStatus,
+        priority: getPriority(q.responseUrgency),
+        assignedTo: q.assignedTo || 'Unassigned',
+        originalData: q,
+        originalIndex: index
       }));
   }
 }
 
 onMounted(() => {
   loadRequests();
-  setInterval(loadRequests, 2000);
+
 });
 
 function assignRequest(request) {

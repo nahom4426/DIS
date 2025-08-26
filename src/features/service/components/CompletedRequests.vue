@@ -3,6 +3,10 @@ import Table from "@/components/Table.vue";
 import { ref, computed, onMounted } from "vue";
 import { openModal } from "@customizer/modal-x";
 import icons from "@/utils/icons";
+import { getUserQuestions } from "@/features/service/api/questionApi";
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore();
 
 const props = defineProps({
   search: String,
@@ -10,32 +14,33 @@ const props = defineProps({
 
 const completedRequests = ref([]);
 
-function loadRequests() {
-  const stored = localStorage.getItem('drugInformationRequests');
-  if (stored) {
-    const requests = JSON.parse(stored);
-    completedRequests.value = requests
-      .filter(request => request.status === 'Completed')
-      .map((request, index) => ({
+async function loadRequests() {
+  const userUuid = authStore.auth?.userUuid;
+  if (!userUuid) return;
+  const response = await getUserQuestions(userUuid);
+  if (response.success && Array.isArray(response.data)) {
+    completedRequests.value = response.data
+      .filter(q => q.answer)
+      .map((q, index) => ({
         id: `DI-${String(index + 1).padStart(3, '0')}`,
-        requestType: getRequestTypeDisplay(request.requestType),
-        patientName: getPatientDisplay(request),
-        question: request.requestQuestion,
-        responseNeeded: request.responseNeeded,
-        submittedAt: formatDate(request.submittedAt),
-        completedAt: request.completedAt ? formatDate(request.completedAt) : 'N/A',
-        status: request.status,
-        priority: getPriority(request.responseNeeded),
-        completedBy: request.completedBy || 'Dr. Amanda Ross',
-        originalData: request,
-        originalIndex: requests.indexOf(request)
+        requestType: q.patientType === "PATIENT_SPECIFIC" ? "Patient Specific" : "Academic",
+        patientName: q.firstName || "N/A",
+        question: q.description,
+        responseNeeded: q.responseUrgency,
+        submittedAt: q.createdAt,
+        completedAt: q.answer?.createdAt ? formatDate(q.answer.createdAt) : 'N/A',
+        status: "Completed",
+        priority: getPriority(q.responseUrgency),
+        completedBy: q.answer?.answerGiverFirstName || "N/A",
+        originalData: q,
+        originalIndex: index
       }));
   }
 }
 
 onMounted(() => {
   loadRequests();
-  setInterval(loadRequests, 2000);
+  
 });
 
 function getRequestTypeDisplay(type) {

@@ -2,18 +2,27 @@
 import  icons  from '@/utils/icons';
 import { useAuthStore } from "@/stores/auth";
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import imageSrc from '@/assets/img/profile.png'
 
 const router = useRouter();
 const authStore = useAuthStore();
+const route = useRoute();
 const isScrolled = ref(false);
 
 // Use a computed property for the profile picture so it updates reactively
 const profilePicture = computed(() => {
-  const img = authStore.auth?.user?.imageData;
-  if (!img) return imageSrc;
-  return img.startsWith("data:image/") ? img : `data:image/png;base64,${img}`;
+  const user = authStore.auth?.user;
+  // Use backend profilePicture URL if available
+  if (user?.profilePicture) return user.profilePicture;
+  // Fallback to base64 imageData if present
+  if (user?.imageData) {
+    return user.imageData.startsWith("data:image/")
+      ? user.imageData
+      : `data:image/png;base64,${user.imageData}`;
+  }
+  // Default image
+  return imageSrc;
 });
 
 // Dropdown states
@@ -48,6 +57,10 @@ function handleClickOutside(event) {
 
 // Handle scroll effect
 onMounted(() => {
+  const userDetail = localStorage.getItem("userDetail");
+  if (userDetail) {
+    authStore.setAuth({ ...authStore.auth, user: JSON.parse(userDetail) });
+  }
   window.addEventListener('scroll', () => {
     isScrolled.value = window.scrollY > 10;
   });
@@ -73,6 +86,14 @@ function goToSettings() {
   closeAllDropdowns();
   router.push('/settings');
 }
+
+// Watch for route changes to reload user data if needed
+watch(() => route.fullPath, () => {
+  const userDetail = localStorage.getItem("userDetail");
+  if (userDetail) {
+    authStore.setAuth({ ...authStore.auth, user: JSON.parse(userDetail) });
+  }
+});
 
 const props = defineProps({
   breadcrumbs: Object,

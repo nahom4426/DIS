@@ -2,9 +2,9 @@ import ApiService from "@/service/ApiService";
 import { getQueryFormObject } from "@/utils/utils.js";
 
 // Use the specific backend URL for this API
-const api = new ApiService("http://192.168.100.57:8280");
-const path = "/api/medco-EDIS/v1/question";
-const answerPath = "/api/medco-EDIS/v1/answers";
+const api = new ApiService();
+const path = "/question";
+const answerPath = "/answers";
 
 // Get all inquiries by user UUID
 export function getAllInquiries(userUuid, query = {}) {

@@ -104,19 +104,19 @@ export default [
     path: "/home",
     name: "Home",
     icon: icons.request,
-     privilege: ["pharmacist"],
+   //  privilege: ["pharmacist"],
   },
   {
     path: "/doctor-requests",
     name: "Requests",
     icon: icons.request,
-    privilege: ["pharmacist"],
+   // privilege: ["pharmacist"],
   },
   {
     path: "drug-management",
     name: "Drug Management",
     icon: icons.drug,
-    privilege: ["pharmacist"],
+    //privilege: ["pharmacist"],
 
   },
    

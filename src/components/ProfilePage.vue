@@ -28,8 +28,8 @@
             <div class="relative">
               <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg overflow-hidden">
                 <img 
-                  v-if="profileData.imageData" 
-                  :src="'data:image/png;base64,' + profileData.imageData" 
+                  v-if="profileData.profilePicture" 
+                  :src="profileData.profilePicture" 
                   alt="Profile" 
                   class="w-full h-full object-cover"
                 />
