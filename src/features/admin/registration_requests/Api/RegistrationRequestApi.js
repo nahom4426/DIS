@@ -3,9 +3,19 @@ import { getQueryFormObject } from "@/utils/utils.js";
 
 const api = new ApiService(import.meta.env.VITE_API_URI);
 const path = "/auth/users";
+function normalizeStatus(status) {
+  if (!status) return "Unknown";
+  switch (status.toUpperCase()) {
+    case "PENDING": return "Pending";
+    case "APPROVED": return "Active";
+    case "REJECTED": return "Rejected";
+    case "DEACTIVATED": return "Deactivated";
+    default: return status;
+  }
+}
 
+// ✅ then your normalizeBackendResponse
 function normalizeBackendResponse(res) {
-  // Support both shapes: { data: { content... } } or { content... }
   const raw = res?.data?.content ? res.data : res;
   if (!raw?.content) return null;
 
@@ -18,7 +28,7 @@ function normalizeBackendResponse(res) {
     providerName: request.providerName,
     mobilePhone: request.mobilePhone,
     createdAt: request.createdAt,
-    userStatus: (request.userStatus || '').toLowerCase(),
+    userStatus: normalizeStatus(request.userStatus), // 👈 used here
     userType: request.userType,
     gender: request.gender,
     profilePicture: request.profilePicture
@@ -55,11 +65,11 @@ export function getAllRegistrationRequests(query = {}) {
 export function approveRegistrationRequest(userUuid, body = {}) {
   return api
     .addAuthenticationHeader()
-    .put(`${path}/${userUuid}/approve`, body)
+    .put(`${path}/update/status/${userUuid}`)
     .then((res) => ({ success: true, data: res?.data ?? res, error: null }))
     .catch((error) => ({
       success: false,
-      error: error?.message || "Failed to approve registration request.",
+      error: error?.message ||  "Failed to approve registration request.",
       data: null,
     }));
 }
@@ -67,7 +77,7 @@ export function approveRegistrationRequest(userUuid, body = {}) {
 export function rejectRegistrationRequest(userUuid, reason = "") {
   return api
     .addAuthenticationHeader()
-    .put(`${path}/${userUuid}/reject`, { reason })
+    .put(`${path}/delete/${userUuid}`)
     .then((res) => ({ success: true, data: res?.data ?? res, error: null }))
     .catch((error) => ({
       success: false,
@@ -87,8 +97,23 @@ export async function getRegistrationRequestDocumentView(query = {}) {
   } catch (error) {
     return {
       success: false,
-      error: error?.message || "Failed to fetch document.",
+      error: error?.message ||  "Failed to fetch document.",
       data: null,
-    };
+    };}
   }
+    export function deactivateRegistrationRequest(userUuid) {
+  return api
+    .addAuthenticationHeader()
+    .put(`${path}/delete/${userUuid}`)
+    .then((res) => ({ success: true, data: res?.data ?? res, error: null }))
+    .catch((error) => ({
+      success: false,
+      error: error?.message || "Failed to deactivate user.",
+      data: null,
+    }));
+   
+    
+
 }
+
+  

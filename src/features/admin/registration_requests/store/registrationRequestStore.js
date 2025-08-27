@@ -1,5 +1,16 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { computed } from "vue";
+
+const visibleRequests = computed(() => {
+  const now = Date.now();
+  return store.requests.filter(req => {
+    if (!req.lastActionTime) return true; // untouched rows
+    // keep row only if < 24h old
+    return now - req.lastActionTime < 24 * 60 * 60 * 1000;
+  });
+});
+
 
 export const useRegistrationRequestStore = defineStore('registrationRequests', () => {
   const requests = ref([]);
@@ -42,35 +53,29 @@ export const useRegistrationRequestStore = defineStore('registrationRequests', (
   function getByUuid(userUuid) {
     return requests.value.find(req => req.userUuid === userUuid);
   }
-
-  function setLoading(v) { loading.value = v; }
-  function setError(e) { error.value = e; }
-
-  function clear() {
-    requests.value = [];
-    totalItems.value = 0;
-    totalPages.value = 1;
-    currentPage.value = 0;
-    pageSize.value = 25;
-    loading.value = false;
-    error.value = null;
+function markLocally(userUuid, newStatus) {
+  const index = requests.value.findIndex(req => req.userUuid === userUuid);
+  if (index !== -1) {
+    requests.value[index] = {
+      ...requests.value[index],
+      userStatus: newStatus,
+      lastActionTime: Date.now()
+    };
   }
+}
 
-  return {
-    requests,
-    loading,
-    error,
-    totalItems,
-    totalPages,
-    currentPage,
-    pageSize,
-    set,
-    add,
-    update,
-    remove,
-    getByUuid,
-    setLoading,
-    setError,
-    clear,
-  };
-});
+return {
+  requests,
+  loading,
+  error,
+  set,
+  add,
+  update,
+  remove,
+  getByUuid,
+  markLocally // ✅ add here
+};
+
+  });
+
+

@@ -293,11 +293,24 @@ notification:`
         stroke="currentColor" stroke-width="1.3" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
 `,
-  request: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-  <path d="M-18,11a2,2,0,0,0,2-2,2,2,0,0,0-2-2,2,2,0,0,0-2,2A2,2,0,0,0-18,11Zm0-3a1,1,0,0,1,1,1,1,1,0,0,1-1,1,1,1,0,0,1-1-1A1,1,0,0,1-18,8Zm2.5,4h-5A2.5,2.5,0,0,0-23,14.5A1.5,1.5,0,0,0-21.5,16h7A1.5,1.5,0,0,0-13,14.5A2.5,2.5,0,0,0-15.5,12Zm1,3h-7a.5.5,0,0,1-.5-.5A1.5,1.5,0,0,1-20.5,13h5A1.5,1.5,0,0,1-14,14.5.5.5,0,0,1-14.5,15ZM-7,2.5v5A2.5,2.5,0,0,1-9.5,10h-2.793l-1.853,1.854A.5.5,0,0,1-
-  <path d="M8.5 5.034v1.1l.953-.55.5.867L9 7l.953.55-.5.866-.953-.55v1.1h-1v-1.1l-.953.55-.5-.866L7 7l-.953-.55.5-.866.953.55v-1.1zM13.25 9a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zM13 11.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zm.25 1.75a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zm-11-4a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5A.25.25 0 0 0 3 9.75v-.5A.25.25 0 0 0 2.75 9zm0 2a.25.25 0 0 0-.25.25v.5c0 .138.112.25.25.25h.5a.25.25 0 0 0 .25-.25v-.5a.25.25 0 0 0-.25-.25zM2 13.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25z"/>
-  <path d="M5 1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1a1 1 0 0 1 1 1v4h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h3V3a1 1 0 0 1 1-1zm2 14h2v-3H7zm3 0h1V3H5v12h1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1zm0-14H6v1h4zm2 7v7h3V8zm-8 7V8H1v7z" fill="currentColor"/>
-</svg>`,
+  request: `<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 24 24" fill="none">
+  <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+  <g id="SVGRepo_iconCarrier">
+    <path d="M22 22L2 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M2 11L6.06296 7.74968M22 11L13.8741 4.49931C12.7784 3.62279 11.2216 3.62279 10.1259 4.49931L9.34398 5.12486" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M15.5 5.5V3.5C15.5 3.22386 15.7239 3 16 3H18.5C18.7761 3 19 3.22386 19 3.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M4 22V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M20 9.5V13.5M20 22V17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M15 22V17C15 15.5858 15 14.8787 14.5607 14.4393C14.1213 14 13.4142 14 12 14C10.5858 14 9.87868 14 9.43934 14.4393M9 22V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14 9.5C14 10.6046 13.1046 11.5 12 11.5C10.8954 11.5 10 10.6046 10 9.5C10 8.39543 10.8954 7.5 12 7.5C13.1046 7.5 14 8.39543 14 9.5Z" stroke="currentColor" stroke-width="1.5"/>
+  </g>
+</svg>
+`,
+requests:`<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M5 11a2 2 0 1 0 0-4a2 2 0 0 0 0 4zm0-3a1 1 0 1 1 0 2a1 1 0 0 1 0-2zm2.5 4h-5A2.5 2.5 0 0 0 0 14.5A1.5 1.5 0 0 0 1.5 16h7A1.5 1.5 0 0 0 10 14.5A2.5 2.5 0 0 0 7.5 12zm1 3h-7a.5.5 0 0 1-.5-.5A1.5 1.5 0 0 1 2.5 13h5A1.5 1.5 0 0 1 9 14.5a.5.5 0 0 1-.5.5zM18 2.5v5A2.5 2.5 0 0 1 15.5 10h-2.793l-1.854 1.854a.5.5 0 0 1-.707-.707V9.5a.5.5 0 1 1 1 0v.793L12.293 9.146A.5.5 0 0 1 12.5 9h3A1.5 1.5 0 0 0 17 7.5v-5A1.5 1.5 0 0 0 15.5 1h-7A1.5 1.5 0 0 0 7 2.5v3a.5.5 0 0 1-1 0v-3A2.5 2.5 0 0 1 8.5 0h7A2.5 2.5 0 0 1 18 2.5zM12.5 2v2.5H15a.5.5 0 1 1 0 1h-2.5V8a.5.5 0 1 1-1 0V5.5H9a.5.5 0 1 1 0-1h2.5V2a.5.5 0 1 1 1 0z"/>
+</svg>
+`,
  
 
   payerContracts: `

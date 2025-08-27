@@ -1,6 +1,11 @@
 import  icons from "@/utils/icons";
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+// import { useAuthStore } from "@/stores/auth";
+
+// const authStore = useAuthStore();
+
+// Theme Store
 
 export const useThemeStore = defineStore("themeStore", () => {
   const themes = [
@@ -52,6 +57,11 @@ export const useThemeStore = defineStore("themeStore", () => {
 
 // Drug Information System Navigation
 export default [
+  //  {
+  //   type: "label",
+  //   name: `Provider Name (${authStore.auth?.providerName })`,
+  //   privililege: ["ROLE_create_drugs"],
+  // },
   {
     path: "/dashboard",
     name: "Dashboard",
@@ -95,7 +105,7 @@ export default [
   {
     path: "/doctor-requests",
     name: "Requests",
-    icon: icons.request,
+    icon: icons.requests,
     privilege: ["ROLE_create_questions"],
   },
   {
@@ -131,9 +141,12 @@ export default [
     icon: icons.privilege,
    privilege:["ROLE_create_privilege"],
   },
+  
  
 
 ];
+
+
 
 
 

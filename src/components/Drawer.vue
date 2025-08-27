@@ -81,14 +81,20 @@ const toggleMenu = (name) => {
         props.isCollapsed ? 'justify-center px-2' : 'justify-start px-4'
       ]">
         <img
-          class="w-8 h-8 flex-shrink-0"
-          src="/src/assets/edislogo.png"
+          class="w-13 h-14 flex-shrink-0"
+          src="/src/assets/EDIS.png"
           alt="DIS Logo"
         />
-        <span
-          v-if="!props.isCollapsed"
-          class="text-md font-bold days-one text-primary whitespace-nowrap"
-        >EDIS</span>
+        <div v-if="!props.isCollapsed" class="flex flex-col items-start leading-tight">
+  <span class="text-xs font-semibold uppercase tracking-wide text-primary">
+    Ethiopian Drug
+  </span>
+  <span class="text-sm font-semibold text-primary">
+    Information System
+  </span>
+</div>
+
+    
       </div>
       <div class="border-b border-[#F6F7FA]"></div>
     </div>

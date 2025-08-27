@@ -1,12 +1,13 @@
 import ApiService from "@/service/ApiService";
 
 const api = new ApiService();
-const basePath = "/users";
+const basePath = "/user";
 
 export function getPersonalDetails(userId) {
   return api
     .addAuthenticationHeader()
-    .get(`${basePath}/${userId}/details`);
+ 
+ .get(`${basePath}/${userId}/details`);
 }
 
 export function uploadProfilePicture(formData) {
