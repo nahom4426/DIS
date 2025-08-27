@@ -85,8 +85,8 @@ function goBack() {
           <h3 class="text-lg font-semibold text-gray-900 mb-3">Patient Information</h3>
           <div class="bg-white p-4 rounded border space-y-3">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><span class="font-medium">Age:</span> {{ formData.patientInfo.age }}</div>
-              <div><span class="font-medium">Sex:</span> {{ formData.patientInfo.sex }}</div>
+              <div><span class="font-medium">Age:</span> {{ formData.patientInfo.patientAge }}</div>
+              <div><span class="font-medium">Sex:</span> {{ formData.patientInfo.patientGender }}</div>
               <div><span class="font-medium">Weight:</span> {{ formData.patientInfo.weight }} kg</div>
               <div><span class="font-medium">Diagnosis:</span> {{ formData.patientInfo.diagnosis }}</div>
             </div>

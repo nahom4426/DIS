@@ -29,7 +29,7 @@ function handleSendResetCode({ values }) {
   forgotReq.send(
     () => sendResetCode(values.email),
     (res) => {
-   
+      checkResetCode({ verificationCode: values.verificationCode, email: props.email });
       toasted(res.success, "Confirmation code sent", res.error);
       if (res.success) {
         emit("user");
@@ -37,10 +37,11 @@ function handleSendResetCode({ values }) {
     }
   );
 }
+
 function handleCheckResetCode({ values }) {
   if (forgotReq.pending.value) return;
   forgotReq.send(
-    () => checkResetCode({ verificationCode: values.verificationCode, email: values.email }),
+    () => checkResetCode({ verificationCode: values.verificationCode, email: props.email }),
     (res) => {
     
       toasted(res.success, "Reset code verified", res.error);
@@ -50,6 +51,7 @@ function handleCheckResetCode({ values }) {
     }
   );
 }
+
 
 </script>
 <template>
@@ -91,7 +93,7 @@ function handleCheckResetCode({ values }) {
           Login now
         </p>
         <!-- </h1> -->
-        <h1 class="text-base-clr text-xs">©DIS 2025</h1>
+        <h1 class="text-base-clr text-xs">©EDIS 2025</h1>
       </div>
     </div>
   </NewFormLayout>

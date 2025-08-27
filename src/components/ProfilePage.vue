@@ -303,6 +303,7 @@ const originalData = ref({});
 const fileInput = ref(null);
 const loading = ref(false);
 
+
 const profileData = reactive({
   email: '',
   title: '',
@@ -426,15 +427,10 @@ function saveProfile() {
     (res) => {
       if (res.success) {
         const updatedUser = {
-          ...authStore.auth.user,
+          ...authStore.auth,
           ...updateData
         };
-
-        authStore.setAuth({
-          ...authStore.auth,
-          user: updatedUser
-        });
-
+        authStore.setAuth(updatedUser);
         localStorage.setItem("userDetail", JSON.stringify(updatedUser));
 
         isEditing.value = false;
