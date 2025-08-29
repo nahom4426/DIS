@@ -2,7 +2,6 @@ import  icons from "@/utils/icons";
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 // import { useAuthStore } from "@/stores/auth";
-
 // const authStore = useAuthStore();
 
 // Theme Store
@@ -60,7 +59,7 @@ export default [
   //  {
   //   type: "label",
   //   name: `Provider Name (${authStore.auth?.providerName })`,
-  //   privililege: ["ROLE_create_drugs"],
+  //   privilege: ["ROLE_create_drugs"],
   // },
   {
     path: "/dashboard",

@@ -1,5 +1,6 @@
 <script setup>
 import  icons  from '@/utils/icons';
+import navs from "@/config/navs";
 import { useAuthStore } from "@/stores/auth";
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -30,11 +31,13 @@ const profilePicture = computed(() => {
 // Dropdown states
 const languageDropdownOpen = ref(false);
 const profileDropdownOpen = ref(false);
+const notificationDropdownOpen = ref(false);
 
 // Close all dropdowns
 function closeAllDropdowns() {
   languageDropdownOpen.value = false;
   profileDropdownOpen.value = false;
+  notificationDropdownOpen.value = false;
 }
 
 // Toggle specific dropdown and close others
@@ -48,6 +51,12 @@ function toggleProfileDropdown() {
   const wasOpen = profileDropdownOpen.value;
   closeAllDropdowns();
   profileDropdownOpen.value = !wasOpen;
+}
+
+function toggleNotificationDropdown() {
+  const wasOpen = notificationDropdownOpen.value;
+  closeAllDropdowns();
+  notificationDropdownOpen.value = !wasOpen;
 }
 
 // Close dropdowns when clicking outside
@@ -111,6 +120,13 @@ const api=useApiRequest()
     }
   );
 
+const userPrivileges = computed(() => authStore.auth?.privileges || []);
+
+const filteredNavs = computed(() =>
+  navs.filter(nav =>
+    !nav.privilege || nav.privilege.some(p => userPrivileges.value.includes(p))
+  )
+);
 </script>
 
 <template>
@@ -152,8 +168,8 @@ const api=useApiRequest()
 
     <!-- Center Section -->
     <div class="hidden md:block">
-      <div class="bg-gradient-to-r from-primary/10 to-secondary/10 px-4 py-2 rounded-lg shadow-inner backdrop-blur-sm border border-white/50">
-        <span class="text-primary font-medium text-sm md:text-base animate-pulse">
+      <div class="bg-gradient-to-r from-green/10 to-secondary/10 px-4 py-2 rounded-lg shadow-inner backdrop-blur-sm border border-white/50">
+        <span class="text-primary font-medium text-sm md:text-base animate-pulse colo">
           {{ authStore.auth?.roleName+ " "+"Dashboard" }}
         </span>
       </div>
@@ -310,6 +326,20 @@ const api=useApiRequest()
       </div>
     </div>
   </div>
+
+  <!-- Navigation Links (for testing) -->
+<ul class="list-none p-0 m-0 flex items-center justify-center">
+  <li
+    class="min-w-[220px] text-center bg-white text-gray-800 
+           px-6 py-3 rounded-xl text-base font-medium 
+           border border-gray-300 shadow-sm 
+           hover:bg-gray-50 hover:shadow-md 
+           transition-all duration-200"
+  >
+    {{ `${authStore.auth?.providerName}` }}
+    
+  </li>
+</ul>
 </template>
 
 <style scoped>

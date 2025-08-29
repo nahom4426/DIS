@@ -89,7 +89,7 @@ const toggleMenu = (name) => {
   <span class="text-xs font-semibold uppercase tracking-wide text-primary">
     Ethiopian Drug
   </span>
-  <span class="text-sm font-semibold text-primary">
+  <span class="text-xs font-semibold uppercase tracking-wide text-primary">
     Information System
   </span>
 </div>
@@ -161,6 +161,30 @@ const toggleMenu = (name) => {
             </div>
           </template>
 
+           <!-- Single menu items -->
+          <template v-else>
+            <RouterLink
+              :to="item.path"
+              @click="handleSingleItemClick"
+              :class="[
+                'flex items-center h-12 rounded-lg hover:bg-secondary transition-all duration-200 group',
+                props.isCollapsed ? 'justify-center px-2' : 'px-3',
+                'router-link-active:bg-primary router-link-active:text-white'
+              ]"
+              :title="props.isCollapsed ? item.name : ''"
+            >
+              <span :class="[
+                'flex items-center',
+                props.isCollapsed ? 'justify-center' : 'gap-3'
+              ]">
+                <i v-html="item.icon" class="text-lg flex-shrink-0"></i>
+                <span
+                  v-if="!props.isCollapsed"
+                  class="text-sm font-medium whitespace-nowrap"
+                >{{ item.name }}</span>
+              </span>
+            </RouterLink>
+          </template>
           <!-- Single menu items -->
           <template v-else>
             <RouterLink

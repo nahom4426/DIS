@@ -33,9 +33,12 @@ const form = [
     component: Congratulation,
   },
 ];
+const email=ref('')
 const values = ref(new Array(form.length));
 const confirmationCode = ref("");
 const next = (value) => {
+ email.value=value
+  
   if (activeForm.value == 2) {
     confirmationCode.value = value;
   }
@@ -104,6 +107,7 @@ function loadFromAuthStore() {
       @user="next"
       @previous="prevous"
       :values="values"
+      :email="email"
       :activeForm="activeForm"
       :is="form[activeForm].component"
       :confirmationCode="confirmationCode"

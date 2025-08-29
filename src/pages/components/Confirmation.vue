@@ -10,6 +10,7 @@ import { useApiRequest } from "@/composables/useApiRequest";
 const props = defineProps({
   email: { type: String, required: true }
 });
+console.log(props.email);
 
 const emit = defineEmits(["user", "previous"]);
 

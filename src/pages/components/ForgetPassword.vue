@@ -29,7 +29,6 @@ function handleSendResetCode({ values }) {
   forgotReq.send(
     () => sendResetCode(values.email),
     (res) => {
-      checkResetCode({ verificationCode: values.verificationCode, email: props.email });
       toasted(res.success, "Confirmation code sent", res.error);
       if (res.success) {
         emit("user");
@@ -43,7 +42,7 @@ function handleCheckResetCode({ values }) {
   forgotReq.send(
     () => checkResetCode({ verificationCode: values.verificationCode, email: props.email }),
     (res) => {
-    
+      handleNewPassword({ values }) 
       toasted(res.success, "Reset code verified", res.error);
       if (res.success) {
         emit("codeVerified");
