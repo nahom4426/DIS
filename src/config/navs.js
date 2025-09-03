@@ -18,7 +18,7 @@ export const useThemeStore = defineStore("themeStore", () => {
 
   const currentTheme = computed(() => {
     const theme = themes.find(t => t.id === activeTheme.value);
-    return theme?.class || "";
+    return theme?.class ?? "";
   });
 
   const currentThemeInfo = computed(() => {
@@ -57,44 +57,30 @@ export default [
     name: "Dashboard",
     icon: icons.dashboard,
   },
- 
-    {
-    path: "/users",
-    name: "User Management",
-    icon: icons.user,
-    privileges: ["Create Employees"],
-  },
-   
-       {
-    path: 'registration',
-    name: "Registration",
-    icon: icons.register,
-    privileges: ["MANAGE_REGISTRATION_REQUEST"],
-  },
    {
     name: "Pharmacist Communication",
     icon: icons.pharmacist,
-   privileges: ["ROLE_change password","ROLE_view_answers","ROLE_edit_profile","ROLE_create_answers", "ROLE_view_questions", "ROLE_search_drug"],
+   privilege: ["ROLE_create_answers"],
     navs: [
        {
     path: "/doctor-comm/dashboard",
     name: "Doctor Communication",
     icon: icons.communication, // Add appropriate icon
-   privilages:["ROLE_change password"] ,
+    privilege: ["ROLE_create_answers"],
   },
      
       {
         path: "/doctor-comm/history",
         name: "Full History",
         icon: icons.history,
-        privilages:[,"ROLE_view_answers","ROLE_edit_profile","ROLE_create_answers", "ROLE_view_questions", "ROLE_search_drug"] ,
+        privilege: ["ROLE_create_answers"],
          
       },
       {
         path: "/doctor-comm/drug-lookup",
         name: "Drug Lookup Tool",
         icon: icons.search,
-        privilages:[]
+        privilege: ["ROLE_create_answers"],
          
       },
  
@@ -104,20 +90,19 @@ export default [
     path: "/home",
     name: "Home",
     icon: icons.request,
-    //  privilege: ["pharmacist"],
+     privilege: ["ROLE_create_questions"],
   },
   {
     path: "/doctor-requests",
     name: "Requests",
     icon: icons.request,
-    privileges: ["ROLE_create_questions","ROLE_view_answers", "ROLE_view_questions"],
-
+    privilege: ["ROLE_create_questions"],
   },
   {
     path: "drug-management",
     name: "Drug Management",
     icon: icons.drug,
-  privileges: ["pharmacist"],
+    privilege: ["ROLE_create_drugs"],
 
   },
    
@@ -125,42 +110,27 @@ export default [
     path: 'registration',
     name: "Registration",
     icon: icons.register,
-    privileges: ["MANAGE_REGISTRATION_REQUESTS"],
+    privilege: ["ROLE_create_drugs"],
   },
   {
     path: "/users",
     name: "User Management",
     icon: icons.user,
-    privileges: ["Role_Create Employees"],
+    privilege: ["ROLE_create_drugs"],
   },
 
   {
     path: "/roles",
     name: "Roles & Permissions",
     icon: icons.role,
-    privileges: ["MANAGE_ROLES"],
+    privilege: ["ROLE_create_privilege"],
   },
     {
     path: "/privileges",
     name: "Privilege",
     icon: icons.privilege,
-   privileges:["CREATE_USER"],
+   privilege:["ROLE_create_privilege"],
   },
  
-  // {
-  //   path: "/system_settings",
-  //   name: "System Settings",
-  //   icon: icons.settings,
-  //   // privilege: ["SYSTEM_ADMIN"],
-  // },
-  // {
-  //   path: "/theme_settings",
-  //   name: "Apperance",
-  //   icon: icons.palette,
-  // },
+
 ];
-
-
-
-
-

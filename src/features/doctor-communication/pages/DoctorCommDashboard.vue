@@ -5,15 +5,24 @@ import icons from '@/utils/icons'
 import Button from '@/components/Button.vue'
 import { openModal } from '@customizer/modal-x'
 import { getAllInquiries } from '../api/inquiryApi'
+import { getDoctorCommReport } from "@/features/Dashboard/api/reportUserApi"
 import { useAuthStore } from '@/stores/auth'
 
+
 const router = useRouter()
-const authStore = useAuthStore()
+const authStore = useAuthStore();
+const sortBy = ref('createdAt'); // default sort field
+const sortOrder = ref('desc');   // default sort order
+
 
 const analytics = ref({
-  weeklyInquiries: 0,
-  monthlyInquiries: 0,
-  pendingInquiries: 0,
+  dailyAnswers: 0,
+  pendingQuestions: 0,
+  weeklyQuestions: 0,
+  monthlyAnswers: 0,
+  dailyQuestions: 0,
+  weeklyAnswers: 0,
+  monthlyQuestions: 0,
   commonTopics: []
 })
 
@@ -79,6 +88,13 @@ const filteredInquiries = computed(() => {
     })
   }
 
+  // Permanently sort by most recent (descending by date)
+  filtered = [...filtered].sort((a, b) => {
+    const aDate = new Date(a.date)
+    const bDate = new Date(b.date)
+    return bDate - aDate
+  })
+
   // Limit to 5 most recent
   return filtered.slice(0, 5)
 })
@@ -127,16 +143,33 @@ function handleDropdownAction(action) {
   closeAllDropdowns();
   action();
 }
+function sortTable(field) {
+  if (sortBy.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortBy.value = field;
+    sortOrder.value = 'asc';
+  }
+}
+
 
 onMounted(async () => {
-  // Example: get userUuid from auth store
-  const userUuid = authStore.auth?.userUuid || authStore.auth?.user?.userUuid
-  if (!userUuid) return
+  // Yes, you can use authStore to fetch the userUuid
+  const userUuid = authStore.auth?.userUuid || authStore.auth?.user?.userUuid;
+  if (!userUuid) return;
+
+  try {
+    const reportRes = await getDoctorCommReport(userUuid)
+    if (reportRes?.data) {
+      Object.assign(analytics.value, reportRes.data)
+    }
+  } catch (error) {
+    console.error("Error fetching report:", error)
+  }
 
   // Fetch inquiries from backend (same as InquiryHistory)
   const response = await getAllInquiries(userUuid)
   if (response && response.success && Array.isArray(response.data)) {
-    // Transform to match table fields
     allInquiries.value = response.data.map(inquiry => ({
       id: inquiry.questionUuid,
       date: new Date(inquiry.createdAt).toLocaleDateString(),
@@ -146,14 +179,6 @@ onMounted(async () => {
     }))
   } else {
     allInquiries.value = []
-  }
-
-  // Example analytics (keep your cards)
-  analytics.value = {
-    weeklyInquiries: 24,
-    monthlyInquiries: 89,
-    pendingInquiries: 8,
-    commonTopics: ['Drug Interactions', 'Dosage Questions', 'Side Effects', 'Contraindications']
   }
 
   document.addEventListener('click', closeAllDropdowns);
@@ -185,28 +210,34 @@ onUnmounted(() => {
     <!-- Analytics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div class="bg-white p-6 rounded-lg shadow">
-        <h3 class="text-sm font-medium text-gray-500">This Week</h3>
-        <p class="text-2xl font-bold text-blue-600">{{ analytics.weeklyInquiries }}</p>
-        <p class="text-xs text-gray-500">Inquiries</p>
+        <h3 class="text-sm font-medium text-gray-500">Daily Questions</h3>
+        <p class="text-2xl font-bold text-blue-600">{{ analytics.dailyQuestions }}</p>
       </div>
       <div class="bg-white p-6 rounded-lg shadow">
-        <h3 class="text-sm font-medium text-gray-500">This Month</h3>
-        <p class="text-2xl font-bold text-green-600">{{ analytics.monthlyInquiries }}</p>
-        <p class="text-xs text-gray-500">Inquiries</p>
+        <h3 class="text-sm font-medium text-gray-500">Weekly Questions</h3>
+        <p class="text-2xl font-bold text-green-600">{{ analytics.weeklyQuestions }}</p>
       </div>
       <div class="bg-white p-6 rounded-lg shadow">
-        <h3 class="text-sm font-medium text-gray-500">Pending</h3>
-        <p class="text-2xl font-bold text-orange-600">{{ analytics.pendingInquiries }}</p>
-        <p class="text-xs text-gray-500">Responses</p>
+        <h3 class="text-sm font-medium text-gray-500">Monthly Questions</h3>
+        <p class="text-2xl font-bold text-purple-600">{{ analytics.monthlyQuestions }}</p>
       </div>
       <div class="bg-white p-6 rounded-lg shadow">
-        <h3 class="text-sm font-medium text-gray-500">Common Topics</h3>
-        <div class="space-y-1">
-          <div v-for="topic in analytics.commonTopics.slice(0, 2)" :key="topic" 
-               class="text-xs bg-gray-100 px-2 py-1 rounded">
-            {{ topic }}
-          </div>
-        </div>
+        <h3 class="text-sm font-medium text-gray-500">Pending Questions</h3>
+        <p class="text-2xl font-bold text-orange-600">{{ analytics.pendingQuestions }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-sm font-medium text-gray-500">Daily Answers</h3>
+        <p class="text-2xl font-bold text-blue-600">{{ analytics.dailyAnswers }}</p>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-sm font-medium text-gray-500">Weekly Answers</h3>
+        <p class="text-2xl font-bold text-green-600">{{ analytics.weeklyAnswers }}</p>
+      </div>
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h3 class="text-sm font-medium text-gray-500">Monthly Answers</h3>
+        <p class="text-2xl font-bold text-purple-600">{{ analytics.monthlyAnswers }}</p>
       </div>
     </div>
 
@@ -326,14 +357,14 @@ onUnmounted(() => {
               <!-- Actions -->
               <td class="w-32 px-3 py-4 relative">
                 <div class="flex items-center gap-1">
+                   <!-- Respond/View button -->
                   <Button 
-                    @click="respondToInquiry(row.id)"
+                    @click="respondToInquiry(row.questionUuid)"
                     size="sm"
                     type="primary"
                     class="text-xs px-2 py-1 flex-shrink-0"
-                    :title="'Respond to Inquiry'"
                   >
-                    Respond
+                    {{ row.hasAnswer || row.questionStatus === 'answered' ? 'View' : 'Respond' }}
                   </Button>
                   <!-- Three dots dropdown -->
                   <div class="relative flex-shrink-0">

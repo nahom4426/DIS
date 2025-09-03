@@ -36,7 +36,7 @@ const emit = defineEmits(["row"]);
     </td>
     <td class="p-4 font-medium text-base-clr">{{ index + 1 }}</td>
     <td
-      class="p-2 py-4 font-medium max-w-40 text-base-clr"
+      class="p-2 py-4 font-medium max-w-40 text-base-clr text-ellipsis overflow-hidden whitespace-nowrap"
       :key="key"
       v-for="key in rowKeys"
     >

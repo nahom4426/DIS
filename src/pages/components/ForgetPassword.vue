@@ -7,17 +7,34 @@ import { forgotPassword } from "../api/LoginApi";
 import { toasted } from "@/utils/utils";
 const forgotReq = useApiRequest();
 const emit = defineEmits(["user", "previous"]);
+import { sendResetCode } from "../api/LoginApi";
+
 
 function handleForgotPassword({ values }) {
   if (forgotReq.pending.value) return;
   forgotReq.send(
     () => forgotPassword({ email: values.email }),
     (res) => {
+      handleSendResetCode({values});
+
+      toasted(res.success, "Confirmation code sent", res.error);
+      if (res.success) {
+        emit("user");
+      }
+    },
+
+    function handleSendResetCode({ values }) {
+  if (forgotReq.pending.value) return;
+  forgotReq.send(
+    () => sendResetCode(values.email),
+    (res) => {
       toasted(res.success, "Confirmation code sent", res.error);
       if (res.success) {
         emit("user");
       }
     }
+  );
+}
   );
 }
 </script>

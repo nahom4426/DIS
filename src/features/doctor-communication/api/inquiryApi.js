@@ -25,7 +25,7 @@ export function getAllInquiries(userUuid, query = {}) {
 export function deleteInquiry(questionUuid) {
   return api
     .addAuthenticationHeader()
-    .delete(`${path}/details/${questionUuid}`)
+    .delete(`${path}/delete/${questionUuid}`)
     .catch((error) => {
       return {
         success: false,

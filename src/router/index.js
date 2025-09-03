@@ -8,6 +8,8 @@ import HomeRoutes from "./dashboard1.routes";
 import Dashboard from "@/features/Dashboard/pages/Dashboard.vue";
 import doctorCommunicationRoutes from '@/features/doctor-communication/routes';
 import registrationRequestRoutes from "./registrationRequest.routes"
+import QuestionUpdate from '@/features/service/pages/QuestionUpdate.vue';
+
 
 // import institutionRoutes from "./institution.routes";
 import adminRoutes from "./admin.routes";
@@ -53,12 +55,12 @@ const router = createRouter({
       component: MainLayout,
       children: [
         {
-          path: '/dashboard',
+          path: 'dashboard',
           name: 'Dashboard',
           component: Dashboard,
         },
         {
-          path: '/profile',
+          path: 'profile',
           name: 'profile',
           component: Profile,
         },
@@ -68,6 +70,14 @@ const router = createRouter({
         ...requestRoutes,
         ...HomeRoutes,
         ...registrationRequestRoutes,
+          {
+            path: '/service/question/:id',
+            name: 'QuestionDetail',
+            component: () => import('@/features/service/pages/QuestionDetail.vue'),
+          },
+
+
+
       ],
     },
     

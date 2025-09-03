@@ -14,7 +14,6 @@
     <!-- Single Profile Card -->
     <div class="flex-1 p-6 pt-4">
       <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 h-full flex flex-col">
-        
         <!-- Profile Header -->
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
           <!-- Loading State -->
@@ -33,7 +32,7 @@
                   alt="Profile" 
                   class="w-full h-full object-cover"
                 />
-                <span v-else>{{ getInitials(profileData.firstName, profileData.fatherName) }}</span>
+                <span v-else>{{ getInitials(profileData.firstName, profileData.lastName) }}</span>
               </div>
               <button 
                 @click="triggerFileUpload"
@@ -51,20 +50,12 @@
             </div>
             <div class="flex-1">
               <h1 class="text-2xl font-bold text-gray-900 mb-1">
-                {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.fatherName || 'Name' }} {{ profileData.grandFatherName || '' }}
+                {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.fatherName || '' }}
               </h1>
               <p class="text-base text-gray-600 mb-1">{{ profileData.userType || 'User Type' }}</p>
               <p class="text-base text-gray-600 mb-1">{{ profileData.roleName || '' }}</p>
               <p class="text-sm text-gray-500 mb-1">{{ profileData.email || 'email@example.com' }}</p>
-              <p class="text-sm text-gray-500 mb-3">{{ profileData.mobilePhone || 'Phone' }}</p>
-              <div class="flex gap-2">
-                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                  {{ profileData.userStatus || 'Status' }}
-                </span>
-                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                  {{ profileData.userType || 'Type' }}
-                </span>
-              </div>
+            
             </div>
             <div>
               <button
@@ -140,20 +131,6 @@
                 >
               </div>
 
-              <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Username</label>
-                <input 
-                  type="text" 
-                  v-model="profileData.userName"
-                  :disabled="!isEditing"
-                  :class="[
-                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                    isEditing 
-                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  ]"
-                >
-              </div>
 
               <div class="space-y-2">
                 <label class="block text-xs font-medium text-gray-700">Gender</label>
@@ -222,20 +199,8 @@
                 >
               </div>
               
-              <div class="space-y-2">
-                <label class="block text-xs font-medium text-gray-700">Grandfather's Name</label>
-                <input 
-                  type="text" 
-                  v-model="profileData.grandFatherName"
-                  :disabled="!isEditing"
-                  :class="[
-                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-                    isEditing 
-                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                  ]"
-                >
-              </div>
+             
+         
 
               <div class="space-y-2">
                 <label class="block text-xs font-medium text-gray-700">Role Name</label>
@@ -288,93 +253,38 @@ const isEditing = ref(false);
 const originalData = ref({});
 const fileInput = ref(null);
 const loading = ref(false);
-// const profilePicture = computed(() => profileData.imageData || cardImage || imageSrc);
+const selectedImageFile = ref(null);
 
-// async function processProfilePicture() {
-//   if (profilePicture.value && !profilePicture.value.startsWith("data:image/")) {
-//     profilePicture.value = `data:image/png;base64,${profilePicture.value}`;
-//     return
-//   }
-
-// }
-
-// processProfilePicture();
-
-
-const profileApi=useApiRequest()
-const triggerFileInput = () => {
-  fileInput.value?.click();
-};
-
-const handleFileChange = (event) => {
+function handleFileUpload(event) {
   const file = event.target.files[0];
-
   if (!file) return;
 
-  if (!file.type.startsWith("image/")) {
-    toasted(false, "Please select a valid image file.");
+  if (!file.type.startsWith('image/')) {
+    toasted(false, 'Please select a valid image file.');
     return;
   }
-
-  const formData = new FormData();
-  formData.append("profilePicture", file);
-
+  if (file.size > 5 * 1024 * 1024) {
+    toasted(false, 'File size must be less than 5MB.');
+    return;
+  }
+  selectedImageFile.value = file;
+  // Optionally show preview
   const reader = new FileReader();
-
   reader.onload = (e) => {
-    const base64Image = e.target.result;
-
-    profileApi.send(
-      () => uploadProfilePicture(formData),
-      (res) => {
-        if (res.success) {
-          profilePicture.value = base64Image;
-          authStore.setProfile(base64Image);
-
-          // Update the user object with new image data
-          const updatedUser = {
-            ...(authStore.auth?.user || {}),
-            imageData: base64Image,
-            profilePicture: base64Image
-          };
-          
-          authStore.setAuth({
-            ...authStore.auth,
-            user: updatedUser
-          });
-
-          // Update both localStorage keys for compatibility
-          localStorage.setItem("userDetail", JSON.stringify(updatedUser));
-          localStorage.setItem("doctorCommUser", JSON.stringify(updatedUser));
-
-          // Dispatch custom event to notify DoctorCommLayout
-          window.dispatchEvent(new CustomEvent('profileUpdated'));
-
-          toasted(true, "Profile picture updated successfully!");
-        } else {
-          toasted(false, res.error || "Failed to update profile picture.");
-        }
-      }
-    );
+    profileData.imageData = e.target.result.split(',')[1];
   };
-
-  reader.onerror = () => {
-    toasted(false, "Error reading image file.");
-  };
-
-  reader.readAsDataURL(file); // Trigger FileReader to get base64
-};
+  reader.readAsDataURL(file);
+}
 
 const profileData = reactive({
   email: '',
   title: '',
   firstName: '',
   userName: '',
-  fatherName: '',
-  grandFatherName: '', // <-- Add this line
+ lastName: '', // <-- Add this line
   roleName: '',        // <-- Add this line
   gender: 'Male',
-  mobilePhone: '',
+ phoneNumber: '',
   userStatus: '',
   userType: '',
   providerUuid: '',
@@ -435,11 +345,10 @@ function loadFromAuthStore() {
       title: user.title || '',
       firstName: user.firstName || '',
       userName: user.userName || '',
-      fatherName: user.fatherName || '',
-      grandFatherName: user.grandFatherName || '', // <-- Add this line
+      lastName: user.lastName || '', // <-- Add this line
       roleName: user.roleName || '',               // <-- Add this line
       gender: user.gender || 'Male',
-      mobilePhone: user.mobilePhone || '',
+      phoneNumber: user.phoneNumber || '',
       userStatus: user.userStatus || '',
       userType: user.userType || '',
       providerUuid: user.providerUuid || '',
@@ -454,8 +363,8 @@ onMounted(() => {
   fetchUserDetails();
 });
 
-function getInitials(firstName, fatherName) {
-  return `${firstName?.charAt(0) || ''}${fatherName?.charAt(0) || ''}`.toUpperCase();
+function getInitials(firstName, lastName) {
+  return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase();
 }
 
 function toggleEdit() {
@@ -473,38 +382,32 @@ function cancelEdit() {
 }
 
 function saveProfile() {
-  const updateData = {
-    title: profileData.title,
-    firstName: profileData.firstName,
-    userName: profileData.userName,
-    fatherName: profileData.fatherName,
-    gender: profileData.gender,
-    mobilePhone: profileData.mobilePhone,
-    email: profileData.email
-  };
-
+  const formData = new FormData();
+  formData.append('title', profileData.title);
+  formData.append('firstName', profileData.firstName);
+  formData.append('userName', profileData.userName);
+  formData.append('lastName', profileData.fatherName || profileData.lastName || '');
+  formData.append('gender', profileData.gender);
+  formData.append('phoneNumber', profileData.phoneNumber || profileData.mobilePhone || '');
+  formData.append('email', profileData.email);
+  formData.append('userUuid', authStore.auth?.userUuid || '');
+  // Add image file if selected
+  if (selectedImageFile.value) {
+    formData.append('profilePicture', selectedImageFile.value);
+  }
   api.send(
-    () => updateProfileData(authStore.auth?.userUuid, updateData),
+    () => updateProfileData(authStore.auth?.userUuid, formData),
     (res) => {
       if (res.success) {
-        const updatedUser = {
-          ...authStore.auth,
-          ...updateData
-        };
-
-        authStore.setAuth(updatedUser);
-
-        localStorage.setItem("userDetail", JSON.stringify(updatedUser));
-
+        // Only update local state after backend confirms
+        fetchUserDetails();
         isEditing.value = false;
         toasted(true, 'Profile updated successfully!');
-        fetchUserDetails();
       } else {
         toasted(false, res.error || 'Failed to update profile');
       }
     },
     (error) => {
-      console.error('Profile update failed:', error);
       toasted(false, 'Failed to update profile');
     }
   );
@@ -512,43 +415,5 @@ function saveProfile() {
 
 function triggerFileUpload() {
   fileInput.value.click();
-}
-
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  if (!file.type.startsWith('image/')) {
-    toasted(false, 'Please select a valid image file.');
-    return;
-  }
-  
-  if (file.size > 5 * 1024 * 1024) {
-    toasted(false, 'File size must be less than 5MB.');
-    return;
-  }
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const base64Data = e.target.result.split(',')[1];
-    profileData.imageData = base64Data;
-    
-    const updatedUser = {
-      ...authStore.auth.user,
-      imageData: base64Data
-    };
-    
-    authStore.setAuth({
-      ...authStore.auth,
-      user: updatedUser
-    });
-
-    localStorage.setItem("userDetail", JSON.stringify(updatedUser));
-    toasted(true, 'Profile image updated successfully!');
-  };
-  reader.onerror = () => {
-    toasted(false, 'Failed to process image. Please try again.');
-  };
-  reader.readAsDataURL(file);
 }
 </script>

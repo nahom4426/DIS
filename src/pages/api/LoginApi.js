@@ -14,10 +14,13 @@ export function login(data, config = {}) {
 
 // Send password reset code to email
 export function forgotPassword(data, config = {}) {
-  return api.post(`${path}/forgot-password`, data, config);
+  return api.post(`${path}/forgotPassword`, data, config);
 }
 
 // Reset password using code and new password
 export function resetPassword(data, config = {}) {
   return api.put(`${path}/password/resetPassword`, data, config);
+}
+export function sendResetCode(email, config = {}) {
+  return api.put(`${path}/password/sendResetCode/${email}`, {}, config);
 }

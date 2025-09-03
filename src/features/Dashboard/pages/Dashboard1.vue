@@ -4,92 +4,36 @@ import { ref, onMounted } from "vue";
 import Button from "@/components/Button.vue";
 import Table from "@/components/Table.vue";
 import { useAuthStore } from "@/stores/auth";
+// Import the report API
+import { getDoctorCommReport } from "@/features/Dashboard/api/reportUserApi";
 
 const authStore = useAuthStore();
 
-// Doctor-specific data with query-based stats
-const doctorStats = ref([
-  {
-    title: "Active Patients",
-    value: "127",
-    change: "+12",
-    changeType: "increase",
-    icon: icons.users,
-    color: "bg-blue-50 text-blue-600"
-  },
-  {
-    title: "Drug Inquiries",
-    value: "23",
-    change: "+5",
-    changeType: "increase", 
-    icon: icons.question_mark_circle,
-    color: "bg-purple-50 text-purple-600"
-  },
-  {
-    title: "Pending Responses",
-    value: "8",
-    change: "-2",
-    changeType: "decrease",
-    icon: icons.clock,
-    color: "bg-yellow-50 text-yellow-600"
-  },
-  {
-    title: "Resolved Today",
-    value: "15",
-    change: "+8",
-    changeType: "increase",
-    icon: icons.check_circle,
-    color: "bg-green-50 text-green-600"
-  }
-]);
+const reportStats = ref({
+  dailyAnswers: 0,
+  pendingQuestions: 0,
+  weeklyQuestions: 0,
+  monthlyAnswers: 0,
+  dailyQuestions: 0,
+  weeklyAnswers: 0,
+  monthlyQuestions: 0,
+});
 
-// Drug inquiry status data
-const drugInquiries = ref([
-  {
-    id: "DI001",
-    patientName: "Sarah Johnson",
-    requestType: "Patient Specific",
-    question: "Drug interaction between Lisinopril and Ibuprofen",
-    priority: "Urgent",
-    status: "Pending Review",
-    submittedAt: "2024-01-15 09:30",
-    responseNeeded: "30-60 min",
-    assignedTo: "Dr. Amanda Ross"
-  },
-  {
-    id: "DI002", 
-    patientName: "Michael Chen",
-    requestType: "Academic",
-    question: "Dosage adjustment for elderly patients with Metformin",
-    priority: "Normal",
-    status: "In Progress",
-    submittedAt: "2024-01-15 08:15",
-    responseNeeded: "End of day",
-    assignedTo: "Dr. Amanda Ross"
-  },
-  {
-    id: "DI003",
-    patientName: "Emily Davis",
-    requestType: "Patient Specific", 
-    question: "Alternative medications for Albuterol allergy",
-    priority: "High",
-    status: "Completed",
-    submittedAt: "2024-01-14 16:45",
-    responseNeeded: "Prompt",
-    assignedTo: "Dr. Amanda Ross"
-  },
-  {
-    id: "DI004",
-    patientName: "Robert Wilson",
-    requestType: "Other",
-    question: "Contraindications for cardiac patients",
-    priority: "Normal",
-    status: "Pending Review",
-    submittedAt: "2024-01-14 14:20",
-    responseNeeded: "When time permits",
-    assignedTo: "Dr. Amanda Ross"
+onMounted(async () => {
+  const userUuid = authStore.auth?.userUuid || authStore.auth?.user?.userUuid;
+  if (!userUuid) return;
+  try {
+    const res = await getDoctorCommReport(userUuid);
+    if (res?.data) {
+      Object.assign(reportStats.value, res.data);
+    }
+  } catch (error) {
+    console.error("Error fetching doctor report:", error);
   }
-]);
+});
+
+// Doctor-specific data with query-based stats
+
 
 const activeTab = ref('inquiries');
 
@@ -138,6 +82,40 @@ function getRequestTypeColor(type) {
           <p class="text-sm text-blue-100">{{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
           <p class="text-lg font-semibold">{{ new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }}</p>
         </div>
+      </div>
+    </div>
+
+    <!-- Doctor Report Stats from API -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <p class="text-sm font-medium text-gray-600">Daily Questions</p>
+        <p class="text-2xl font-bold text-blue-600">{{ reportStats.dailyQuestions }}</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <p class="text-sm font-medium text-gray-600">Daily Answers</p>
+        <p class="text-2xl font-bold text-green-600">{{ reportStats.dailyAnswers }}</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <p class="text-sm font-medium text-gray-600">Pending Questions</p>
+        <p class="text-2xl font-bold text-orange-600">{{ reportStats.pendingQuestions }}</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <p class="text-sm font-medium text-gray-600">Monthly Answers</p>
+        <p class="text-2xl font-bold text-purple-600">{{ reportStats.monthlyAnswers }}</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <p class="text-sm font-medium text-gray-600">Weekly Questions</p>
+        <p class="text-2xl font-bold text-blue-600">{{ reportStats.weeklyQuestions }}</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <p class="text-sm font-medium text-gray-600">Weekly Answers</p>
+        <p class="text-2xl font-bold text-green-600">{{ reportStats.weeklyAnswers }}</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <p class="text-sm font-medium text-gray-600">Monthly Questions</p>
+        <p class="text-2xl font-bold text-purple-600">{{ reportStats.monthlyQuestions }}</p>
       </div>
     </div>
 

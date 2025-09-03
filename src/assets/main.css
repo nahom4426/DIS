@@ -1,3 +1,35 @@
+.text-ellipsis {
+  text-overflow: ellipsis;
+}
+
+table {
+  table-layout: fixed;
+}
+
+td, th {
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+.max-w-full {
+  max-width: 100%;
+}
+
+.dropdown-menu {
+  z-index: 99999 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 25px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.bg-white.rounded-lg.shadow,
+.overflow-x-auto,
+table, thead, tbody, tr, td, th {
+  overflow: visible !important;
+}
+
+.dropdown-trigger {
+  position: relative;
+  z-index: 1;
+}
 @import './base.css';
 
 /* Ensure proper full-height layout */
@@ -67,6 +99,16 @@ a,
   --base-clr-4: 209, 213, 219;
   --dark: 17, 24, 39;
   --error: 239, 68, 68;
+}
+
+/* Ensure horizontal scroll for wide tables */
+.table-scroll {
+  overflow-x: auto;
+  width: 100%;
+}
+.table-scroll table {
+  table-layout: fixed;
+  width: 100%;
 }
 
 

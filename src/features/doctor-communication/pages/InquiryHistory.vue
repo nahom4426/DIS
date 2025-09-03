@@ -61,7 +61,7 @@ const transformInquiry = (inquiry) => {
     id: inquiry.questionUuid,
     questionUuid: inquiry.questionUuid,
     createdAt: date,
-    createdTime: time, // <-- add this
+    createdTime: time,
     firstName: inquiry.firstName || 'Unknown Doctor',
     description: inquiry.description || 'No description provided',
     responseUrgency: inquiry.responseUrgency || 'Normal',
@@ -79,7 +79,6 @@ const transformInquiry = (inquiry) => {
 
 function sortTable(field) {
   if (sortBy.value === field) {
-    // Toggle order if same field
     sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
   } else {
     sortBy.value = field;
@@ -90,7 +89,6 @@ function sortTable(field) {
 const filteredInquiries = computed(() => {
   let filtered = allInquiries.value
 
-  // Search filter
   if (searchQuery.value) {
     const search = searchQuery.value.toLowerCase()
     filtered = filtered.filter(inquiry => 
@@ -100,7 +98,6 @@ const filteredInquiries = computed(() => {
     )
   }
 
-  // Status filter
   if (selectedFilter.value !== 'all') {
     filtered = filtered.filter(inquiry => {
       const status = inquiry.questionStatus.toLowerCase()
@@ -111,7 +108,6 @@ const filteredInquiries = computed(() => {
     })
   }
 
-  // Status filter for selection
   if (statusFilter.value !== 'all') {
     filtered = filtered.filter(inquiry => {
       const status = inquiry.questionStatus.toLowerCase()
@@ -122,14 +118,12 @@ const filteredInquiries = computed(() => {
     })
   }
 
-  // Date filter
   if (dateFilter.value !== 'all') {
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     
     filtered = filtered.filter(inquiry => {
       const inquiryDate = new Date(inquiry.createdAt)
-      
       switch (dateFilter.value) {
         case 'today':
           return inquiryDate >= today
@@ -148,12 +142,10 @@ const filteredInquiries = computed(() => {
     })
   }
 
-  // Sorting
   filtered = [...filtered].sort((a, b) => {
     let aVal = a[sortBy.value];
     let bVal = b[sortBy.value];
 
-    // For date/time, sort by timestamp
     if (sortBy.value === 'createdAt') {
       aVal = new Date(a.createdAt + ' ' + a.createdTime);
       bVal = new Date(b.createdAt + ' ' + b.createdTime);
@@ -230,8 +222,6 @@ function deleteSelectedInquiries() {
     (confirmed) => {
       if (confirmed) {
         const selectedIds = Array.from(selectedInquiries.value)
-        
-        // Delete each inquiry via API
         selectedIds.forEach(questionUuid => {
           inquiriesReq.send(
             () => deleteInquiryApi(questionUuid),
@@ -242,7 +232,35 @@ function deleteSelectedInquiries() {
             }
           )
         })
-        
+        selectedInquiries.value.clear()
+        selectAll.value = false
+      }
+    }
+  )
+  closeAllDropdowns()
+}
+
+function deleteAllInquiries() {
+  if (allInquiries.value.length === 0) return
+  openModal(
+    'Confirmation',
+    {
+      title: 'Delete All Inquiries',
+      message: `Are you sure you want to delete all ${allInquiries.value.length} inquiries? This action cannot be undone.`
+    },
+    (confirmed) => {
+      if (confirmed) {
+        const allIds = allInquiries.value.map(inq => inq.questionUuid)
+        allIds.forEach(questionUuid => {
+          inquiriesReq.send(
+            () => deleteInquiryApi(questionUuid),
+            (response) => {
+              if (response.success) {
+                allInquiries.value = allInquiries.value.filter(inq => inq.questionUuid !== questionUuid)
+              }
+            }
+          )
+        })
         selectedInquiries.value.clear()
         selectAll.value = false
       }
@@ -265,8 +283,6 @@ function toggleSelectInquiry(questionUuid) {
   } else {
     selectedInquiries.value.add(questionUuid)
   }
-  
-  // Update select all checkbox
   selectAll.value = filteredInquiries.value.length > 0 && 
     filteredInquiries.value.every(inquiry => selectedInquiries.value.has(inquiry.questionUuid))
 }
@@ -303,9 +319,9 @@ function exportHistory() {
   console.log('Exporting inquiry history...')
 }
 
-function showDropdown(event, inquiry) {
+function showDropdown(event, row) {
   event.stopPropagation();
-  openDropdownId.value = inquiry.questionUuid;
+  openDropdownId.value = openDropdownId.value === row.id ? null : row.id;
 }
 
 function closeAllDropdowns() {
@@ -316,6 +332,13 @@ function handleDropdownAction(action) {
   closeAllDropdowns();
   action();
 }
+
+onMounted(() => {
+  document.addEventListener('click', closeAllDropdowns);
+});
+onUnmounted(() => {
+  document.removeEventListener('click', closeAllDropdowns);
+});
 
 onMounted(() => {
   loadInquiries();
@@ -336,23 +359,8 @@ onUnmounted(() => {
         <p class="text-gray-600">Complete archive of all doctor inquiries</p>
       </div>
       <div class="flex items-center gap-3">
-        <Button 
-          v-if="selectedInquiries.size > 0"
-          @click="deleteSelectedInquiries"
-          type="danger"
-          class="flex items-center gap-2"
-        >
-          <i v-html="icons.delete"></i>
-          Delete Selected ({{ selectedInquiries.size }})
-        </Button>
-        <Button 
-          @click="exportHistory"
-          type="outline"
-          class="flex items-center gap-2"
-        >
-          <i v-html="icons.download"></i>
-          Export History
-        </Button>
+      
+        
       </div>
     </div>
 
@@ -405,7 +413,7 @@ onUnmounted(() => {
           </select>
 
           <!-- Date Filter -->
-          <select
+           <select
             v-model="dateFilter"
             class="px-3 py-2 border border-blue-300 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
@@ -432,7 +440,17 @@ onUnmounted(() => {
             Clear Filters
           </button>
         </div>
-
+          <Button 
+          v-if="selectedInquiries.size > 0"
+          @click="deleteSelectedInquiries"
+          type="danger"
+          class="flex items-center gap-2"
+        >
+          <i v-html="icons.delete"></i>
+          Delete Selected ({{ selectedInquiries.size }})
+        </Button>
+        
+       
         <!-- Results Count -->
         <div class="ml-auto text-sm text-gray-600">
           Showing {{ filteredInquiries.length }} of {{ allInquiries.length }} inquiries
@@ -441,7 +459,27 @@ onUnmounted(() => {
           </span>
         </div>
       </div>
+       <select
+            v-model="dateFilter"
+            class="px-3 py-2 border border-blue-300 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option v-for="option in dateFilterOptions" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+
+          <!-- Status Filter for Selection -->
+          <select
+            v-model="statusFilter"
+            @change="selectByStatus"
+            class="px-3 py-2 border border-blue-300 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option v-for="option in statusFilterOptions" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </option>
+          </select>
     </div>
+   
 
     <!-- Table -->
     <div class="bg-white rounded-lg shadow">
@@ -554,38 +592,45 @@ onUnmounted(() => {
               <!-- Actions -->
               <td class="w-32 px-3 py-4 relative">
                 <div class="flex items-center gap-1">
-                  <button
+                  <!-- Respond/View button -->
+                  <Button 
                     @click="respondToInquiry(row.questionUuid)"
-                    class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded flex items-center gap-2"
+                    size="sm"
+                    type="primary"
+                    class="text-xs px-2 py-1 flex-shrink-0"
                   >
-                    <i v-html="icons.reply" class="w-4 h-4"></i>
-                    {{ row.hasAnswer ? 'View Response' : 'Respond' }}
-                  </button>
-                  <div class="relative dropdown-trigger">
+                    {{ row.hasAnswer || row.questionStatus === 'answered' ? 'View' : 'Respond' }}
+                  </Button>
+
+                  <!-- Dropdown trigger -->
+                  <div class="relative flex-shrink-0">
                     <button
-                      @click.stop="showDropdown($event, row)"
-                      class="px-2 py-2 text-gray-500 hover:text-gray-700 rounded-full"
+                      @click="showDropdown($event, row)"
+                      class="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100"
+                      title="More options"
                     >
-                      <i v-html="icons.more"></i>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="5" cy="12" r="2"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <circle cx="19" cy="12" r="2"/>
+                      </svg>
                     </button>
-                    <div
+
+                    <!-- Dropdown menu -->
+                    <div 
                       v-if="openDropdownId === row.questionUuid"
-                      class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg dropdown-menu"
+                      :id="`dropdown-${row.questionUuid}`"
+                      class="dropdown-menu absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-[9999]"
                     >
-                      <button
-                        @click="handleDropdownAction(() => toggleSelectInquiry(row.questionUuid))"
-                        class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-2"
-                      >
-                        <i v-html="icons.check" class="w-4 h-4"></i>
-                        Select
-                      </button>
-                      <button
-                        @click="handleDropdownAction(() => deleteInquiry(row.questionUuid))"
-                        class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                      >
-                        <i v-html="icons.delete" class="w-4 h-4"></i>
-                        Delete
-                      </button>
+                      <div class="py-1">
+                        <button
+                          @click="handleDropdownAction(() => deleteInquiry(row.questionUuid))"
+                          class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        >
+                          <i v-html="icons.delete" class="w-4 h-4"></i>
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -630,5 +675,15 @@ table, thead, tbody, tr, td, th {
 .dropdown-trigger {
   position: relative;
   z-index: 1;
+}
+.dropdown-menu {
+  z-index: 99999 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 
+              0 10px 25px -3px rgba(0, 0, 0, 0.1) !important;
+}
+.bg-white.rounded-lg.shadow,
+.overflow-x-auto,
+table, thead, tbody, tr, td, th {
+  overflow: visible !important;
 }
 </style>

@@ -3,16 +3,22 @@ import Table from "@/components/Table.vue";
 import { ref, computed, onMounted } from "vue";
 import { openModal } from "@customizer/modal-x";
 import icons from "@/utils/icons";
-import { getUserQuestions } from "@/features/service/api/questionApi";
+import { getUserQuestions, updateQuestion, deleteQuestion } from "@/features/service/api/questionApi";
 import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
+const router = useRouter();
 
 const props = defineProps({
   search: String,
 });
 
 const drugInformationRequests = ref([]);
+const showDropdown = ref(null);
+const searchTerm = ref('');
+const selectedRows = ref([]);
+const selectAll = ref(false);
 
 // Load and watch for new requests
 async function loadRequests() {
@@ -40,7 +46,6 @@ async function loadRequests() {
 
 onMounted(() => {
   loadRequests();
-
 });
 
 function assignRequest(request) {
@@ -50,6 +55,30 @@ function assignRequest(request) {
   allRequests[request.originalIndex].startedAt = new Date().toISOString();
   localStorage.setItem('drugInformationRequests', JSON.stringify(allRequests));
   loadRequests();
+}
+
+function openDropdown(id) {
+  showDropdown.value = id;
+}
+
+function closeDropdown() {
+  showDropdown.value = null;
+}
+
+async function handleUpdate(request) {
+  // Do NOT change status, assignedTo, or startedAt
+  await updateQuestion(request.originalData.questionUuid, {}); 
+
+  await loadRequests(); // refresh table
+  closeDropdown();      // close the dropdown after update
+}
+
+
+
+async function handleDelete(request) {
+  await deleteQuestion(request.originalData.questionUuid);
+  loadRequests();
+  closeDropdown();
 }
 
 function getRequestTypeDisplay(type) {
@@ -109,34 +138,72 @@ function getRequestTypeColor(type) {
 }
 
 function viewDetails(request) {
-  const data = request.originalData;
-  openModal('RequestDetails', {
-    requestId: request.id,
-    requestType: request.requestType,
-    patientInfo: data.patientInfo,
-    question: data.requestQuestion,
-    responseNeeded: data.responseNeeded,
-    submittedAt: request.submittedAt,
-    status: request.status,
-    priority: request.priority
-  });
+  // Navigate to QuestionDetail page with questionUuid as route param
+  router.push({ name: 'QuestionDetail', params: { id: request.originalData.questionUuid } });
+}
+
+function handleSearch(e) {
+  searchTerm.value = e.target.value;
+}
+
+function toggleSelectAll() {
+  if (selectAll.value) {
+    selectedRows.value = filteredRequests.value.map(r => r.id);
+  } else {
+    selectedRows.value = [];
+  }
+}
+
+function toggleSelectRow(id) {
+  if (selectedRows.value.includes(id)) {
+    selectedRows.value = selectedRows.value.filter(rowId => rowId !== id);
+  } else {
+    selectedRows.value.push(id);
+  }
+  selectAll.value = selectedRows.value.length === filteredRequests.value.length;
+}
+
+async function handleDeleteSelected() {
+  const toDelete = filteredRequests.value.filter(r => selectedRows.value.includes(r.id));
+  for (const req of toDelete) {
+    await deleteQuestion(req.originalData.questionUuid);
+  }
+  selectedRows.value = [];
+  selectAll.value = false;
+  await loadRequests();
 }
 
 const filteredRequests = computed(() => {
-  if (!props.search) return drugInformationRequests.value;
-  
-  const searchTerm = props.search.toLowerCase();
+  const term = searchTerm.value?.toLowerCase() || props.search?.toLowerCase() || '';
+  if (!term) return drugInformationRequests.value;
   return drugInformationRequests.value.filter(request => 
-    request.question.toLowerCase().includes(searchTerm) ||
-    request.requestType.toLowerCase().includes(searchTerm) ||
-    request.id.toLowerCase().includes(searchTerm) ||
-    request.patientName.toLowerCase().includes(searchTerm)
+    request.question.toLowerCase().includes(term) ||
+    request.requestType.toLowerCase().includes(term) ||
+    request.id.toLowerCase().includes(term) ||
+    request.patientName.toLowerCase().includes(term)
   );
 });
 </script>
 
 <template>
-  <div class="p-6">
+  <div class="w-full">
+    <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <input
+        type="text"
+        v-model="searchTerm"
+        @input="handleSearch"
+        placeholder="Search requests..."
+        class="border rounded px-3 py-2 w-full sm:w-64"
+      />
+      <div v-if="selectedRows.length > 0" class="flex gap-2">
+        <button
+          @click="handleDeleteSelected"
+          class="px-3 py-2 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200"
+        >
+          Delete Selected ({{ selectedRows.length }})
+        </button>
+      </div>
+    </div>
     <div v-if="filteredRequests.length === 0" class="text-center py-12">
       <div class="text-gray-400 mb-4">
         <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,61 +213,114 @@ const filteredRequests = computed(() => {
       <h3 class="text-lg font-medium text-gray-900 mb-2">No pending drug information requests</h3>
       <p class="text-gray-500">Submit a new drug information request to get started.</p>
     </div>
-
     <div v-else>
       <div class="mb-4">
         <h3 class="text-lg font-semibold text-gray-900">Pending Drug Information Requests ({{ filteredRequests.length }})</h3>
         <p class="text-sm text-gray-600">Review and assign submitted drug information requests</p>
       </div>
-
-      <Table
-        :pending="false"
-        :rows="filteredRequests"
-        :headers="{
-          head: ['Request ID', 'Patient', 'Type', 'Question', 'Priority', 'Response Time', 'Submitted', 'Actions'],
-          row: ['id', 'patientName', 'requestType', 'question', 'priority', 'responseNeeded', 'submittedAt']
-        }"
-      >
-        <template #requestType="{ row }">
-          <span :class="['px-2 py-1 text-xs font-medium rounded-full', getRequestTypeColor(row.requestType)]">
-            {{ row.requestType }}
-          </span>
-        </template>
-
-        <template #question="{ row }">
-          <div class="max-w-xs">
-            <p class="text-sm text-gray-900 truncate" :title="row.question">
-              {{ row.question }}
-            </p>
-          </div>
-        </template>
+      <div class="w-full overflow-x-auto">
+        <table class="w-full table-fixed">
+          <thead class="bg-gray-50">
+            <tr class="text-center">
+              <th class="w-12 px-3 py-3 align-middle">
+                <input
+                  type="checkbox"
+                  :checked="selectAll"
+                  @change="() => { selectAll = !selectAll; toggleSelectAll(); }"
+                  class="form-checkbox h-4 w-4 mx-auto"
+                  title="Select All"
+                />
+              </th>
+              <th class="px-3 py-3 align-middle">Request ID</th>
+              <th class="px-3 py-3 align-middle">Patient</th>
+              <th class="px-3 py-3 align-middle">Type</th>
+              <th class="px-3 py-3 align-middle">Question</th>
+              <th class="px-3 py-3 align-middle">Priority</th>
+              <th class="px-3 py-3 align-middle">Response Time</th>
+              <th class="px-3 py-3 align-middle">Submitted At</th>
+              <th class="px-3 py-3 align-middle">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="row in filteredRequests" :key="row.id" class="hover:bg-gray-50 relative text-center">
+              <!-- Checkbox -->
+              <td class="w-12 px-3 py-4 align-middle">
+                <input
+                  type="checkbox"
+                  :checked="selectedRows.includes(row.id)"
+                  @change="toggleSelectRow(row.id)"
+                  class="form-checkbox h-4 w-4 mx-auto"
+                />
+              </td>
+              <td class="px-3 py-4 align-middle">{{ row.id }}</td>
+              <td class="px-3 py-4 align-middle">{{ row.patientName }}</td>
+              <td class="px-3 py-4 align-middle">
+                <span :class="['inline-block px-2 py-1 text-xs font-medium rounded-full', getRequestTypeColor(row.requestType)]">
+                  {{
+                    row.requestType === "Patient Specific"
+                      ? "Patient Specific"
+                      : row.requestType === "Academic"
+                        ? "Academic"
+                        : "Other"
+                  }}
+                </span>
+              </td>
+              <td class="px-3 py-4 align-middle">
+                <div class="max-w-xs mx-auto">
+                  <p class="text-sm text-gray-900 truncate" :title="row.question">
+                    {{ row.question }}
+                  </p>
+                </div>
+              </td>
+              <td class="px-3 py-4 align-middle">
+                <span :class="['px-2 py-1 text-xs font-medium rounded-full', getPriorityColor(row.priority)]">
+                  {{ row.priority }}
+                </span>
+              </td>
+              <td class="px-3 py-4 align-middle">{{ row.responseNeeded }}</td>
+              <td class="px-3 py-4 align-middle whitespace-pre-wrap break-words">
+                {{ formatDate(row.submittedAt) }}
+              </td>
+              <td class="px-3 py-4 align-middle relative">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    @click="viewDetails(row)"
+                    class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded hover:bg-blue-50"
+                  >
+                    View Details
+                  </button>
+                  <button
+                    @click="openDropdown(row.id)"
+                    class="text-gray-600 hover:text-gray-800 text-sm font-medium px-3 py-1 rounded hover:bg-gray-100"
+                  >
+                    &#x22EE;
+                  </button>
+                  <div v-if="showDropdown === row.id" class="absolute z-10 right-0 mt-2 w-32 bg-white border rounded shadow-lg">
         
-        <template #priority="{ row }">
-          <span :class="['px-2 py-1 text-xs font-medium rounded-full', getPriorityColor(row.priority)]">
-            {{ row.priority }}
-          </span>
-        </template>
 
-        <template #actions="{ row }">
-          <div class="flex items-center gap-2">
-            <button
-              @click="viewDetails(row)"
-              class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded hover:bg-blue-50"
-            >
-              View Details
-            </button>
-            <button
-              @click="assignRequest(row)"
-              class="text-green-600 hover:text-green-800 text-sm font-medium px-3 py-1 rounded hover:bg-green-50"
-            >
-              Assign & Start
-            </button>
-          </div>
-        </template>
-      </Table>
+                    <button
+                      @click="handleDelete(row)"
+                      class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      @click="closeDropdown"
+                      class="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
+
 
 
 
