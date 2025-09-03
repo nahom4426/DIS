@@ -33,9 +33,12 @@ const form = [
     component: Congratulation,
   },
 ];
+const email=ref('')
 const values = ref(new Array(form.length));
 const confirmationCode = ref("");
 const next = (value) => {
+ email.value=value
+  
   if (activeForm.value == 2) {
     confirmationCode.value = value;
   }
@@ -104,38 +107,15 @@ function loadFromAuthStore() {
       @user="next"
       @previous="prevous"
       :values="values"
+      :email="email"
       :activeForm="activeForm"
       :is="form[activeForm].component"
       :confirmationCode="confirmationCode"
     >
     </component>
-    <div>
+    <!--<div>
       {{ profileData.title }} {{ profileData.firstName || 'User' }} {{ profileData.fatherName || 'Name' }} {{ profileData.grandFatherName || '' }}
-    </div>
+    </div>-->
     <p class="text-base text-gray-600 mb-1">{{ profileData.roleName || '' }}</p>
-
-    <div class="space-y-2">
-      <label class="block text-xs font-medium text-gray-700">Grandfather's Name</label>
-      <input 
-        type="text" 
-        v-model="profileData.grandFatherName"
-        :disabled="!isEditing"
-        :class="[
-          'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
-          isEditing 
-            ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
-            : 'border-gray-200 bg-gray-50 cursor-not-allowed'
-        ]"
-      >
-    </div>
-    <div class="space-y-2">
-      <label class="block text-xs font-medium text-gray-700">Role Name</label>
-      <input 
-        type="text" 
-        v-model="profileData.roleName"
-        disabled
-        class="w-full border border-gray-200 bg-gray-50 cursor-not-allowed rounded-lg px-3 py-2 text-sm"
-      >
-    </div>
   </div>
 </template>

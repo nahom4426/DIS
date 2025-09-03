@@ -17,9 +17,22 @@
         <!-- Profile Header -->
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
           <!-- Loading State -->
-          <div v-if="loading" class="flex items-center justify-center py-8">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span class="ml-3 text-gray-600">Loading profile...</span>
+          <div v-if="loading" class="flex flex-col items-center justify-center py-8">
+            <div class="mb-4">
+              <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg overflow-hidden">
+                <img 
+                  v-if="profileData.imageData" 
+                  :src="'data:image/png;base64,' + profileData.imageData" 
+                  alt="Profile" 
+                  class="w-full h-full object-cover"
+                />
+                <span v-else>{{ getInitials(profileData.firstName, profileData.fatherName) }}</span>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span class="ml-3 text-gray-600">Loading profile...</span>
+            </div>
           </div>
           
           <!-- Profile Content -->
@@ -132,6 +145,20 @@
               </div>
 
 
+               <div class="space-y-2">
+                <label class="block text-xs font-medium text-gray-700">Grandfather's Name</label>
+                <input 
+                  type="text" 
+                  v-model="profileData.grandFatherName"
+                  :disabled="!isEditing"
+                  :class="[
+                    'w-full border rounded-lg px-3 py-2 text-sm transition-all duration-200',
+                    isEditing 
+                      ? 'border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white' 
+                      : 'border-gray-200 bg-gray-50 cursor-not-allowed'
+                  ]"
+                >
+              </div>
               <div class="space-y-2">
                 <label class="block text-xs font-medium text-gray-700">Gender</label>
                 <select 
@@ -275,6 +302,7 @@ function handleFileUpload(event) {
   };
   reader.readAsDataURL(file);
 }
+
 
 const profileData = reactive({
   email: '',

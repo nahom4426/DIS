@@ -1,3 +1,4 @@
+
 // Import and register the FormConfirmation modal
 import FormConfirmation from '@/components/FormConfirmation.mdl.vue'
 

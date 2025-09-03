@@ -17,8 +17,19 @@ export const useRegistrationRequestStore = defineStore('registrationRequests', (
   const loading = ref(false);
   const error = ref(null);
 
+  // Pagination
+  const totalItems = ref(0);
+  const totalPages = ref(1);
+  const currentPage = ref(0);
+  const pageSize = ref(25);
+
   function set(data) {
-    requests.value = data || [];
+    // expects { requests, totalItems, totalPages, currentPage, pageSize }
+    requests.value = data?.requests || [];
+    totalItems.value = data?.totalItems ?? 0;
+    totalPages.value = data?.totalPages ?? 1;
+    currentPage.value = data?.currentPage ?? 0;
+    pageSize.value = data?.pageSize ?? 25;
   }
 
   function add(request) {
@@ -28,7 +39,7 @@ export const useRegistrationRequestStore = defineStore('registrationRequests', (
   function update(userUuid, updates) {
     const index = requests.value.findIndex(req => req.userUuid === userUuid);
     if (index !== -1) {
-      requests.value[index] = { ...requests.value[index], ...updates };
+      requests.value.splice(index, 1, { ...requests.value[index], ...updates });
     }
   }
 

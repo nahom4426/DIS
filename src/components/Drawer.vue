@@ -16,14 +16,14 @@ const props = defineProps({
 });
 const emit = defineEmits(["toggle-sidebar", "toggle-menu"]);
 
-const userData = computed(() => auth.auth?.user || {});
+const userData = computed(() => auth.auth || []);
 const hasPrivilege = (requiredPrivileges) => {
   if (!requiredPrivileges || requiredPrivileges.length === 0) return true;
   const userPrivileges = userData.value.privileges || [];
 
   const userRole = userData.value.roleName;
   return (
-    userRole === "Super Admin" ||
+    userRole === "SuperAdmin" ||
     userPrivileges.includes("All Privileges") ||
     requiredPrivileges.some((priv) => userPrivileges.includes(priv))
   );
@@ -81,14 +81,21 @@ const toggleMenu = (name) => {
         props.isCollapsed ? 'justify-center px-2' : 'justify-start px-4'
       ]">
         <img
-          class="w-8 h-8 flex-shrink-0"
-          src="/src/assets/edislogo.png"
+          class="w-13 h-14 flex-shrink-0"
+          src="/src/assets/EDIS.png"
           alt="DIS Logo"
         />
-        <span
-          v-if="!props.isCollapsed"
-          class="text-md font-bold days-one text-primary whitespace-nowrap"
-        >EDIS</span>
+        <div v-if="!props.isCollapsed" class="flex flex-col items-start leading-tight" >
+          
+  <span class="text-xs font-semibold uppercase tracking-wide text-primary">
+    Ethiopian Drug
+  </span>
+  <span class="text-xs font-semibold uppercase tracking-wide text-primary">
+    Information System
+  </span>
+</div>
+
+    
       </div>
       <div class="border-b border-[#F6F7FA]"></div>
     </div>
@@ -155,6 +162,30 @@ const toggleMenu = (name) => {
             </div>
           </template>
 
+           <!-- Single menu items -->
+          <template v-else>
+            <RouterLink
+              :to="item.path"
+              @click="handleSingleItemClick"
+              :class="[
+                'flex items-center h-12 rounded-lg hover:bg-secondary transition-all duration-200 group',
+                props.isCollapsed ? 'justify-center px-2' : 'px-3',
+                'router-link-active:bg-primary router-link-active:text-white'
+              ]"
+              :title="props.isCollapsed ? item.name : ''"
+            >
+              <span :class="[
+                'flex items-center',
+                props.isCollapsed ? 'justify-center' : 'gap-3'
+              ]">
+                <i v-html="item.icon" class="text-lg flex-shrink-0"></i>
+                <span
+                  v-if="!props.isCollapsed"
+                  class="text-sm font-medium whitespace-nowrap"
+                >{{ item.name }}</span>
+              </span>
+            </RouterLink>
+          </template>
           <!-- Single menu items -->
           <template v-else>
             <RouterLink

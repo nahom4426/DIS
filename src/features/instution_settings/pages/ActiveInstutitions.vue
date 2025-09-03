@@ -206,7 +206,7 @@ function handleImageError(event) {
               'Category',
               'Dosage',
               'Storage',
-              'Status',
+              // 'Status',
               'Actions',
             ],
             row: [
@@ -215,7 +215,7 @@ function handleImageError(event) {
               'categories',
               'dosage',
               'storage',
-              'status',
+              // 'status',
             ],
           }"
           :rows="drugs"

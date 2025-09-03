@@ -1,9 +1,12 @@
 <script setup>
 import  icons  from '@/utils/icons';
+import navs from "@/config/navs";
 import { useAuthStore } from "@/stores/auth";
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import imageSrc from '@/assets/img/profile.png'
+import { useApiRequest } from '@/composables/useApiRequest';
+import { getNotifications } from '@/api/notificationApi';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -28,11 +31,13 @@ const profilePicture = computed(() => {
 // Dropdown states
 const languageDropdownOpen = ref(false);
 const profileDropdownOpen = ref(false);
+const notificationDropdownOpen = ref(false);
 
 // Close all dropdowns
 function closeAllDropdowns() {
   languageDropdownOpen.value = false;
   profileDropdownOpen.value = false;
+  notificationDropdownOpen.value = false;
 }
 
 // Toggle specific dropdown and close others
@@ -46,6 +51,12 @@ function toggleProfileDropdown() {
   const wasOpen = profileDropdownOpen.value;
   closeAllDropdowns();
   profileDropdownOpen.value = !wasOpen;
+}
+
+function toggleNotificationDropdown() {
+  const wasOpen = notificationDropdownOpen.value;
+  closeAllDropdowns();
+  notificationDropdownOpen.value = !wasOpen;
 }
 
 // Close dropdowns when clicking outside
@@ -98,6 +109,24 @@ watch(() => route.fullPath, () => {
 const props = defineProps({
   breadcrumbs: Object,
 });
+console.log(authStore.auth);
+
+const api=useApiRequest()
+  api.send(
+    () => getNotifications(authStore.auth?.userUuid),
+    (res) => {
+      if (res.success) {
+      }
+    }
+  );
+
+const userPrivileges = computed(() => authStore.auth?.privileges || []);
+
+const filteredNavs = computed(() =>
+  navs.filter(nav =>
+    !nav.privilege || nav.privilege.some(p => userPrivileges.value.includes(p))
+  )
+);
 </script>
 
 <template>
@@ -139,16 +168,31 @@ const props = defineProps({
 
     <!-- Center Section -->
     <div class="hidden md:block">
-      <div class="bg-gradient-to-r from-primary/10 to-secondary/10 px-4 py-2 rounded-lg shadow-inner backdrop-blur-sm border border-white/50">
-        <span class="text-primary font-medium text-sm md:text-base animate-pulse">
-          {{ authStore.auth?.roleName+ " "+"Dashboard" }}
+       <!-- Navigation Links (for testing) -->
+<ul class="list-none p-0 m-0 flex items-center justify-center">
+  <li
+    class="min-w-[220px] text-center bg-white text-gray-800 
+           px-6 py-3 rounded-xl text-base font-medium 
+           border border-gray-300 shadow-sm 
+           hover:bg-gray-50 hover:shadow-md 
+           transition-all duration-200"
+  >
+    <marquee behavior="" direction=""><span class="text-primary font-medium text-sm md:text-base animate-pulse colo">{{ `${authStore.auth?.providerName}` }}</span>
+      </marquee>
+    
+  </li>
+</ul>
+     <!-- <div class="bg-gradient-to-r from-green/10 to-secondary/10 px-4 py-2 rounded-lg shadow-inner backdrop-blur-sm border border-white/50">
+        <span class="text-primary font-medium text-sm md:text-base animate-pulse colo">
+           {{ authStore.auth?.roleName+ " "+"Dashboard" }} 
         </span>
-      </div>
+      </div>-->
+      
     </div>
 
     <!-- Right Section -->
     <div class="flex items-center gap-4">
-      <!-- Language Selector -->
+      <!--- Language Selector 
       <div class="dropdown-container relative">
         <button
           @click.stop="toggleLanguageDropdown"
@@ -179,26 +223,26 @@ const props = defineProps({
             Amharic
           </button>
         </div>
-      </div>
+      </div> 
+      -->
 <!-- Notification Bell -->
 <div class="dropdown-container relative">
   <button
-    @click.stop="toggleNotificationDropdown"
-    class="relative p-2 rounded-full hover:bg-gray-100 transition-colors group"
-    aria-label="Notifications"
+  @click="$router.push('/doctor-requests')"
+  class="relative p-2 rounded-full hover:bg-gray-100 transition-colors group"
+  aria-label="Notifications"
+>
+  <i
+    v-html="icons.bell"
+    class="w-5 h-5 text-gray-600 group-hover:text-primary"
+  />
+  <span
+    class="absolute top-0 right-0 inline-flex items-center justify-center px-1 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full"
   >
-    <i
-      v-html="icons.bell"
-      class="w-5 h-5 text-gray-600 group-hover:text-primary"
-    />
-    <!-- Badge -->
-    <span
-      v-if="notificationCount > 0"
-      class="absolute top-0 right-0 inline-flex items-center justify-center px-1 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full"
-    >
-      {{ notificationCount }}
-    </span>
-  </button>
+    {{ (api.response.value?.length ?? 0) }}
+  </span>
+</button>
+
 
   <!-- Dropdown panel -->
   <div
@@ -209,7 +253,7 @@ const props = defineProps({
       Notifications
     </div>
     <ul class="max-h-60 overflow-y-auto">
-      <li v-for="(notif, i) in notifications" :key="i" class="px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">
+      <li v-for="(Notification, i) in notifications" :key="i" class="px-4 py-2 hover:bg-gray-50 text-sm text-gray-700">
         {{ notif }}
       </li>
       <li v-if="notifications.length === 0" class="px-4 py-4 text-sm text-gray-500 text-center">
@@ -296,6 +340,8 @@ const props = defineProps({
       </div>
     </div>
   </div>
+
+ 
 </template>
 
 <style scoped>

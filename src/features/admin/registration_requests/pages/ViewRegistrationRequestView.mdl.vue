@@ -15,9 +15,11 @@ const req = useApiRequest();
 const src = ref('')
 
 req.send(
-    () => getRegistrationRequestDocumentView(props.data.fileName),
+    () => getRegistrationRequestDocumentView(),
     (res) => {
         if (res.success) {
+            console.log('Document fetched successfully:', res);
+            
             src.value = URL.createObjectURL(res.data)
         }
     }

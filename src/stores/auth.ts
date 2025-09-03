@@ -5,6 +5,8 @@ import { ref } from 'vue'
 export const useAuthStore = defineStore('myAuthStore', () => {
   const auth = ref<LoginResponse>({
     token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXllckBnbWFpbC5jb20iLCJpYXQiOjE3MjY3MzE5MDIsImV4cCI6ODY0MDAxNzI2NzMxOTAyfQ.d9lI2EUE3oDicgDquqI3EYV0jEB5QD8UEfvN429GoIQ",
+    providerName: '',
+    userName: '',
     userUuid: '',
     email: '',
     roleName: '',
@@ -12,7 +14,7 @@ export const useAuthStore = defineStore('myAuthStore', () => {
     firstName: '',
     fatherName: '',
     grandFatherName: '',
-    gender: ' ',
+    Gender: ' ',
     mobilePhone: '',
     userStatus: '',
     roles: [],

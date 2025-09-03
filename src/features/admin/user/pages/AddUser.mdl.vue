@@ -36,7 +36,9 @@ async function handleSubmit(formValues) {
       ...formValues,
       providerUuid: formValues.hospitalUuid || modalData.value.providerUuid,
       // Remove hospitalUuid since API doesn't expect it
-      hospitalUuid: undefined
+      hospitalUuid: undefined,
+     
+      userStatus: 'ACTIVE' // Also set userStatus if used in your model
     };
     
     console.log('Submitting user data:', userData);

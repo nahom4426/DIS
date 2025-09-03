@@ -43,7 +43,6 @@ function normalizeBackendResponse(res) {
   };
 }
 
-
 export function getAllRegistrationRequests(query = {}) {
   const qr = getQueryFormObject(query);
   return api

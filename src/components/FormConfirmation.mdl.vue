@@ -94,11 +94,11 @@ function getQuestionText() {
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <div class="space-y-1">
                   <label class="text-sm font-medium text-gray-600">Age:</label>
-                  <div class="text-gray-900 font-medium">{{ getPatientInfo().age || 'Not provided' }}</div>
+                  <div class="text-gray-900 font-medium">{{ getPatientInfo().patientAge || 'Not provided' }}</div>
                 </div>
                 <div class="space-y-1">
                   <label class="text-sm font-medium text-gray-600">Sex:</label>
-                  <div class="text-gray-900 font-medium capitalize">{{ getPatientInfo().sex || 'Not provided' }}</div>
+                  <div class="text-gray-900 font-medium capitalize">{{ getPatientInfo().patientGender || 'Not provided' }}</div>
                 </div>
                 <div class="space-y-1">
                   <label class="text-sm font-medium text-gray-600">Weight:</label>
@@ -129,7 +129,7 @@ function getQuestionText() {
                 
                 <div v-if="getPatientInfo().otherInfo" class="border-t pt-4">
                   <label class="text-sm font-medium text-gray-600 block mb-2">Other Information:</label>
-                  <div class="text-gray-900 bg-gray-50 p-3 rounded border whitespace-pre-wrap">{{ getPatientInfo().otherInfo }}</div>
+                  <div class="text-gray-900 bg-gray-50 p-3 rounded border whitespace-pre-wrap">{{ getPatientInfo().otherInformation }}</div>
                 </div>
               </div>
             </div>
@@ -144,7 +144,7 @@ function getQuestionText() {
               Request/Question
             </h3>
             <div class="bg-white p-4 rounded border">
-              <p class="text-gray-900 whitespace-pre-wrap leading-relaxed">{{ getFormData().requestQuestion || 'No question provided' }}</p>
+              <p class="text-gray-900 whitespace-pre-wrap leading-relaxed">{{ getFormData().description || 'No question provided' }}</p>
             </div>
           </div>
 
@@ -172,7 +172,7 @@ function getQuestionText() {
                 Response Time Needed
               </h3>
               <div class="bg-white p-3 rounded border">
-                <span class="text-gray-900 font-medium">{{ getFormData().responseNeeded || 'Not specified' }}</span>
+                <span class="text-gray-900 font-medium">{{ getFormData().responseUrgency || 'Not specified' }}</span>
               </div>
             </div>
           </div>

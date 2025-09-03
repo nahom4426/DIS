@@ -1,6 +1,10 @@
 import  icons from "@/utils/icons";
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+// import { useAuthStore } from "@/stores/auth";
+// const authStore = useAuthStore();
+
+// Theme Store
 
 export const useThemeStore = defineStore("themeStore", () => {
   const themes = [
@@ -39,7 +43,6 @@ export const useThemeStore = defineStore("themeStore", () => {
 
   // Initialize theme on store creation
   document.documentElement.className = currentTheme.value;
-
   return {
     activeTheme,
     currentTheme,
@@ -52,17 +55,22 @@ export const useThemeStore = defineStore("themeStore", () => {
 
 // Drug Information System Navigation
 export default [
+  //  {
+  //   type: "label",
+  //   name: `Provider Name (${authStore.auth?.providerName })`,
+  //   privilege: ["ROLE_create_drugs"],
+  // },
   {
     path: "/dashboard",
     name: "Dashboard",
     icon: icons.dashboard,
+    privilege: ["ROLE_create_drugs"],
   },
    {
     name: "Pharmacist Communication",
     icon: icons.pharmacist,
    privilege: ["ROLE_create_answers"],
-    navs: [
-       {
+       
     path: "/doctor-comm/dashboard",
     name: "Doctor Communication",
     icon: icons.communication, // Add appropriate icon
@@ -83,9 +91,6 @@ export default [
         privilege: ["ROLE_create_answers"],
          
       },
- 
-    ],
-  },
   {
     path: "/home",
     name: "Home",
@@ -95,7 +100,7 @@ export default [
   {
     path: "/doctor-requests",
     name: "Requests",
-    icon: icons.request,
+    icon: icons.requests,
     privilege: ["ROLE_create_questions"],
   },
   {
@@ -105,7 +110,6 @@ export default [
     privilege: ["ROLE_create_drugs"],
 
   },
-   
        {
     path: 'registration',
     name: "Registration",
@@ -131,6 +135,11 @@ export default [
     icon: icons.privilege,
    privilege:["ROLE_create_privilege"],
   },
- 
-
 ];
+
+
+
+
+
+
+

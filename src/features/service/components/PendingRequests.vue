@@ -49,11 +49,13 @@ onMounted(() => {
 });
 
 function assignRequest(request) {
-  const allRequests = JSON.parse(localStorage.getItem('drugInformationRequests') || '[]');
-  allRequests[request.originalIndex].status = 'In Progress';
-  allRequests[request.originalIndex].assignedTo = 'Dr. Amanda Ross';
+  const allRequests = JSON.parse(
+    localStorage.getItem("drugInformationRequests") || "[]"
+  );
+  allRequests[request.originalIndex].status = "In Progress";
+  allRequests[request.originalIndex].assignedTo = authStore?.user?.name || "";
   allRequests[request.originalIndex].startedAt = new Date().toISOString();
-  localStorage.setItem('drugInformationRequests', JSON.stringify(allRequests));
+  localStorage.setItem("drugInformationRequests", JSON.stringify(allRequests));
   loadRequests();
 }
 
@@ -83,57 +85,67 @@ async function handleDelete(request) {
 
 function getRequestTypeDisplay(type) {
   const typeMap = {
-    'patientSpecific': 'Patient Specific',
-    'academic': 'Academic',
-    'other': 'Other'
+    patientSpecific: "Patient Specific",
+    academic: "Academic",
+    other: "Other",
   };
   return typeMap[type] || type;
 }
 
 function getPatientDisplay(request) {
-  if (request.requestType === 'patientSpecific' && request.patientInfo) {
+  if (request.requestType === "patientSpecific" && request.patientInfo) {
     const { age, sex } = request.patientInfo;
     if (age && sex) {
       return `Patient (${age}y, ${sex})`;
     }
-    return 'Patient Information Available';
+    return "Patient Information Available";
   }
-  return 'N/A';
+  return "N/A";
 }
 
 function formatDate(dateString) {
-  return new Date(dateString).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
 function getPriority(responseTime) {
-  if (!responseTime) return 'Normal';
+  if (!responseTime) return "Normal";
   const time = responseTime.toLowerCase();
-  if (time.includes('asap') || time.includes('urgent') || time.includes('30')) return 'Urgent';
-  if (time.includes('24') || time.includes('1 day')) return 'High';
-  return 'Normal';
+  if (time.includes("asap") || time.includes("urgent") || time.includes("30"))
+    return "Urgent";
+  if (time.includes("24") || time.includes("1 day")) return "High";
+  return "Normal";
 }
 
 function getPriorityColor(priority) {
   switch (priority) {
-    case 'Urgent': return 'bg-red-100 text-red-800';
-    case 'High': return 'bg-orange-100 text-orange-800';
-    case 'Normal': return 'bg-green-100 text-green-800';
-    default: return 'bg-gray-100 text-gray-800';
+    case "Urgent":
+      return "bg-red-100 text-red-800";
+    case "High":
+      return "bg-orange-100 text-orange-800";
+    case "Normal":
+      return "bg-green-100 text-green-800";
+    default:
+      return "bg-gray-100 text-gray-800";
   }
 }
 
 function getRequestTypeColor(type) {
   switch (type) {
-    case 'Patient Specific': return 'bg-blue-100 text-blue-800';
-    case 'Academic': return 'bg-purple-100 text-purple-800';
-    case 'Other': return 'bg-gray-100 text-gray-800';
-    default: return 'bg-gray-100 text-gray-800';
+    case "Patient Specific":
+      return "bg-blue-100 text-blue-800";
+    case "Academic":
+      return "bg-purple-100 text-purple-800";
+    case "Other":
+      return "bg-gray-100 text-gray-800";
+    default:
+      return "bg-gray-100 text-gray-800";
   }
 }
 
@@ -206,17 +218,38 @@ const filteredRequests = computed(() => {
     </div>
     <div v-if="filteredRequests.length === 0" class="text-center py-12">
       <div class="text-gray-400 mb-4">
-        <svg class="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <svg
+          class="mx-auto h-16 w-16"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 
+            012-2h5.586a1 1 0 01.707.293l5.414 
+            5.414a1 1 0 01.293.707V19a2 2 0 
+            01-2 2z"
+          />
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">No pending drug information requests</h3>
-      <p class="text-gray-500">Submit a new drug information request to get started.</p>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">
+        No pending drug information requests
+      </h3>
+      <p class="text-gray-500">
+        Submit a new drug information request to get started.
+      </p>
     </div>
     <div v-else>
       <div class="mb-4">
-        <h3 class="text-lg font-semibold text-gray-900">Pending Drug Information Requests ({{ filteredRequests.length }})</h3>
-        <p class="text-sm text-gray-600">Review and assign submitted drug information requests</p>
+        <h3 class="text-lg font-semibold text-gray-900">
+          Pending Drug Information Requests ({{ filteredRequests.length }})
+        </h3>
+        <p class="text-sm text-gray-600">
+          Review and assign submitted drug information requests
+        </p>
       </div>
       <div class="w-full overflow-x-auto">
         <table class="w-full table-fixed">

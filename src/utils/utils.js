@@ -436,3 +436,11 @@ export async function convertBase64Image(
     }
   });
 }
+
+export const tableColumns = [
+  {
+    type: "label",
+    name: "Provider Name",
+    privilege: ["ROLE_create_drugs"],
+  },
+];

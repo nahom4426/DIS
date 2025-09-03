@@ -3,6 +3,7 @@ import NewFormLayout from "@/components/NewFormLayout.vue";
 import FormSubmitButton from "@/components/FormSubmitButton.vue";
 import { useApiRequest } from "@/composables/useApiRequest";
 import { resetPassword } from "../api/LoginApi";
+
 import { toasted } from "@/utils/utils";
 import InputPassword from "@/components/new_form_elements/InputPassword.vue";
 const resetReq = useApiRequest();
@@ -30,6 +31,8 @@ function handleNewPassword({ values }) {
     }
   );
 }
+
+
 </script>
 <template>
   <NewFormLayout v-slot="{ submit }" id="forgot-password-form">
