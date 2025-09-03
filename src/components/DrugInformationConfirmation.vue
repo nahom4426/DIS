@@ -13,7 +13,7 @@ const emit = defineEmits(['submit', 'back']);
 function getRequestTypes() {
   const types = [];
   if (props.formData.requestType.patientSpecific) types.push('DIS');
-  if (props.formData.requestType.academic) types.push('Academic');
+  if (props.formData.patientType.academic) types.push('Academic');
   if (props.formData.requestType.other) types.push('Other');
   return types.join(', ');
 }

@@ -144,7 +144,7 @@ function getQuestionText() {
               Request/Question
             </h3>
             <div class="bg-white p-4 rounded border">
-              <p class="text-gray-900 whitespace-pre-wrap leading-relaxed">{{ getFormData().requestQuestion || 'No question provided' }}</p>
+              <p class="text-gray-900 whitespace-pre-wrap leading-relaxed">{{ getFormData().description || 'No question provided' }}</p>
             </div>
           </div>
 
@@ -172,7 +172,7 @@ function getQuestionText() {
                 Response Time Needed
               </h3>
               <div class="bg-white p-3 rounded border">
-                <span class="text-gray-900 font-medium">{{ getFormData().responseNeeded || 'Not specified' }}</span>
+                <span class="text-gray-900 font-medium">{{ getFormData().responseUrgency || 'Not specified' }}</span>
               </div>
             </div>
           </div>

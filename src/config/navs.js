@@ -43,7 +43,6 @@ export const useThemeStore = defineStore("themeStore", () => {
 
   // Initialize theme on store creation
   document.documentElement.className = currentTheme.value;
-
   return {
     activeTheme,
     currentTheme,
@@ -65,13 +64,13 @@ export default [
     path: "/dashboard",
     name: "Dashboard",
     icon: icons.dashboard,
+    privilege: ["ROLE_create_drugs"],
   },
    {
     name: "Pharmacist Communication",
     icon: icons.pharmacist,
    privilege: ["ROLE_create_answers"],
-    navs: [
-       {
+       
     path: "/doctor-comm/dashboard",
     name: "Doctor Communication",
     icon: icons.communication, // Add appropriate icon
@@ -92,9 +91,6 @@ export default [
         privilege: ["ROLE_create_answers"],
          
       },
- 
-    ],
-  },
   {
     path: "/home",
     name: "Home",
@@ -114,7 +110,6 @@ export default [
     privilege: ["ROLE_create_drugs"],
 
   },
-   
        {
     path: 'registration',
     name: "Registration",
@@ -140,9 +135,6 @@ export default [
     icon: icons.privilege,
    privilege:["ROLE_create_privilege"],
   },
-  
- 
-
 ];
 
 

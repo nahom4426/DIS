@@ -85,7 +85,8 @@ const toggleMenu = (name) => {
           src="/src/assets/EDIS.png"
           alt="DIS Logo"
         />
-        <div v-if="!props.isCollapsed" class="flex flex-col items-start leading-tight">
+        <div v-if="!props.isCollapsed" class="flex flex-col items-start leading-tight" >
+          
   <span class="text-xs font-semibold uppercase tracking-wide text-primary">
     Ethiopian Drug
   </span>

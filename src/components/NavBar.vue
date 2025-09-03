@@ -168,11 +168,25 @@ const filteredNavs = computed(() =>
 
     <!-- Center Section -->
     <div class="hidden md:block">
-      <div class="bg-gradient-to-r from-green/10 to-secondary/10 px-4 py-2 rounded-lg shadow-inner backdrop-blur-sm border border-white/50">
+       <!-- Navigation Links (for testing) -->
+<ul class="list-none p-0 m-0 flex items-center justify-center">
+  <li
+    class="min-w-[220px] text-center bg-white text-gray-800 
+           px-6 py-3 rounded-xl text-base font-medium 
+           border border-gray-300 shadow-sm 
+           hover:bg-gray-50 hover:shadow-md 
+           transition-all duration-200"
+  >
+    <marquee behavior="" direction=""><span class="text-primary font-medium text-sm md:text-base animate-pulse colo">{{ `${authStore.auth?.providerName}` }}</span>
+      </marquee>
+    
+  </li>
+</ul>
+     <!-- <div class="bg-gradient-to-r from-green/10 to-secondary/10 px-4 py-2 rounded-lg shadow-inner backdrop-blur-sm border border-white/50">
         <span class="text-primary font-medium text-sm md:text-base animate-pulse colo">
-          {{ authStore.auth?.roleName+ " "+"Dashboard" }}
+           {{ authStore.auth?.roleName+ " "+"Dashboard" }} 
         </span>
-      </div>
+      </div>-->
       
     </div>
 
@@ -214,21 +228,21 @@ const filteredNavs = computed(() =>
 <!-- Notification Bell -->
 <div class="dropdown-container relative">
   <button
-    @click.stop="toggleNotificationDropdown"
-    class="relative p-2 rounded-full hover:bg-gray-100 transition-colors group"
-    aria-label="Notifications"
+  @click="$router.push('/doctor-requests')"
+  class="relative p-2 rounded-full hover:bg-gray-100 transition-colors group"
+  aria-label="Notifications"
+>
+  <i
+    v-html="icons.bell"
+    class="w-5 h-5 text-gray-600 group-hover:text-primary"
+  />
+  <span
+    class="absolute top-0 right-0 inline-flex items-center justify-center px-1 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full"
   >
-    <i
-      v-html="icons.bell"
-      class="w-5 h-5 text-gray-600 group-hover:text-primary"
-    />
-    <!-- Badge -->
-    <span
-      class="absolute top-0 right-0 inline-flex items-center justify-center px-1 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full"
-    >
-      {{ (api.response.value?.length ?? []) }}
-    </span>
-  </button>
+    {{ (api.response.value?.length ?? 0) }}
+  </span>
+</button>
+
 
   <!-- Dropdown panel -->
   <div
@@ -327,19 +341,7 @@ const filteredNavs = computed(() =>
     </div>
   </div>
 
-  <!-- Navigation Links (for testing) -->
-<ul class="list-none p-0 m-0 flex items-center justify-center">
-  <li
-    class="min-w-[220px] text-center bg-white text-gray-800 
-           px-6 py-3 rounded-xl text-base font-medium 
-           border border-gray-300 shadow-sm 
-           hover:bg-gray-50 hover:shadow-md 
-           transition-all duration-200"
-  >
-    {{ `${authStore.auth?.providerName}` }}
-    
-  </li>
-</ul>
+ 
 </template>
 
 <style scoped>
