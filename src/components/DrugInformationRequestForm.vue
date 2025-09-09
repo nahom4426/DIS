@@ -3,6 +3,7 @@ import { ref, reactive, computed } from 'vue';
 import Button from '@/components/Button.vue';
 import { openModal } from '@customizer/modal-x';
 import { submitDrugInformationRequest } from '@/features/service/api/drugInformationApi';
+import { submitAcademicRequest } from '@/service/acadamicApi';
 import { useApiRequest } from '@/composables/useApiRequest';
 import { useAuthStore } from '@/stores/auth';
 import { toasted } from '@/utils/utils';
@@ -43,7 +44,27 @@ const formData = reactive({
   patientType: 'PATIENT_SPECIFIC'     // Added new field
 });
 
+
+
 const showConfirmation = ref(false);
+
+function resetForm() {
+  formData.requestType = '';
+  
+  // Mutate each property inside patientInfo individually
+  formData.patientInfo.patientAge = 0;
+  formData.patientInfo.patientGender = '';
+  formData.patientInfo.weight = 0.1;
+  formData.patientInfo.diagnosis = '';
+  formData.patientInfo.currentMedication = '';
+  formData.patientInfo.concurrentMedication = '';
+  formData.patientInfo.allergies = '';
+  formData.patientInfo.otherInformation = '';
+
+  formData.description = '';
+  formData.responseUrgency = '';
+  formData.patientType = 'PATIENT_SPECIFIC';
+}
 const emit = defineEmits(['submit', 'back', 'showConfirmation']);
 
 function validateForm() {
@@ -82,28 +103,24 @@ function validateForm() {
   return errors;
 }
 
+import { cloneDeep } from 'lodash'; // npm install lodash if needed
+
 function handleSubmit() {
-  console.log('=== SUBMIT BUTTON CLICKED ===');
-  console.log('Form data:', formData);
-  
   const errors = validateForm();
-  console.log('Validation errors:', errors);
-  
   if (errors.length > 0) {
-    console.log('Form has errors, showing alert');
-    alert('Please fix the following errors:\n\n' + errors.join('\n'));
+    alert('Please fix errors:\n' + errors.join('\n'));
     return;
   }
 
-  console.log('Form is valid, navigating to confirmation page');
-  showConfirmation.value= true;
-
-  // Emit event to parent to show confirmation page
-  emit('showConfirmation', formData);
+  // Pass a clone of formData to avoid reference issues
+  showConfirmation.value = true;
+  emit('showConfirmation', cloneDeep(formData));
 }
+
 const auth=useAuthStore()
 
 function confirmSubmission() {
+  showConfirmation.value = false;
   // Get the correct userUuid from auth store
   const userUuid = auth.auth?.user?.userUuid || auth.auth?.userUuid || '';
   
@@ -114,6 +131,39 @@ function confirmSubmission() {
     alert('User not authenticated. Please login again.');
     return;
   }
+ const handleAfterSubmit = () => {
+    resetForm();                // clear the form
+    showConfirmation.value = false;  // close modal
+    goBack();                   // navigate back like Cancel button
+  };
+
+if (formData.requestType === 'academic') {
+  const academicPayload = {
+    description: formData.description,
+    questionStatus: "UNANSWERED",
+    responseUrgency: formData.responseUrgency  // 👈 Swagger calls it responseDueDate
+  };
+
+  submitAcademicRequest(userUuid, academicPayload)
+    .then((response) => {
+      console.log("Academic API raw response:", response);
+
+      if (response.data?.message === "question has been created") {
+        toasted.success("Academic request created!");
+        handleAfterSubmit();
+        emit('submit', response.data);  // pass backend response up
+      } else {
+        toasted.error("Unexpected response: " + JSON.stringify(response.data));
+      }
+    })
+    .catch((error) => {
+      console.error("Academic API error:", error);
+      toasted.error("Error submitting academic request: " + error.message);
+    });
+
+  return;
+}
+
 
   const submissionData = {
     description: formData.description,
@@ -139,6 +189,7 @@ function confirmSubmission() {
     .then((response) => {
       if (response.success) {
         console.log('Question submitted successfully');
+        resetForm();
         showConfirmation.value = false;
         emit('submit', response.data);
       } else {
@@ -204,7 +255,7 @@ function goBack() {
       <div class="p-4">
         <!-- Responsive Table Container -->
         <div class="min-w-full">
-          <table class="w-full min-w-[800px] border-collapse border border-gray-400">
+          <table class="w-full min-w-800px border-collapse border border-gray-400">
             <!-- Header Row -->
             <tr>
               <td colspan="2" class="border border-gray-400 p-4 text-center" style="background-color: #ADD8E6;">
@@ -494,7 +545,7 @@ input, select, textarea {
 
 /* Responsive adjustments for small screens */
 @media (max-width: 640px) {
-  .min-w-[800px] {
+  .min-w-800px {
     min-width: 600px;
   }
 }

@@ -10,7 +10,6 @@ import { checkResetCode } from "../api/LoginApi";
 import { toasted } from "@/utils/utils";
 const forgotReq = useApiRequest();
 const emit = defineEmits(["user", "previous"]);
-import { sendResetCode } from "../api/LoginApi";
 
 
 function handleForgotPassword({ values }) {

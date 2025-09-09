@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, reactive, watch } from 'vue';
+import { ref, onMounted, reactive, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getUserQuestions } from '@/features/service/api/questionApi';
 import Button from '@/components/Button.vue';
@@ -33,6 +33,8 @@ const editQuestion = reactive({
   firstName: '',
   description: ''
 });
+
+const isCompleted = computed(() => !!answer.value);
 
 watch(question, (val) => {
   if (val) {
@@ -143,52 +145,51 @@ onMounted(() => {
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">First Name:</label>
-          <input v-model="editQuestion.firstName" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.firstName" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Patient Age:</label>
-          <input v-model="editQuestion.patientAge" type="number" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.patientAge" type="number" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Patient Gender:</label>
-          <select v-model="editQuestion.patientGender" class="border rounded px-2 py-1 w-full">
+          <select v-model="editQuestion.patientGender" class="border rounded px-2 py-1 w-full" :disabled="isCompleted">
             <option value="">Select gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-          
           </select>
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Type:</label>
-          <input v-model="editQuestion.patientType" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.patientType" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Weight:</label>
-          <input v-model="editQuestion.weight" type="number" step="any" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.weight" type="number" step="any" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Diagnosis:</label>
-          <input v-model="editQuestion.diagnosis" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.diagnosis" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Current Medication:</label>
-          <input v-model="editQuestion.currentMedication" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.currentMedication" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Concurrent Medication:</label>
-          <input v-model="editQuestion.concurrentMedication" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.concurrentMedication" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Allergies:</label>
-          <input v-model="editQuestion.allergies" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.allergies" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Other Information:</label>
-          <input v-model="editQuestion.otherInformation" class="border rounded px-2 py-1 w-full" />
+          <input v-model="editQuestion.otherInformation" class="border rounded px-2 py-1 w-full" :disabled="isCompleted" />
         </div>
         <div class="mb-2">
           <label class="block text-sm text-gray-500">Urgency:</label>
-          <select v-model="editQuestion.responseUrgency" class="border rounded px-2 py-1 w-full">
+          <select v-model="editQuestion.responseUrgency" class="border rounded px-2 py-1 w-full" :disabled="isCompleted">
             <option value="">Select urgency</option>
             <option value="30-60 min">30-60 min</option>
             <option value="End of day">End of day</option>
@@ -202,7 +203,13 @@ onMounted(() => {
       </div>
       <div class="mb-8">
         <h3 class="text-lg font-semibold text-gray-800 mb-2">Question</h3>
-        <textarea v-model="editQuestion.description" class="p-4 bg-gray-50 rounded border border-gray-200 text-gray-900 whitespace-pre-line w-full" rows="3"></textarea>
+        <textarea
+          :value="question.description || question.question || editQuestion.description || 'No question provided'"
+          class="p-4 bg-gray-50 rounded border border-gray-200 text-gray-900 whitespace-pre-line w-full"
+          rows="3"
+          :disabled="isCompleted"
+          readonly
+        ></textarea>
       </div>
       <div>
         <h3 class="text-lg font-semibold text-gray-800 mb-2">Answer</h3>
@@ -217,7 +224,7 @@ onMounted(() => {
         <div v-if="updateError" class="text-red-500 mb-2">{{ updateError }}</div>
         <div class="flex gap-2">
           <Button @click="router.back()" type="outline">Back</Button>
-          <Button @click="handleUpdate" type="primary" :disabled="updating">
+          <Button @click="handleUpdate" type="primary" :disabled="updating || isCompleted">
             Update
           </Button>
         </div>

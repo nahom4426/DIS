@@ -54,6 +54,7 @@ function goToProfile() {
   showProfile.value = true;
   showInquiryForm.value = false;
   showUserDropdown.value = false;
+  // Do NOT navigate away, just show the profile overlay
 }
 
 function closeProfile() {
@@ -399,7 +400,7 @@ function logout() {
 
             <!-- Main Content -->
             <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/50 min-h-96 h-[calc(100vh-240px)] overflow-hidden">
-              <!-- Show Profile Page -->
+              <!-- Show Profile Page as overlay, keep sidebar and navigation -->
               <div
                 v-if="showProfile"
                 class="h-full overflow-y-auto custom-scrollbar"
@@ -418,7 +419,7 @@ function logout() {
                 />
               </div>
 
-              <!-- Default Router View when form is not shown -->
+              <!-- Default Router View when form/profile is not shown -->
               <div v-else class="h-full overflow-y-auto custom-scrollbar">
                 <RouterView />
               </div>

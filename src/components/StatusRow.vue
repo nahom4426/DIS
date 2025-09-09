@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 import Button from "@/components/Button.vue";
 import { openModal } from '@customizer/modal-x';
 import { useProviders } from "@/features/providers/store/providersStore";

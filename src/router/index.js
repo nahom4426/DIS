@@ -55,12 +55,12 @@ const router = createRouter({
       component: MainLayout,
       children: [
         {
-          path: 'dashboard',
+          path: '/dashboard',
           name: 'Dashboard',
           component: Dashboard,
         },
         {
-          path: 'profile',
+          path: '/profile',
           name: 'profile',
           component: Profile,
         },

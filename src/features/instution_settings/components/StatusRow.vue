@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, onMounted, onUnmounted } from 'vue';
+import {onMounted, onUnmounted } from 'vue';
 import { openModal } from '@customizer/modal-x';
 import { useToast } from '@/toast/store/toast';
 import { institutions } from "@/features/instution_settings/store/InstitutionsStore";

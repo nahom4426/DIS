@@ -445,3 +445,20 @@ function triggerFileUpload() {
   fileInput.value.click();
 }
 </script>
+
+<!-- If you use <router-view> or <ProfilePage> directly, make sure your sidebar is outside the <router-view> region in your main layout. -->
+<!-- The sidebar should be part of your main layout, not replaced by profile navigation. -->
+
+<!-- Example fix for your main layout (not ProfilePage.vue): -->
+<!-- <template> -->
+<!--   <div class="flex"> -->
+<!--     <Sidebar /> <!-- Always visible --> -->
+<!--     <div class="flex-1"> -->
+<!--       <router-view /> <!-- Only main content changes --> -->
+<!--     </div> -->
+<!--   </div> -->
+<!-- </template> -->
+
+<!-- If you use <ProfilePage> as a route, do NOT wrap your sidebar inside <router-view>. -->
+
+<!-- No code change needed in ProfilePage.vue itself. -->

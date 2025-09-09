@@ -25,7 +25,7 @@ async function loadRequests() {
         id: `DI-${String(index + 1).padStart(3, '0')}`,
         requestType: q.patientType === "PATIENT_SPECIFIC" ? "Patient Specific" : "Academic",
         patientName: q.firstName || "N/A",
-        question: q.description,
+        question: q.description || q.question || "No question provided", // Ensure question is always present
         responseNeeded: q.responseUrgency,
         submittedAt: q.createdAt,
         completedAt: q.answer?.createdAt ? formatDate(q.answer.createdAt) : 'N/A',
