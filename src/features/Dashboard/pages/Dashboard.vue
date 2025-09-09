@@ -36,7 +36,12 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue"
+<<<<<<< HEAD
 import { getGeneralReport} from "@/features/Dashboard/api/reportApi"
+=======
+import { getGeneralReport} from "@/features/Dashboard/reportApi"
+import { Home, Settings } from "lucide-vue-next";
+>>>>>>> 64eaf996 (Your commit message)
 import { Users, Pill, HelpCircle, Calendar, UserCheck, Clock } from "lucide-vue-next"
 import BarChartComponent from "@/components/charts/LineChart.vue"
 
@@ -84,4 +89,8 @@ const chartData = computed(() => ({
     }
   ]
 }))
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> 64eaf996 (Your commit message)
