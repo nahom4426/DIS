@@ -345,6 +345,19 @@ const filteredNavs = computed(() =>
 </template>
 
 <style scoped>
+<<<<<<< HEAD
+=======
+.digital-number {
+  font-family: 'Digital-7', 'Orbitron', monospace;
+  letter-spacing: 2px;
+  /* optional for spacing effect */
+  color: #9d31ef;
+  /* optional digital green */
+  text-shadow: 0 0 1px #9230e8, 0 0 10px #00ff00;
+  /* LED glow effect */
+}
+
+>>>>>>> 64eaf996 (Your commit message)
 /* Animation for dropdown entrance */
 .dropdown-enter-active,
 .dropdown-leave-active {
