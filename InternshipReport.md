@@ -78,112 +78,119 @@ I participated in daily standups, sprint planning, and code reviews. I communica
 ## Part Two: Real World Project (SRS and System Design)
 
 ### 4. General Overview of the Project
-The project is a web-based platform for managing drug information and academic requests. It enables healthcare professionals to submit detailed queries, track responses, and manage their profiles. The system is built with Vue.js for the frontend and a RESTful API backend documented with Swagger. The frontend communicates with the backend using service modules, and all data is validated and sanitized before submission. Admin and superadmin roles are integrated throughout the system for management and oversight.
 
-### 4.1 Background of the Project
-Healthcare providers often need timely, accurate drug information and academic support. Manual processes are slow and error-prone. This system automates request submission, tracking, and response, improving efficiency and record-keeping. The project was initiated to address the lack of a centralized platform for managing such requests.
+The project is a comprehensive web-based platform for managing drug information and academic requests. The frontend is built with Vue.js, while the backend is developed using Spring Boot (Java) and PostgreSQL. This technology stack provides robust, scalable, and secure data management, supporting structured forms, centralized storage, analytics, and role-based access control (admin/superadmin). The system automates workflows that were previously manual, reducing delays and errors.
 
-### 4.2 Objective of the Project
-#### 4.2.1 General Objective
-To create a scalable, user-friendly platform for drug information and academic request management.
-#### 4.2.2 Specific Objective
-- Allow users to submit requests with patient and academic details.
-- Enable specialists to respond and manage inquiries.
-- Provide analytics and reporting for administrators.
-- Ensure data security and privacy for sensitive medical information.
+---
 
-### 4.3 Statement of the Problem
-Manual request management leads to delays, lost information, and poor communication. The project solves these issues by providing structured forms, automated tracking, and centralized data storage. The system also supports role-based access control to ensure only authorized users can view or respond to requests.
+## 4.1 Background of the Project
 
-### 4.4 Methodology
-Agile methodology was used, with two-week sprints, daily standups, and iterative development. The team used Vue.js for rapid UI prototyping and RESTful APIs for backend integration. Swagger was used for API documentation and testing. Code reviews and automated testing were performed to ensure quality and maintainability.
+Healthcare professionals require timely access to accurate drug information and academic resources. Manual requests are often inefficient, error-prone, and lack accountability. This project addressed these gaps by introducing a centralized, digital platform. The backend leverages Spring Boot for RESTful API development and PostgreSQL for reliable, ACID-compliant data storage. Spring Security is used for authentication and role-based access control, while JPA/Hibernate manages entity relationships and queries.
 
-### 4.5 Development Tools
-- **Frontend:** Vue.js, JavaScript, HTML, CSS, TailwindCSS
-- **Backend:** RESTful API (Swagger, Node.js/Express or Spring Boot)
-- **Version Control:** Git, GitHub
-- **Collaboration:** VS Code, Slack, Jira
-- **Testing:** Postman, Swagger UI, Jest for unit tests
-- **Design:** Figma for UI mockups, Lucidchart for diagrams
+---
 
-### 4.6 Functional and Nonfunctional Requirements
-- **Functional:**
-  - User authentication and profile management
-  - Submit drug/academic requests
-  - View and respond to inquiries
-  - Analytics dashboard
-  - Role-based access control (admin, superadmin, user)
-  - Notification system for new responses
-  - Admin: Manage users, requests, generate reports
-  - Superadmin: Manage institutions, system settings, audit logs
-- **Nonfunctional:**
-  - Security: JWT authentication, HTTPS, input validation, RBAC for admin/superadmin
-  - Performance: Fast response times, efficient data loading
-  - Usability: Responsive UI, clear error messages, accessibility
-  - Scalability: Modular codebase, API versioning, cloud deployment
+## 4.2 Objective of the Project
 
-### 4.7 Use Case, Class Diagram, Sequence Diagram
-- **Use Case Example:**
-  - A doctor logs in, submits a drug information request via `DrugInformationRequestForm.vue`, which validates input and calls `submitDrugInformationRequest`. The backend processes the request and returns a response, which is displayed in the UI. The user can view the status of their request in `PendingRequests.vue` and receive notifications when a response is available.
-  - An admin logs in, reviews all requests, manages users, and generates reports using `AdminDashboard.vue` and related API endpoints.
-  - A superadmin logs in, manages institutions, configures system-wide settings, and audits logs using dedicated superadmin panels and endpoints.
-- **Class Diagram:**
-  - `User`: userUuid, firstName, email, role, profilePicture
-  - `Request`: requestId, userUuid, description, patientInfo, status, urgency, createdAt, updatedAt
-  - `Response`: responseId, requestId, answer, responder, createdAt
-  - `Institution`: institutionId, name, admins, users (managed by superadmin)
-- **Sequence Diagram:**
-  1. User fills form and submits request
-  2. Frontend validates and sends API call
-  3. Backend creates request, returns confirmation
-  4. Specialist responds, backend updates request
-  5. Admin reviews and manages requests/users
-  6. Superadmin manages institutions and system settings
-  7. User views response in dashboard
+### 4.2.1 General Objective
+To create a scalable, user-friendly platform for drug information and academic request management, using modern web and backend technologies.
 
-**Code Example:**
-```js
-// In questionApi.js
-export function updateQuestion(questionUuid, data) {
-  return api
-    .addAuthenticationHeader()
-    .put(`/question/update/${questionUuid}`, data);
+### 4.2.2 Specific Objective
+- Allow users to submit requests with patient and academic details via Vue.js forms, stored in PostgreSQL.
+- Enable specialists to respond and manage inquiries through secure Spring Boot REST APIs.
+- Provide analytics and reporting for administrators using backend queries and frontend dashboards.
+- Ensure data security and privacy for sensitive medical information using Spring Security and PostgreSQL access controls.
+
+---
+
+## 4.3 Statement of the Problem for the Project
+
+Manual request management leads to delays, lost information, and poor communication. The project solves these issues by providing structured forms (Vue.js), automated tracking (Spring Boot REST APIs), and centralized data storage (PostgreSQL). Role-based access (Spring Security) ensures proper security.
+
+### Technical Implementation Details
+- **Spring Boot REST API:** Handles all business logic, request validation, and response formatting. Controllers map HTTP endpoints to service methods, which interact with JPA repositories.
+- **PostgreSQL Database:** Stores all entities (User, Request, Response, Institution) with referential integrity and transaction support. Indexes and constraints ensure fast queries and data consistency.
+- **Spring Security:** Manages authentication (JWT tokens) and authorization (role-based access). Only authorized users can access admin/superadmin endpoints.
+- **JPA/Hibernate:** Maps Java entities to PostgreSQL tables, supports complex queries, and manages relationships (e.g., User has many Requests).
+- **Audit Logging:** All actions (create, update, delete) are logged for compliance and accountability.
+- **Frontend Integration:** Vue.js communicates with Spring Boot APIs via Axios, sending and receiving JSON data. Form validation is performed on both frontend and backend.
+
+### Example Entity (Java):
+```java
+@Entity
+public class Request {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long requestId;
+    private String description;
+    private String patientType;
+    private String responseUrgency;
+    @ManyToOne
+    private User user;
+    @OneToOne
+    private Response answer;
+    // getters and setters
 }
 ```
 
-### 4.8 Database Design
-- **Entities:**
-  - User (userUuid, name, email, role, profilePicture)
-  - Request (requestId, userUuid, description, patientInfo, status, urgency, createdAt, updatedAt)
-  - Response (responseId, requestId, answer, responder, createdAt)
-  - Institution (institutionId, name, admins, users (managed by superadmin))
-  
-- **Relationships:**
-  - User has many Requests
-  - Request has one Response
-- **Indexes and Constraints:**
-  - Unique indexes on userUuid and requestId
-  - Foreign key constraints between Request and User, Response and Request
+### Example Repository (Java):
+```java
+public interface RequestRepository extends JpaRepository<Request, Long> {
+    List<Request> findByUser_UserUuid(String userUuid);
+}
+```
 
-### 4.9 System Design (Component, Deployment, Block Diagram)
-- **Component Diagram:**
-  - Frontend: Vue components (forms, tables, modals, dashboard, profile, admin panels, superadmin panels)
-  - Backend: API controllers, services, database models, admin/superadmin modules
-- **Deployment Diagram:**
-  - Web client (Vue.js) → API server → Database
-  - Hosted on cloud infrastructure (e.g., AWS, Azure)
-  - Admin and superadmin access via secure routes and endpoints
-- **Block Diagram:**
-  - User Interface ↔ API Service ↔ Database
-  - Authentication Service ↔ User Interface
-  - Admin/Superadmin Interface ↔ Management API ↔ Database
+### Example Controller (Java):
+```java
+@RestController
+@RequestMapping("/question")
+public class QuestionController {
+    @GetMapping("/user/{userUuid}")
+    public List<Request> getUserQuestions(@PathVariable String userUuid) {
+        return requestRepository.findByUser_UserUuid(userUuid);
+    }
+}
+```
 
-**Design Decisions:**
-- Used Vue's composition API for better code organization and reusability.
-- Modularized API calls into separate service files for maintainability, including admin and superadmin modules.
-- Used environment variables for API endpoints and secrets.
-- Implemented error boundaries and fallback UI for robustness.
-- Enforced RBAC and secure access for admin/superadmin features.
+### Example Security Configuration (Java):
+```java
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+            .antMatchers("/admin/**").hasRole("ADMIN")
+            .antMatchers("/superadmin/**").hasRole("SUPERADMIN")
+            .anyRequest().authenticated()
+            .and()
+            .oauth2ResourceServer().jwt();
+    }
+}
+```
+
+### Example Database Table (PostgreSQL):
+```sql
+CREATE TABLE request (
+    request_id SERIAL PRIMARY KEY,
+    description TEXT,
+    patient_type VARCHAR(50),
+    response_urgency VARCHAR(50),
+    user_id INTEGER REFERENCES user(user_id),
+    answer_id INTEGER REFERENCES response(response_id)
+);
+```
+
+### Example Frontend API Call (Vue.js):
+```js
+export function getUserQuestions(userUuid) {
+  return api.addAuthenticationHeader().get(`/question/user/${userUuid}`);
+}
+```
+
+---
+
+## Summary
+By combining Vue.js, Spring Boot, and PostgreSQL, the project delivers a secure, scalable, and efficient solution for managing drug information and academic requests. The backend ensures robust data management, security, and compliance, while the frontend provides a user-friendly interface for all roles.
 
 ---
 

@@ -93,9 +93,9 @@ function goToProfile() {
   router.push('/profile');
 }
 
-function goToSettings() {
+function goToChangePassword() {
   closeAllDropdowns();
-  router.push('/settings');
+  router.push('/change-password');
 }
 
 // Watch for route changes to reload user data if needed
@@ -141,7 +141,7 @@ const filteredNavs = computed(() =>
     <div class="flex items-center gap-6">
       <button 
         @click="$router.back()"
-        class="p-2 rounded-full hover:bg-primary/10 transition-colors duration-200 group"
+        class="p-2 rounded-full hovyer:bg-primary/10 transition-colors duration-200 group"
         aria-label="Go back"
       >
         <i 
@@ -320,11 +320,11 @@ const filteredNavs = computed(() =>
           </button>
           
           <button
-            @click="goToSettings"
+            @click="goToChangePassword"
             class="p-2 flex items-center gap-3 rounded-lg hover:bg-gray-50 transition-all duration-200 group"
           >
             <i v-html="icons.settings" class="text-gray-500 group-hover:text-primary" />
-            <span class="text-sm">Settings</span>
+            <span class="text-sm">Change Password</span>
           </button>
           
           <div class="border-t border-gray-100 my-1"></div>

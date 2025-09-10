@@ -29,7 +29,7 @@ import icons from '@/utils/icons';
     </template>
     <template #right>
       <div @click="toggleType" class="h-full w-12 grid place-items-center ">
-        <span v-html="text ? icons.eye : icons.eyeSlash" />
+         <span v-html="text ? icons.eye : icons.eyeSlash" />
       </div>
     </template>
   </Input>

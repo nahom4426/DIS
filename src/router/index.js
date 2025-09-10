@@ -75,12 +75,14 @@ const router = createRouter({
             name: 'QuestionDetail',
             component: () => import('@/features/service/pages/QuestionDetail.vue'),
           },
-
-
-
       ],
     },
     
+    {
+      path: '/change-password',
+      name: 'ChangePassword',
+      component: () => import('@/features/profile/pages/ChangePasswordPage.vue'),
+    },
     {
       path: '/',
       redirect: '/doctor-comm/dashboard'
